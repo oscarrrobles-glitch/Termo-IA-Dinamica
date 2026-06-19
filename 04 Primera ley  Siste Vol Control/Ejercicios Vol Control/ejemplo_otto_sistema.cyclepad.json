@@ -1,0 +1,112 @@
+{
+  "app": "cyclepad",
+  "version": 1,
+  "title": "Ejemplo · Ciclo Otto (aire, ciclo cerrado)",
+  "cycleType": "closed",
+  "substance": "air",
+  "unitSystem": "SI",
+  "nodes": [
+    {
+      "id": "c",
+      "type": "POLY_COMPRESSION",
+      "name": "COM1",
+      "params": {
+        "model": "adiabatic",
+        "r": 8,
+        "n": ""
+      },
+      "x": 200,
+      "y": 150
+    },
+    {
+      "id": "h",
+      "type": "HEATING",
+      "name": "HTG1",
+      "params": {
+        "model": "isochoric"
+      },
+      "x": 530,
+      "y": 150
+    },
+    {
+      "id": "x",
+      "type": "POLY_EXPANSION",
+      "name": "EXP1",
+      "params": {
+        "model": "adiabatic",
+        "r": 8,
+        "n": ""
+      },
+      "x": 530,
+      "y": 380
+    },
+    {
+      "id": "k",
+      "type": "COOLING",
+      "name": "CLG1",
+      "params": {
+        "model": "isochoric"
+      },
+      "x": 200,
+      "y": 380
+    }
+  ],
+  "edges": [
+    {
+      "id": "s1",
+      "fromNodeId": "k",
+      "toNodeId": "c",
+      "fromPort": 0,
+      "toPort": 0,
+      "cond": {
+        "phase": "auto",
+        "T": 300,
+        "P": 100,
+        "x": ""
+      },
+      "pts": []
+    },
+    {
+      "id": "s2",
+      "fromNodeId": "c",
+      "toNodeId": "h",
+      "fromPort": 0,
+      "toPort": 0,
+      "cond": {
+        "phase": "auto",
+        "P": "",
+        "T": "",
+        "x": ""
+      },
+      "pts": []
+    },
+    {
+      "id": "s3",
+      "fromNodeId": "h",
+      "toNodeId": "x",
+      "fromPort": 0,
+      "toPort": 0,
+      "cond": {
+        "phase": "auto",
+        "T": 1500,
+        "P": "",
+        "x": ""
+      },
+      "pts": []
+    },
+    {
+      "id": "s4",
+      "fromNodeId": "x",
+      "toNodeId": "k",
+      "fromPort": 0,
+      "toPort": 0,
+      "cond": {
+        "phase": "auto",
+        "P": "",
+        "T": "",
+        "x": ""
+      },
+      "pts": []
+    }
+  ]
+}

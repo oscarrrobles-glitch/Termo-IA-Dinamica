@@ -1,0 +1,26 @@
+{
+  "app": "TermoIA-PrimeraLey",
+  "version": "1.1",
+  "savedAt": "2026-06-16T00:00:00.000Z",
+  "title": "EJ-A · Ciclo Clásico — Aire (Sistema Inglés)",
+  "source": "Moran & Shapiro 7e — Ejemplo 1.7 / Air Standard Cycle",
+  "description": "1 lb de Aire realiza un ciclo termodinámico de tres procesos. Estado 1: T₁=540 °R (300 K), P₁=1 atm. Proceso 1→2: compresión isocórica (v=cte) hasta P₂=2 atm (T₂=1080 °R). Proceso 2→3: expansión isotérmica (T=cte) de regreso a P₃=P₁=1 atm. Proceso 3→1: enfriamiento isobárico (P=cte) hasta T₁=540 °R. Determinar: W, Q y ΔU de cada proceso y del ciclo completo; verificar si es ciclo motor o de refrigeración; eficiencia térmica.",
+  "config": {
+    "currentUnit": "ENG",
+    "tempSubUnit": "R",
+    "pressSubUnit": "atm",
+    "currentGas": "air",
+    "calcMode": "cycle",
+    "propMode": "integ"
+  },
+  "state1": {
+    "T0": 540.0,
+    "P0": 1.0,
+    "mass": 1.0
+  },
+  "processes": [
+    { "type": "isochoric",  "inp2a": 1080.0, "inp2b": 1.3 },
+    { "type": "isothermal", "inp2a": 1.0,    "inp2b": 1.3 },
+    { "type": "isobaric",   "inp2a": 540.0,  "inp2b": 1.3 }
+  ]
+}

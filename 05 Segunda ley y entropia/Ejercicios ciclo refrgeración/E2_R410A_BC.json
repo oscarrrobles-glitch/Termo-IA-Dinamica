@@ -1,0 +1,16 @@
+{
+  "app": "sim-ciclo-vc",
+  "ver": 2,
+  "units": "SI",
+  "modo": "Bomba de calor",
+  "state": {
+    "fluid": "R410A",
+    "Te": 2,
+    "Tc": 50,
+    "sh": 5,
+    "sc": 3,
+    "eta": 0.78,
+    "dimMode": "cap",
+    "dimval": 12
+  }
+}

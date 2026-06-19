@@ -1,0 +1,2646 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Tabla A · Diagrama de Mollier h–s · Agua</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.27.0/plotly.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f5f7fa;--surface:#fff;--border:#dde3ec;--text:#1a2233;--muted:#6b7a99;
+  --accent:#1976d2;--dome:#7b1fa2;--critical:#f57c00;
+  --hdr:linear-gradient(90deg,#1565c0 0%,#1976d2 60%,#1e88e5 100%)}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 0 40px}
+.topbar{width:100%;background:var(--hdr);display:flex;align-items:center;
+  justify-content:space-between;gap:14px;padding:0 28px;height:66px;
+  box-shadow:0 2px 8px rgba(21,101,192,.18);margin-bottom:24px;flex-shrink:0;
+  position:relative;overflow:hidden}
+.topbar::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 280px 100px at 50% 140%,rgba(255,179,0,.22),transparent 70%);
+  opacity:.9;z-index:0}
+.topbar-brand{display:flex;align-items:center;gap:10px;
+  font-family:'IBM Plex Sans',sans-serif;font-weight:700;
+  font-size:1.45rem;letter-spacing:-.01em;color:#fff;line-height:1;
+  position:relative;z-index:2;text-shadow:0 1px 2px rgba(0,0,0,.20);flex-shrink:0}
+.topbar-brand .t-name{display:flex;align-items:baseline;gap:3px}
+.topbar-logo{width:38px;height:38px;flex-shrink:0;
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,.22))
+         drop-shadow(0 0 6px rgba(255,179,0,.28))}
+.topbar-logo .ring{transform-origin:center;
+  animation:brand-rot 18s linear infinite}
+.topbar-logo .spark{transform-origin:center;
+  animation:brand-pulse 2.4s ease-in-out infinite}
+@keyframes brand-rot{to{transform:rotate(360deg)}}
+@keyframes brand-pulse{0%,100%{opacity:.55;transform:scale(.9)}
+  50%{opacity:1;transform:scale(1.08)}}
+.topbar-brand .t-sep{color:rgba(255,224,178,.85);font-weight:400;padding:0 2px}
+.topbar-brand .t-ia{background:linear-gradient(135deg,#ffeb3b 0%,#ffb300 45%,#ff5722 80%,#ef5350 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  font-weight:900;letter-spacing:.01em;
+  filter:drop-shadow(0 0 6px rgba(255,152,0,.35))}
+.topbar-center{position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);display:flex;align-items:center;gap:12px;z-index:1}
+.topbar-icon{width:46px;height:46px;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.12);border-radius:10px;
+  box-shadow:inset 0 0 0 1px rgba(255,236,179,.30),
+             0 0 14px rgba(255,152,0,.30),
+             0 1px 3px rgba(0,0,0,.15)}
+.topbar-icon svg{width:28px;height:40px;display:block;overflow:visible}
+.th-glow{transform-origin:16px 46px;animation:th-pulse 2.2s ease-in-out infinite}
+.th-bulb{transform-origin:16px 46px;animation:th-bulb 2.2s ease-in-out infinite}
+.th-col{transform-origin:16px 51px;animation:th-rise 3.8s ease-in-out infinite}
+@keyframes th-pulse{0%,100%{opacity:.55;transform:scale(.80)}
+  50%{opacity:1;transform:scale(1.20)}}
+@keyframes th-bulb{0%,100%{filter:brightness(1) saturate(1)}
+  50%{filter:brightness(1.18) saturate(1.25)}}
+@keyframes th-rise{0%,100%{transform:scaleY(.94)}
+  50%{transform:scaleY(1.03)}}
+.topbar-text h1{font-size:1rem;font-weight:700;color:#fff;letter-spacing:.04em;
+  text-transform:uppercase;line-height:1.1}
+.topbar-text h1 .lc{text-transform:lowercase;font-weight:800;letter-spacing:.01em}
+.topbar-text p{font-size:.72rem;color:rgba(255,255,255,.78);font-weight:300;margin-top:1px}
+.topbar-spacer{visibility:hidden;pointer-events:none}
+.main-wrapper{width:100%;max-width:1140px;padding:0 20px 0 54px;display:flex;flex-direction:column;gap:0}
+.subtitle-bar{display:flex;align-items:center;gap:10px;padding:10px 18px;background:#fff;
+  border:1px solid var(--border);border-radius:8px 8px 0 0;border-bottom:none}
+.subtitle-bar .ci{font-size:1rem;color:var(--accent)}
+.subtitle-bar .ct{font-size:.95rem;font-weight:600;color:var(--text)}
+.unit-toggle{margin-left:auto;display:flex;border:1.5px solid var(--accent);border-radius:6px;overflow:hidden}
+.unit-btn{padding:4px 14px;font-size:.78rem;font-weight:600;background:#fff;color:var(--accent);
+  border:none;cursor:pointer;transition:background .18s,color .18s;letter-spacing:.04em}
+.unit-btn:first-child{border-right:1.5px solid var(--accent)}
+.unit-btn.active{background:var(--accent);color:#fff}
+.unit-btn:not(.active):hover{background:#e3edf9}
+#chart{width:100%;height:630px;background:#fff;border:1px solid var(--border);
+  border-radius:0 0 8px 8px;overflow:visible;box-shadow:0 2px 12px rgba(25,118,210,.07)}
+.ax-drag-handle{position:absolute;width:26px;height:26px;background:rgba(255,255,255,0.95);
+  border-radius:5px;display:flex;align-items:center;justify-content:center;
+  z-index:25;user-select:none;font-size:14px;font-weight:700;
+  box-shadow:0 2px 6px rgba(0,0,0,0.20);transition:background 0.15s,transform 0.12s;
+  pointer-events:all}
+.ax-drag-handle.round{border-radius:50%}
+.ax-drag-handle:hover{transform:scale(1.18)}
+.sidebar{position:fixed;top:50%;left:0;transform:translateY(-50%);display:flex;align-items:center;z-index:100}
+.sidebar-tab{writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);
+  background:var(--accent);color:#fff;font-size:.68rem;font-weight:600;letter-spacing:.07em;
+  text-transform:uppercase;padding:14px 8px;border-radius:6px 0 0 6px;cursor:pointer;
+  user-select:none;white-space:nowrap;transition:background .2s;display:flex;align-items:center;
+  gap:6px;box-shadow:2px 0 8px rgba(25,118,210,.15)}
+.sidebar-tab:hover{background:#1565c0}
+.sidebar-tab .arrow{display:inline-block;font-size:.65rem;transition:transform .35s;writing-mode:horizontal-tb}
+.sidebar.open .sidebar-tab .arrow{transform:rotate(180deg)}
+.sidebar-panel{width:0;overflow:hidden;transition:width .35s cubic-bezier(.4,0,.2,1);background:#fff;
+  border:1px solid var(--border);border-left:none;border-radius:0 8px 8px 0;
+  box-shadow:4px 0 16px rgba(25,118,210,.10)}
+.sidebar.open .sidebar-panel{width:238px}
+.spi{padding:18px 16px;width:238px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:85vh}
+.sb-sub{font-size:.68rem;font-weight:700;color:var(--dome);letter-spacing:.07em;text-transform:uppercase;
+  border-bottom:1px solid var(--border);padding-bottom:5px;margin-top:2px}
+.info-btn{display:inline-flex;align-items:center;justify-content:center;
+  width:15px;height:15px;border-radius:50%;border:1px solid var(--accent);
+  background:#fff;color:var(--accent);font-family:Georgia,serif;
+  font-size:.64rem;font-weight:700;font-style:italic;line-height:1;
+  cursor:pointer;transition:background .15s,color .15s;user-select:none;
+  text-transform:none;letter-spacing:0}
+.info-btn:hover{background:var(--accent);color:#fff}
+.info-btn.active{background:var(--accent);color:#fff}
+.info-box{font-size:.68rem;color:#6b7a99;line-height:1.35;
+  background:#f5f8fd;border:1px solid #d9e5f5;border-radius:5px;
+  padding:7px 9px;margin-bottom:4px;display:none}
+.info-box.open{display:block}
+.fc-mode{display:flex;gap:4px;margin:4px 0}
+.fc-mode-btn{flex:1;padding:5px 4px;font-size:.68rem;font-weight:600;
+  color:#bf360c;background:#fff3e0;border:1px solid #ffb74d;
+  border-radius:5px;cursor:pointer;transition:all .15s;text-align:center}
+.fc-mode-btn.active{background:#e65100;color:#fff;border-color:#e65100}
+.fc-mode-btn:hover:not(.active){background:#ffe0b2}
+.pt-mode{display:flex;gap:4px;margin:4px 0}
+.pt-mode-btn{flex:1;padding:5px 4px;font-size:.7rem;font-weight:700;
+  color:#4a148c;background:#faf4fc;border:1px solid #ce93d8;
+  border-radius:5px;cursor:pointer;transition:all .15s;text-align:center;
+  font-family:'IBM Plex Mono',monospace;letter-spacing:.02em}
+.pt-mode-btn.active{background:#7b1fa2;color:#fff;border-color:#7b1fa2}
+.pt-mode-btn:hover:not(.active){background:#f3e5f5}
+.rtog{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;
+  background:#f5f8fd;border:1px solid #d9e5f5;border-radius:6px;cursor:pointer;transition:background .15s;user-select:none}
+.rtog:hover{background:#e8f0fc}
+.rtog .rl{font-size:.78rem;color:var(--text);display:flex;align-items:center;gap:7px}
+.rtog .rd{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.sw{width:32px;height:17px;background:#c8d6e8;border-radius:999px;position:relative;transition:background .2s;flex-shrink:0}
+.sw::after{content:'';position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#8fa8c8;transition:transform .2s,background .2s}
+.rtog.active .sw{background:rgba(25,118,210,.25);border:1px solid var(--accent)}
+.rtog.active .sw::after{transform:translateX(15px);background:var(--accent)}
+.ctrl{display:flex;gap:6px;align-items:center}
+.sel{flex:1;font-size:.74rem;color:var(--text);background:#f5f8fd;border:1px solid #d9e5f5;
+  border-radius:5px;padding:5px 6px;cursor:pointer;outline:none}
+.sel:focus{border-color:var(--accent)}
+.addbtn{flex-shrink:0;background:var(--accent);color:#fff;border:none;border-radius:5px;
+  padding:5px 10px;font-size:.74rem;font-weight:600;cursor:pointer;transition:background .18s;white-space:nowrap}
+.addbtn:hover{background:#1565c0}
+.sg{display:flex;flex-direction:column;gap:5px}
+.sr{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:#f5f8fd;border:1px solid #d9e5f5;border-radius:6px}
+.sl{font-size:.73rem;color:var(--text);cursor:pointer;user-select:none}
+.ss{position:relative;display:inline-block;width:34px;height:18px;flex-shrink:0}
+.ss input{opacity:0;width:0;height:0}
+.ss-knob{position:absolute;inset:0;background:#c8d6e8;border-radius:999px;cursor:pointer;transition:background .2s}
+.ss-knob::before{content:'';position:absolute;width:13px;height:13px;left:2px;top:2.5px;background:#8fa8c8;border-radius:50%;transition:transform .2s,background .2s}
+.ss input:checked+.ss-knob{background:rgba(25,118,210,.28);border:1px solid var(--accent)}
+.ss input:checked+.ss-knob::before{transform:translateX(16px);background:var(--accent)}
+.ic{background:#f5f8fd;border:1px solid #d9e5f5;border-radius:6px;padding:10px 12px}
+.ic .lb{font-size:.62rem;font-family:'IBM Plex Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.ic .vl{font-size:.88rem;font-weight:600;color:var(--text)}
+/* Refuerzo tipográfico para trazas y ejes del chart Plotly */
+#chart .xtick text, #chart .ytick text, #chart .y2tick text{font-weight:600 !important}
+#chart .xtitle, #chart .ytitle, #chart .y2title{font-weight:700 !important}
+#chart .scatterlayer .textpoint text, #chart g.scatter text{font-weight:700 !important;
+  paint-order:stroke fill;stroke:#fff;stroke-width:2.5px;stroke-linejoin:round}
+
+/* ── Optimizaciones v2.0 ───────────────────────────────────── */
+@media print{
+  .sidebar,.topbar-brand,.topbar-spacer,.dl-btn{display:none!important}
+  .main-wrapper{padding:0!important;max-width:100%!important}
+  #chart{border:none!important;box-shadow:none!important;height:90vh!important}
+  .subtitle-bar{border-radius:0!important;border-bottom:1px solid var(--border)!important}
+}
+.spi::-webkit-scrollbar{width:5px}
+.spi::-webkit-scrollbar-track{background:#f1f3f7;border-radius:4px}
+.spi::-webkit-scrollbar-thumb{background:#b0c4de;border-radius:4px}
+.spi::-webkit-scrollbar-thumb:hover{background:#7b97bb}
+.reset-btn{width:100%;margin-top:10px;padding:7px 10px;font-size:.73rem;font-weight:700;
+  color:#fff;background:linear-gradient(90deg,#c62828,#e53935);border:none;border-radius:6px;
+  cursor:pointer;transition:background .18s,transform .12s;letter-spacing:.04em;
+  box-shadow:0 2px 6px rgba(229,57,53,.22)}
+.reset-btn:hover{background:linear-gradient(90deg,#b71c1c,#c62828);transform:translateY(-1px)}
+.reset-btn:active{transform:translateY(0)}
+.dl-btn{padding:4px 12px;font-size:.77rem;font-weight:700;color:var(--accent);
+  background:#fff;border:1.5px solid var(--accent);border-radius:6px;
+  cursor:pointer;transition:background .18s,color .18s;letter-spacing:.04em;margin-left:8px;
+  box-shadow:0 1px 4px rgba(25,118,210,.12)}
+.dl-btn:hover{background:var(--accent);color:#fff}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-brand" aria-label="TermoIA Dinámica">
+    <svg class="topbar-logo" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="tg-top" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%"  stop-color="#64b5f6"/>
+          <stop offset="55%" stop-color="#1565c0"/>
+          <stop offset="100%" stop-color="#0d47a1"/>
+        </linearGradient>
+        <linearGradient id="dg-top" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%"  stop-color="#ffeb3b"/>
+          <stop offset="55%" stop-color="#ff9800"/>
+          <stop offset="100%" stop-color="#e65100"/>
+        </linearGradient>
+        <radialGradient id="sg-top" cx="50%" cy="50%" r="50%">
+          <stop offset="0%"  stop-color="#fff59d"/>
+          <stop offset="60%" stop-color="#ffb300"/>
+          <stop offset="100%" stop-color="#e65100"/>
+        </radialGradient>
+      </defs>
+      <g class="ring">
+        <circle cx="32" cy="32" r="24" fill="none" stroke="url(#tg-top)" stroke-width="4"
+                stroke-linecap="round" stroke-dasharray="110 40"/>
+      </g>
+      <path d="M20 38 Q26 20 32 30 Q38 40 44 26" fill="none" stroke="url(#dg-top)"
+            stroke-width="3.2" stroke-linecap="round"/>
+      <circle class="spark" cx="48" cy="18" r="3.2" fill="url(#sg-top)"/>
+      <circle cx="32" cy="32" r="2.6" fill="#fff"/>
+    </svg>
+    <div class="t-name">
+      <span>Termo</span><span class="t-sep">·</span><span class="t-ia">IA</span><span class="t-sep">·</span><span>Dinámica</span>
+    </div>
+  </div>
+  <div class="topbar-center">
+    <div class="topbar-icon" aria-hidden="true">
+      <svg viewBox="0 0 32 56" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <!-- Columna líquida: frío profundo → punta incandescente -->
+          <linearGradient id="th-merc" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0%"   stop-color="#1565c0"/>
+            <stop offset="25%"  stop-color="#ef5350"/>
+            <stop offset="60%"  stop-color="#ff9800"/>
+            <stop offset="85%"  stop-color="#ffeb3b"/>
+            <stop offset="100%" stop-color="#fffde7"/>
+          </linearGradient>
+          <!-- Bulbo incandescente -->
+          <radialGradient id="th-bulb" cx=".5" cy=".55" r=".55">
+            <stop offset="0%"   stop-color="#fff59d"/>
+            <stop offset="45%"  stop-color="#ff9800"/>
+            <stop offset="100%" stop-color="#bf360c"/>
+          </radialGradient>
+          <!-- Halo pulsante -->
+          <radialGradient id="th-glow" cx=".5" cy=".5" r=".5">
+            <stop offset="0%"   stop-color="#ffeb3b" stop-opacity=".85"/>
+            <stop offset="55%"  stop-color="#ff7043" stop-opacity=".35"/>
+            <stop offset="100%" stop-color="#e65100" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <!-- Halo pulsante detrás del bulbo -->
+        <circle class="th-glow" cx="16" cy="46" r="12" fill="url(#th-glow)"/>
+        <!-- Vidrio anatómico (cuello estrecho + bulbo redondeado) -->
+        <path d="M12 6 Q12 2.5 16 2.5 Q20 2.5 20 6 L20 36 Q23.5 38.5 23.5 43.5 Q23.5 52.5 16 52.5 Q8.5 52.5 8.5 43.5 Q8.5 38.5 12 36 Z"
+              fill="rgba(255,255,255,.16)" stroke="#e3f2fd" stroke-width="1.4"
+              stroke-linejoin="round"/>
+        <!-- Columna de mercurio (se ensancha hacia el bulbo) -->
+        <g class="th-col">
+          <path d="M14.2 7.5 L17.8 7.5 L17.8 38 Q20 39.8 20 42.5 Q20 46.5 16 46.5 Q12 46.5 12 42.5 Q12 39.8 14.2 38 Z"
+                fill="url(#th-merc)"/>
+        </g>
+        <!-- Bulbo sólido superpuesto -->
+        <circle class="th-bulb" cx="16" cy="46" r="5.2" fill="url(#th-bulb)"
+                stroke="#ffecb3" stroke-width=".6" opacity=".96"/>
+        <!-- Graduaciones a la derecha del vidrio -->
+        <g stroke="#fff3e0" stroke-width=".85" stroke-linecap="round" opacity=".80">
+          <line x1="20.5" y1="12" x2="23.5" y2="12"/>
+          <line x1="20.5" y1="18" x2="22.3" y2="18"/>
+          <line x1="20.5" y1="24" x2="23.5" y2="24"/>
+          <line x1="20.5" y1="30" x2="22.3" y2="30"/>
+        </g>
+        <!-- Reflejo tenue sobre el vidrio -->
+        <path d="M13.2 10 L13.2 34" stroke="#ffffff" stroke-width=".9"
+              stroke-linecap="round" opacity=".45"/>
+      </svg>
+    </div>
+    <div class="topbar-text">
+      <h1>Tabla A &nbsp;·&nbsp; Diagrama de Mollier <span class="lc">h</span> – <span class="lc">s</span></h1>
+      <p>Agua Saturada y Vapor Sobrecalentado</p>
+    </div>
+  </div>
+  <div class="topbar-spacer topbar-brand" aria-hidden="true">
+    <span style="display:inline-block;width:38px;height:38px"></span>
+    <div class="t-name">
+      <span>Termo</span><span class="t-sep">·</span><span class="t-ia">IA</span><span class="t-sep">·</span><span>Dinámica</span>
+    </div>
+  </div>
+</div>
+<div class="main-wrapper">
+<div class="subtitle-bar">
+  <span class="ci">📈</span>
+  <span class="ct">Diagrama de Mollier — Entalpía vs. Entropía Específica</span>
+  <div class="unit-toggle">
+    <button id="btn-si" class="unit-btn active" onclick="setUnits('SI')">SI</button>
+    <button id="btn-ing" class="unit-btn" onclick="setUnits('ING')">Inglés</button>
+  </div>
+  <button class="dl-btn" onclick="downloadChart()" title="Descargar imagen PNG (3×, alta resolución)">⬇ PNG</button>
+</div>
+<div id="chart"></div>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-panel"><div class="spi">
+    <div class="sb-sub">Isobaras</div>
+    <div class="sg">
+      <div class="sr"><label class="sl" id="lbl-low">Bajas P</label>
+        <label class="ss"><input type="checkbox" id="sh-low" onchange="toggleGrp('low')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-mid">Medias P</label>
+        <label class="ss"><input type="checkbox" id="sh-mid" onchange="toggleGrp('mid')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-high">Altas P</label>
+        <label class="ss"><input type="checkbox" id="sh-high" onchange="toggleGrp('high')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-vhigh">Muy altas P</label>
+        <label class="ss"><input type="checkbox" id="sh-vhigh" onchange="toggleGrp('vhigh')"><span class="ss-knob"></span></label></div>
+    </div>
+    <div class="ctrl" style="margin-top:4px">
+      <select id="sel-single" class="sel"></select>
+      <button class="addbtn" onclick="addSingle()">+ Ver</button>
+      <button class="addbtn" onclick="clearSingles()" style="background:#e53935">Limpiar</button>
+    </div>
+    <div id="list-single"></div>
+
+    <div class="sb-sub" style="margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:6px">
+      <span>Isobara personalizada</span>
+      <span class="info-btn" id="info-customP-btn" onclick="toggleInfo('customP')" title="Ayuda">i</span>
+    </div>
+    <div class="info-box" id="info-customP">
+      Ingresa una presión arbitraria dentro del intervalo tabulado de la Tabla A-4/A-4E. La isobara se construye interpolando linealmente entre las dos isobaras adyacentes para cada T común; el tramo bifásico usa h<sub>f</sub>,h<sub>g</sub>,s<sub>f</sub>,s<sub>g</sub> de la Tabla A-3/A-3E. Trazo discontinuo para distinguirla de las tabuladas.
+    </div>
+    <div class="ctrl">
+      <input type="number" id="inp-customP" class="sel" style="flex:1" placeholder="ej. 12.5" step="any">
+      <span id="unit-customP" style="font-size:.72rem;color:#6b7a99;min-width:30px">bar</span>
+    </div>
+    <div id="msg-customP" style="font-size:.68rem;color:#e53935;min-height:.9rem;line-height:1.2"></div>
+    <div class="ctrl" style="margin-top:2px">
+      <button class="addbtn" onclick="addCustomP()" style="flex:1">+ Ver</button>
+      <button class="addbtn" onclick="clearCustomsP()" style="background:#e53935;flex:1">Limpiar todo</button>
+    </div>
+    <div id="list-customP"></div>
+
+    <div class="sb-sub">Isotermas</div>
+    <div class="sg">
+      <div class="sr"><label class="sl" id="lbl-tlow">Bajas T</label>
+        <label class="ss"><input type="checkbox" id="st-low" onchange="toggleGrpT('low')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-tmid">Medias T</label>
+        <label class="ss"><input type="checkbox" id="st-mid" onchange="toggleGrpT('mid')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-thigh">Altas T</label>
+        <label class="ss"><input type="checkbox" id="st-high" onchange="toggleGrpT('high')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-tvhigh">Muy altas T</label>
+        <label class="ss"><input type="checkbox" id="st-vhigh" onchange="toggleGrpT('vhigh')"><span class="ss-knob"></span></label></div>
+    </div>
+    <div class="ctrl" style="margin-top:4px">
+      <select id="sel-singleT" class="sel"></select>
+      <button class="addbtn" onclick="addSingleT()">+ Ver</button>
+      <button class="addbtn" onclick="clearSinglesT()" style="background:#e53935">Limpiar</button>
+    </div>
+    <div id="list-singleT"></div>
+
+    <div class="sb-sub" style="margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:6px">
+      <span>Isoterma personalizada</span>
+      <span class="info-btn" id="info-customT-btn" onclick="toggleInfo('customT')" title="Ayuda">i</span>
+    </div>
+    <div class="info-box" id="info-customT">
+      Ingresa una temperatura arbitraria dentro del intervalo tabulado de la Tabla A-4/A-4E. La isoterma se construye recorriendo las isobaras tabuladas, interpolando (h,s) a la T solicitada en cada una; se ancla en la curva de saturación de vapor. Trazo discontinuo.
+    </div>
+    <div class="ctrl">
+      <input type="number" id="inp-customT" class="sel" style="flex:1" placeholder="ej. 275" step="any">
+      <span id="unit-customT" style="font-size:.72rem;color:#6b7a99;min-width:30px">°C</span>
+    </div>
+    <div id="msg-customT" style="font-size:.68rem;color:#e53935;min-height:.9rem;line-height:1.2"></div>
+    <div class="ctrl" style="margin-top:2px">
+      <button class="addbtn" onclick="addCustomT()" style="flex:1">+ Ver</button>
+      <button class="addbtn" onclick="clearCustomsT()" style="background:#e53935;flex:1">Limpiar todo</button>
+    </div>
+    <div id="list-customT"></div>
+
+    <div class="sb-sub">Isoentálpicas (h = const)</div>
+    <div class="sg">
+      <div class="sr"><label class="sl" id="lbl-hlow">Bajas h</label>
+        <label class="ss"><input type="checkbox" id="sh-h-low" onchange="toggleGrpH('low')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-hmid">Medias h</label>
+        <label class="ss"><input type="checkbox" id="sh-h-mid" onchange="toggleGrpH('mid')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-hhigh">Altas h</label>
+        <label class="ss"><input type="checkbox" id="sh-h-high" onchange="toggleGrpH('high')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-hvhigh">Muy altas h</label>
+        <label class="ss"><input type="checkbox" id="sh-h-vhigh" onchange="toggleGrpH('vhigh')"><span class="ss-knob"></span></label></div>
+    </div>
+    <div class="ctrl" style="margin-top:4px">
+      <select id="sel-singleH" class="sel"></select>
+      <button class="addbtn" onclick="addSingleH()">+ Ver</button>
+      <button class="addbtn" onclick="clearSinglesH()" style="background:#e53935">Limpiar</button>
+    </div>
+    <div id="list-singleH"></div>
+
+    <div class="sb-sub" style="margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:6px">
+      <span>Isoentálpica personalizada</span>
+      <span class="info-btn" id="info-customH-btn" onclick="toggleInfo('customH')" title="Ayuda">i</span>
+    </div>
+    <div class="info-box" id="info-customH">
+      Ingresa una entalpía arbitraria dentro del intervalo del diagrama. Se traza la recta horizontal h = const a lo largo del eje s. Trazo discontinuo para distinguirla.
+    </div>
+    <div class="ctrl">
+      <input type="number" id="inp-customH" class="sel" style="flex:1" placeholder="ej. 2750" step="any">
+      <span id="unit-customH" style="font-size:.72rem;color:#6b7a99;min-width:42px">kJ/kg</span>
+    </div>
+    <div id="msg-customH" style="font-size:.68rem;color:#e53935;min-height:.9rem;line-height:1.2"></div>
+    <div class="ctrl" style="margin-top:2px">
+      <button class="addbtn" onclick="addCustomH()" style="flex:1">+ Ver</button>
+      <button class="addbtn" onclick="clearCustomsH()" style="background:#e53935;flex:1">Limpiar todo</button>
+    </div>
+    <div id="list-customH"></div>
+
+    <div class="sb-sub">Isoentrópicas (s = const)</div>
+    <div class="sg">
+      <div class="sr"><label class="sl" id="lbl-slow">Bajas s</label>
+        <label class="ss"><input type="checkbox" id="sh-s-low" onchange="toggleGrpS('low')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-smid">Medias s</label>
+        <label class="ss"><input type="checkbox" id="sh-s-mid" onchange="toggleGrpS('mid')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-shigh">Altas s</label>
+        <label class="ss"><input type="checkbox" id="sh-s-high" onchange="toggleGrpS('high')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-svhigh">Muy altas s</label>
+        <label class="ss"><input type="checkbox" id="sh-s-vhigh" onchange="toggleGrpS('vhigh')"><span class="ss-knob"></span></label></div>
+    </div>
+    <div class="ctrl" style="margin-top:4px">
+      <select id="sel-singleS" class="sel"></select>
+      <button class="addbtn" onclick="addSingleS()">+ Ver</button>
+      <button class="addbtn" onclick="clearSinglesS()" style="background:#e53935">Limpiar</button>
+    </div>
+    <div id="list-singleS"></div>
+
+    <div class="sb-sub" style="margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:6px">
+      <span>Isoentrópica personalizada</span>
+      <span class="info-btn" id="info-customS-btn" onclick="toggleInfo('customS')" title="Ayuda">i</span>
+    </div>
+    <div class="info-box" id="info-customS">
+      Ingresa una entropía arbitraria dentro del intervalo del diagrama. Se traza la recta vertical s = const a lo largo del eje h. Trazo discontinuo para distinguirla.
+    </div>
+    <div class="ctrl">
+      <input type="number" id="inp-customS" class="sel" style="flex:1" placeholder="ej. 6.55" step="any">
+      <span id="unit-customS" style="font-size:.72rem;color:#6b7a99;min-width:62px">kJ/(kg·K)</span>
+    </div>
+    <div id="msg-customS" style="font-size:.68rem;color:#e53935;min-height:.9rem;line-height:1.2"></div>
+    <div class="ctrl" style="margin-top:2px">
+      <button class="addbtn" onclick="addCustomS()" style="flex:1">+ Ver</button>
+      <button class="addbtn" onclick="clearCustomsS()" style="background:#e53935;flex:1">Limpiar todo</button>
+    </div>
+    <div id="list-customS"></div>
+
+    <div class="sb-sub">Líneas de Calidad (x)</div>
+    <div class="rtog" id="tog-qx" onclick="toggleQx()">
+      <div class="rl"><div class="rd" style="background:#f50057"></div>Mostrar x = 0.80 … 0.98</div>
+      <div class="sw"></div>
+    </div>
+
+    <div class="sb-sub" style="margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:6px">
+      <span>Isocalidad de x</span>
+      <span class="info-btn" id="info-customQX-btn" onclick="toggleInfo('customQX')" title="Ayuda"
+            style="border-color:#c2185b;color:#c2185b">i</span>
+    </div>
+    <div class="info-box" id="info-customQX" style="background:#fff0f5;border-color:#f8bbd0;color:#6b3a5a">
+      Ingresa una calidad de vapor en (0, 1). La curva se construye recorriendo la cúpula de saturación con h(x,P)=h<sub>f</sub>+x·(h<sub>g</sub>−h<sub>f</sub>) y s(x,P)=s<sub>f</sub>+x·(s<sub>g</sub>−s<sub>f</sub>) de las tablas A-3/A-3E.
+    </div>
+    <div class="ctrl">
+      <input type="number" id="inp-customQX" class="sel" style="flex:1" placeholder="0.01 – 0.99" step="0.01" min="0" max="1">
+      <span id="unit-customQX" style="font-size:.72rem;color:#6b7a99;min-width:22px">—</span>
+    </div>
+    <div id="msg-customQX" style="font-size:.68rem;color:#e53935;min-height:.9rem;line-height:1.2"></div>
+    <div class="ctrl" style="margin-top:2px">
+      <button class="addbtn" onclick="addCustomQX()" style="flex:1;background:#c2185b">+ Ver</button>
+      <button class="addbtn" onclick="clearCustomsQX()" style="background:#e53935;flex:1">Limpiar todo</button>
+    </div>
+    <div id="list-customQX"></div>
+
+    <div class="sb-sub">Cursor</div>
+    <div class="rtog" id="tog-fc" onclick="toggleFC()">
+      <div class="rl"><div class="rd" style="background:#e65100"></div>Libre</div>
+      <div class="sw"></div>
+    </div>
+    <div id="fc-panel" style="display:none;flex-direction:column;gap:6px">
+      <div class="ic"><div class="lb">Entalpía h</div><div class="vl" id="fr-h" style="color:#e65100">— kJ/kg</div></div>
+      <div class="ic"><div class="lb">Entropía s</div><div class="vl" id="fr-s" style="color:#e65100">— kJ/(kg·K)</div></div>
+      <div class="ic" style="background:#fff3e0;border-color:#ffb74d">
+        <div class="lb" style="color:#bf360c;display:flex;align-items:center;justify-content:space-between;gap:6px">
+          <span id="fc-mode-lb">Trayectoria</span>
+          <span class="info-btn" id="info-fc-btn" onclick="toggleInfo('fc')" title="Ayuda"
+                style="border-color:#e65100;color:#e65100">i</span>
+        </div>
+        <div class="info-box" id="info-fc" style="background:#fff8f0;border-color:#ffcc80;color:#6b5a4a">
+          Clic en el plano para marcar un punto. En modo <b>Trayectoria</b> cada segmento se une al siguiente con una flecha; en modo <b>Puntos</b> los marcadores son independientes.
+        </div>
+        <div class="fc-mode">
+          <div class="fc-mode-btn active" id="fcm-path" onclick="setFCMode('path')">Trayectoria</div>
+          <div class="fc-mode-btn" id="fcm-points" onclick="setFCMode('points')">Puntos</div>
+        </div>
+        <div class="vl" id="fr-nmk" style="color:#bf360c;font-size:.82rem">0 puntos</div>
+        <div id="fr-mlist" style="display:flex;flex-direction:column;gap:4px;margin-top:6px;max-height:220px;overflow-y:auto"></div>
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <button class="addbtn" onclick="undoFCMark()" style="background:#fb8c00;flex:1">Deshacer</button>
+          <button class="addbtn" onclick="clearFCMarks()" style="background:#e53935;flex:1">Limpiar</button>
+        </div>
+      </div>
+      <div class="ic" style="background:#f3e5f5;border-color:#ce93d8">
+        <div class="lb" style="color:#4a148c;display:flex;align-items:center;justify-content:space-between;gap:6px">
+          <span>Punto por <span id="pt-mode-lb" style="font-family:'IBM Plex Mono',monospace">(T, P)</span></span>
+          <span class="info-btn" id="info-tp-btn" onclick="toggleInfo('tp')" title="Ayuda"
+                style="border-color:#7b1fa2;color:#7b1fa2">i</span>
+        </div>
+        <div class="info-box" id="info-tp" style="background:#faf4fc;border-color:#e1bee7;color:#4a148c">
+          Selecciona el par de coordenadas y captura sus valores dentro del rango tabulado (vapor sobrecalentado o supercrítico). Se interpola la(s) variable(s) restante(s) por bracketing en las isobaras adyacentes. Estados bifásicos (s entre s<sub>f</sub> y s<sub>g</sub> o T ≤ T<sub>sat</sub>) y líquido subenfriado no se resuelven.
+        </div>
+        <div class="pt-mode">
+          <div class="pt-mode-btn active" id="pm-TP" onclick="setPointMode('TP')">(T,P)</div>
+          <div class="pt-mode-btn" id="pm-Ts" onclick="setPointMode('Ts')">(T,s)</div>
+          <div class="pt-mode-btn" id="pm-Ps" onclick="setPointMode('Ps')">(P,s)</div>
+        </div>
+        <div class="ctrl" style="margin-top:4px">
+          <input type="number" id="inp-pt-a" class="sel" style="flex:1" placeholder="T" step="any">
+          <span id="unit-pt-a" style="font-size:.7rem;color:#6b7a99;min-width:54px;text-align:right">°C</span>
+        </div>
+        <div class="ctrl" style="margin-top:4px">
+          <input type="number" id="inp-pt-b" class="sel" style="flex:1" placeholder="P" step="any">
+          <span id="unit-pt-b" style="font-size:.7rem;color:#6b7a99;min-width:54px;text-align:right">bar</span>
+        </div>
+        <div id="msg-tp" style="font-size:.68rem;color:#e53935;min-height:.9rem;line-height:1.2;margin-top:2px"></div>
+        <div style="display:flex;gap:6px;margin-top:4px">
+          <button class="addbtn" onclick="addPoint()" style="background:#7b1fa2;flex:1">+ Trazar</button>
+          <button class="addbtn" onclick="clearTPPoints()" style="background:#e53935;flex:1">Limpiar</button>
+        </div>
+        <div id="list-tp" style="display:flex;flex-direction:column;gap:4px;margin-top:6px;max-height:160px;overflow-y:auto"></div>
+      </div>
+    </div>
+  
+    <button class="reset-btn" onclick="resetAll()">↺ Reiniciar todo</button>
+  </div></div>
+  <div class="sidebar-tab" onclick="toggleSidebar()"><span class="arrow">&#9660;</span>Visualizar</div>
+</div>
+</div>
+<script>
+// ════════════════════════════════════════════════════════════
+// TABLA A-3 (SI) — Saturación por Presión
+// P(bar), T_sat(°C), hf,hg (kJ/kg), sf,sg (kJ/kg·K)
+// Fuente: Moran & Shapiro 7e (formulación IAPWS-IF97)
+// ════════════════════════════════════════════════════════════
+const satSI=[
+  {P:0.04,T:28.96,hf:121.46,hg:2554.4,sf:0.4226,sg:8.4746},
+  {P:0.06,T:36.16,hf:151.53,hg:2567.4,sf:0.5210,sg:8.3304},
+  {P:0.08,T:41.51,hf:173.88,hg:2577.0,sf:0.5926,sg:8.2287},
+  {P:0.10,T:45.81,hf:191.83,hg:2584.7,sf:0.6493,sg:8.1502},
+  {P:0.20,T:60.06,hf:251.40,hg:2609.7,sf:0.8320,sg:7.9085},
+  {P:0.30,T:69.10,hf:289.23,hg:2625.3,sf:0.9439,sg:7.7686},
+  {P:0.40,T:75.87,hf:317.58,hg:2636.8,sf:1.0259,sg:7.6700},
+  {P:0.50,T:81.33,hf:340.49,hg:2645.9,sf:1.0910,sg:7.5939},
+  {P:0.60,T:85.94,hf:359.86,hg:2653.5,sf:1.1453,sg:7.5320},
+  {P:0.70,T:89.95,hf:376.70,hg:2660.0,sf:1.1919,sg:7.4797},
+  {P:0.80,T:93.50,hf:391.66,hg:2665.8,sf:1.2329,sg:7.4346},
+  {P:0.90,T:96.71,hf:405.15,hg:2670.9,sf:1.2695,sg:7.3949},
+  {P:1.00,T:99.63,hf:417.46,hg:2675.5,sf:1.3026,sg:7.3594},
+  {P:1.50,T:111.4,hf:467.11,hg:2693.6,sf:1.4336,sg:7.2233},
+  {P:2.00,T:120.2,hf:504.70,hg:2706.7,sf:1.5301,sg:7.1271},
+  {P:2.50,T:127.4,hf:535.37,hg:2716.9,sf:1.6072,sg:7.0527},
+  {P:3.00,T:133.6,hf:561.47,hg:2725.3,sf:1.6718,sg:6.9919},
+  {P:3.50,T:138.9,hf:584.33,hg:2732.4,sf:1.7275,sg:6.9405},
+  {P:4.00,T:143.6,hf:604.74,hg:2738.6,sf:1.7766,sg:6.8959},
+  {P:4.50,T:147.9,hf:623.25,hg:2743.9,sf:1.8207,sg:6.8565},
+  {P:5.00,T:151.9,hf:640.23,hg:2748.7,sf:1.8607,sg:6.8212},
+  {P:6.00,T:158.9,hf:670.56,hg:2756.8,sf:1.9312,sg:6.7600},
+  {P:7.00,T:165.0,hf:697.22,hg:2763.5,sf:1.9922,sg:6.7080},
+  {P:8.00,T:170.4,hf:721.11,hg:2769.1,sf:2.0462,sg:6.6628},
+  {P:9.00,T:175.4,hf:742.83,hg:2773.9,sf:2.0946,sg:6.6226},
+  {P:10.0,T:179.9,hf:762.81,hg:2778.1,sf:2.1387,sg:6.5863},
+  {P:15.0,T:198.3,hf:844.84,hg:2792.2,sf:2.3150,sg:6.4448},
+  {P:20.0,T:212.4,hf:908.79,hg:2799.5,sf:2.4474,sg:6.3409},
+  {P:25.0,T:224.0,hf:962.11,hg:2803.1,sf:2.5547,sg:6.2575},
+  {P:30.0,T:233.9,hf:1008.4,hg:2804.2,sf:2.6457,sg:6.1869},
+  {P:35.0,T:242.6,hf:1049.8,hg:2803.4,sf:2.7253,sg:6.1253},
+  {P:40.0,T:250.4,hf:1087.3,hg:2801.4,sf:2.7964,sg:6.0701},
+  {P:45.0,T:257.5,hf:1121.9,hg:2798.3,sf:2.8610,sg:6.0199},
+  {P:50.0,T:264.0,hf:1154.2,hg:2794.3,sf:2.9202,sg:5.9734},
+  {P:60.0,T:275.6,hf:1213.4,hg:2784.3,sf:3.0267,sg:5.8892},
+  {P:70.0,T:285.9,hf:1267.0,hg:2772.1,sf:3.1211,sg:5.8133},
+  {P:80.0,T:295.1,hf:1316.6,hg:2758.0,sf:3.2068,sg:5.7432},
+  {P:90.0,T:303.4,hf:1363.3,hg:2742.1,sf:3.2858,sg:5.6772},
+  {P:100.,T:311.1,hf:1407.6,hg:2724.7,sf:3.3596,sg:5.6141},
+  {P:110.,T:318.2,hf:1450.1,hg:2705.6,sf:3.4295,sg:5.5527},
+  {P:120.,T:324.8,hf:1491.3,hg:2684.9,sf:3.4962,sg:5.4924},
+  {P:130.,T:330.9,hf:1531.5,hg:2662.2,sf:3.5606,sg:5.4323},
+  {P:140.,T:336.8,hf:1571.1,hg:2637.6,sf:3.6232,sg:5.3717},
+  {P:150.,T:342.2,hf:1610.5,hg:2610.5,sf:3.6848,sg:5.3098},
+  {P:160.,T:347.4,hf:1650.1,hg:2580.6,sf:3.7461,sg:5.2455},
+  {P:170.,T:352.4,hf:1690.3,hg:2547.2,sf:3.8079,sg:5.1777},
+  {P:180.,T:357.1,hf:1732.0,hg:2509.1,sf:3.8715,sg:5.1044},
+  {P:190.,T:361.5,hf:1776.5,hg:2464.5,sf:3.9388,sg:5.0228},
+  {P:200.,T:365.8,hf:1826.3,hg:2409.7,sf:4.0139,sg:4.9269},
+  {P:220.9,T:374.14,hf:2099.3,hg:2099.3,sf:4.4298,sg:4.4298},
+];
+
+// ════════════════════════════════════════════════════════════
+// TABLA A-4 (SI) — Vapor Sobrecalentado
+// {P(bar), pts:[[T(°C), h(kJ/kg), s(kJ/kg·K)],...]}
+// Fuente: Moran & Shapiro 7e (formulación IAPWS-IF97)
+// ════════════════════════════════════════════════════════════
+const shSI=[
+  {P:0.06,pts:[[36.16,2567.4,8.3304],[80,2650.1,8.5804],[120,2726.0,8.7840],[160,2802.5,8.9693],
+    [200,2879.7,9.1398],[240,2957.8,9.2982],[280,3036.8,9.4464],[320,3116.7,9.5859],
+    [360,3197.7,9.7180],[400,3279.6,9.8435],[440,3362.6,9.9633],[500,3489.1,10.1336]]},
+  {P:0.35,pts:[[72.69,2631.4,7.7158],[80,2645.6,7.7564],[120,2723.1,7.9644],[160,2800.6,8.1519],
+    [200,2878.4,8.3237],[240,2956.8,8.4828],[280,3036.0,8.6314],[320,3116.1,8.7712],
+    [360,3197.1,8.9034],[400,3279.2,9.0291],[440,3362.2,9.1490],[500,3488.8,9.3194]]},
+  {P:0.70,pts:[[89.95,2660.0,7.4797],[100,2680.0,7.5341],[120,2719.6,7.6375],[160,2798.2,7.8279],
+    [200,2876.7,8.0012],[240,2955.5,8.1611],[280,3035.0,8.3162],[320,3115.3,8.4504],
+    [360,3196.5,8.5828],[400,3278.6,8.7086],[440,3361.8,8.8286],[500,3488.5,8.9991]]},
+  {P:1.00,pts:[[99.63,2675.5,7.3594],[100,2676.2,7.3614],[120,2716.6,7.4668],[160,2796.2,7.6597],
+    [200,2875.3,7.8343],[240,2954.5,7.9949],[280,3034.2,8.1445],[320,3114.6,8.2849],
+    [360,3195.9,8.4175],[400,3278.2,8.5435],[440,3361.4,8.6636],[500,3488.1,8.8342]]},
+  {P:1.50,pts:[[111.37,2693.6,7.2233],[120,2711.4,7.2693],[160,2792.8,7.4665],[200,2872.9,7.6433],
+    [240,2952.7,7.8052],[280,3032.8,7.9555],[320,3113.5,8.0964],[360,3195.0,8.2293],
+    [400,3277.4,8.3555],[440,3360.7,8.4757],[500,3487.6,8.6466],[600,3704.3,8.9101]]},
+  {P:3.00,pts:[[133.55,2725.3,6.9919],[160,2782.3,7.1276],[200,2865.5,7.3115],[240,2947.3,7.4774],
+    [280,3028.6,7.6299],[320,3110.1,7.7722],[360,3192.2,7.9061],[400,3275.0,8.0330],
+    [440,3358.7,8.1538],[500,3486.0,8.3251],[600,3703.2,8.5892]]},
+  {P:5.00,pts:[[151.86,2748.7,6.8213],[180,2812.0,6.9656],[200,2855.4,7.0592],[240,2939.9,7.2307],
+    [280,3022.9,7.3865],[320,3105.6,7.5308],[360,3188.4,7.6660],[400,3271.9,7.7938],
+    [440,3356.0,7.9152],[500,3483.9,8.0873],[600,3701.7,8.3522],[700,3925.9,8.5952]]},
+  {P:7.00,pts:[[164.97,2763.5,6.7080],[180,2799.1,6.7880],[200,2844.8,6.8865],[240,2932.2,7.0641],
+    [280,3017.1,7.2233],[320,3100.9,7.3697],[360,3184.7,7.5063],[400,3268.7,7.6350],
+    [440,3353.3,7.7571],[500,3481.7,7.9299],[600,3700.2,8.1956],[700,3924.8,8.4391]]},
+  {P:10.0,pts:[[179.91,2778.1,6.5865],[200,2827.9,6.6940],[240,2920.4,6.8817],[280,3008.2,7.0465],
+    [320,3093.9,7.1962],[360,3178.9,7.3349],[400,3263.9,7.4651],[440,3349.3,7.5883],
+    [500,3478.5,7.7622],[540,3565.6,7.8720],[600,3697.9,8.0290],[640,3787.2,8.1290]]},
+  {P:15.0,pts:[[198.32,2792.2,6.4448],[200,2796.8,6.4546],[240,2899.3,6.6628],[280,2992.7,6.8381],
+    [320,3081.9,6.9938],[360,3169.2,7.1363],[400,3255.8,7.2690],[440,3342.5,7.3940],
+    [500,3473.1,7.5698],[540,3560.9,7.6805],[600,3694.0,7.8385],[640,3783.8,7.9391]]},
+  {P:20.0,pts:[[212.42,2799.5,6.3409],[240,2876.5,6.4952],[280,2976.4,6.6828],[320,3069.5,6.8452],
+    [360,3159.3,6.9917],[400,3247.6,7.1271],[440,3335.5,7.2540],[500,3467.6,7.4317],
+    [540,3556.1,7.5434],[600,3690.1,7.7024],[640,3780.4,7.8035],[700,3917.4,7.9487]]},
+  {P:30.0,pts:[[233.90,2804.2,6.1869],[240,2824.3,6.2265],[280,2941.3,6.4462],[320,3043.4,6.6245],
+    [360,3138.7,6.7801],[400,3230.9,6.9212],[440,3321.5,7.0520],[500,3456.5,7.2338],
+    [540,3546.6,7.3474],[600,3682.3,7.5085],[640,3773.5,7.6106],[700,3911.7,7.7571]]},
+  {P:40.0,pts:[[250.40,2801.4,6.0701],[280,2901.8,6.2568],[320,3015.4,6.4553],[360,3117.2,6.6215],
+    [400,3213.6,6.7690],[440,3307.1,6.9041],[500,3445.3,7.0901],[540,3536.9,7.2056],
+    [600,3674.4,7.3688],[640,3766.6,7.4720],[700,3905.9,7.6198],[740,3999.6,7.7141]]},
+  {P:60.0,pts:[[275.64,2784.3,5.8892],[280,2804.2,5.9252],[320,2952.6,6.1846],[360,3071.1,6.3782],
+    [400,3177.2,6.5408],[440,3277.3,6.6853],[500,3422.2,6.8803],[540,3517.0,6.9999],
+    [600,3658.4,7.1677],[640,3752.6,7.2731],[700,3894.1,7.4234],[740,3989.2,7.5190]]},
+  {P:80.0,pts:[[295.06,2758.0,5.7432],[320,2877.2,5.9489],[360,3019.8,6.1819],[400,3138.3,6.3634],
+    [440,3246.1,6.5190],[480,3348.4,6.6586],[520,3447.7,6.7871],[560,3545.3,6.9072],
+    [600,3642.0,7.0206],[640,3738.3,7.1283],[700,3882.4,7.2812],[740,3978.7,7.3782]]},
+  {P:100.,pts:[[311.06,2724.7,5.6141],[320,2781.3,5.7103],[360,2962.1,6.0060],[400,3096.5,6.2120],
+    [440,3213.2,6.3805],[480,3321.4,6.5282],[520,3425.1,6.6622],[560,3526.0,6.7864],
+    [600,3625.3,6.9029],[640,3723.7,7.0131],[700,3870.5,7.1687],[740,3968.1,7.2670]]},
+  {P:120.,pts:[[324.75,2684.9,5.4924],[360,2895.7,5.8361],[400,3051.3,6.0747],[440,3178.7,6.2586],
+    [480,3293.5,6.4154],[520,3401.8,6.5555],[560,3506.2,6.6840],[600,3608.3,6.8037],
+    [640,3709.0,6.9164],[700,3858.4,7.0749],[740,3957.4,7.1746]]},
+  {P:140.,pts:[[336.75,2637.6,5.3717],[360,2816.5,5.6602],[400,3001.9,5.9448],[440,3142.2,6.1474],
+    [480,3264.5,6.3143],[520,3377.8,6.4610],[560,3486.0,6.5941],[600,3591.1,6.7172],
+    [640,3694.1,6.8326],[700,3846.2,6.9939],[740,3946.7,7.0952]]},
+  {P:160.,pts:[[347.44,2580.6,5.2455],[360,2715.8,5.4614],[400,2947.6,5.8175],[440,3103.7,6.0429],
+    [480,3234.4,6.2215],[520,3353.3,6.3752],[560,3465.4,6.5132],[600,3573.5,6.6399],
+    [640,3678.9,6.7580],[700,3833.9,6.9224],[740,3935.9,7.0251]]},
+  {P:180.,pts:[[357.06,2509.1,5.1044],[360,2564.5,5.1922],[400,2887.0,5.6887],[440,3062.8,5.9428],
+    [480,3203.2,6.1345],[520,3328.0,6.2960],[560,3444.4,6.4392],[600,3555.6,6.5696],
+    [640,3663.6,6.6905],[700,3821.5,6.8580],[740,3925.0,6.9623]]},
+  {P:200.,pts:[[365.81,2409.7,4.9269],[400,2818.1,5.5540],[440,3019.4,5.8450],[480,3170.8,6.0518],
+    [520,3302.2,6.2218],[560,3423.0,6.3705],[600,3537.6,6.5048],[640,3648.1,6.6286],
+    [700,3809.0,6.7993],[740,3914.1,6.9052],[800,4069.7,7.0544]]},
+  {P:240.,pts:[[400,2639.4,5.2393],[440,2923.4,5.6506],[480,3102.3,5.8950],[520,3248.5,6.0842],
+    [560,3379.0,6.2448],[600,3500.7,6.3875],[640,3616.7,6.5174],[700,3783.8,6.6947],
+    [740,3892.1,6.8038],[800,4051.6,6.9567]]},
+  {P:280.,pts:[[400,2330.7,4.7494],[440,2812.6,5.4494],[480,3028.5,5.7446],[520,3192.3,5.9566],
+    [560,3333.7,6.1307],[600,3463.0,6.2823],[640,3584.8,6.4187],[700,3758.4,6.6029],
+    [740,3870.0,6.7153],[800,4033.4,6.8720],[900,4298.8,7.1084]]},
+  {P:320.,pts:[[400,2055.9,4.3239],[440,2683.0,5.2327],[480,2949.2,5.5968],[520,3133.7,5.8357],
+    [560,3287.2,6.0246],[600,3424.6,6.1858],[640,3552.5,6.3290],[700,3732.8,6.5203],
+    [740,3847.8,6.6361],[800,4015.1,6.7966],[900,4285.1,7.0372]]},
+];
+
+// ════════════════════════════════════════════════════════════
+// TABLA A-3E — Saturación por Presión (Inglés)
+// P(psia), T_sat(°F), hf,hg (Btu/lbm), sf,sg (Btu/lbm·°R)
+// Fuente: Moran & Shapiro 7e (formulación IAPWS-IF97)
+// ════════════════════════════════════════════════════════════
+const satENG=[
+  {P:1,T:101.70,hf:69.74,hg:1105.8,sf:0.1327,sg:1.9779},
+  {P:2,T:126.04,hf:94.02,hg:1116.1,sf:0.1750,sg:1.9198},
+  {P:3,T:141.43,hf:109.39,hg:1122.5,sf:0.2009,sg:1.8861},
+  {P:4,T:152.93,hf:120.89,hg:1127.3,sf:0.2198,sg:1.8624},
+  {P:5,T:162.21,hf:130.17,hg:1131.0,sf:0.2349,sg:1.8441},
+  {P:6,T:170.03,hf:138.00,hg:1134.2,sf:0.2474,sg:1.8292},
+  {P:8,T:182.84,hf:150.84,hg:1139.3,sf:0.2675,sg:1.8058},
+  {P:10,T:193.19,hf:161.23,hg:1143.3,sf:0.2836,sg:1.7877},
+  {P:14.696,T:211.99,hf:180.15,hg:1150.5,sf:0.3121,sg:1.7567},
+  {P:15,T:213.03,hf:181.19,hg:1150.9,sf:0.3137,sg:1.7551},
+  {P:20,T:227.96,hf:196.26,hg:1156.4,sf:0.3358,sg:1.7320},
+  {P:25,T:240.08,hf:208.52,hg:1160.7,sf:0.3535,sg:1.7142},
+  {P:30,T:250.34,hf:218.93,hg:1164.3,sf:0.3682,sg:1.6996},
+  {P:35,T:259.30,hf:228.04,hg:1167.4,sf:0.3809,sg:1.6873},
+  {P:40,T:267.26,hf:236.16,hg:1170.0,sf:0.3921,sg:1.6767},
+  {P:45,T:274.46,hf:243.51,hg:1172.3,sf:0.4022,sg:1.6673},
+  {P:50,T:281.03,hf:250.24,hg:1174.4,sf:0.4113,sg:1.6589},
+  {P:55,T:287.10,hf:256.46,hg:1176.3,sf:0.4196,sg:1.6513},
+  {P:60,T:292.73,hf:262.2,hg:1178.0,sf:0.4273,sg:1.6443},
+  {P:65,T:298.00,hf:267.7,hg:1179.6,sf:0.4345,sg:1.6380},
+  {P:70,T:302.96,hf:272.8,hg:1181.0,sf:0.4412,sg:1.6321},
+  {P:75,T:307.63,hf:277.6,hg:1182.4,sf:0.4475,sg:1.6265},
+  {P:80,T:312.07,hf:282.2,hg:1183.6,sf:0.4534,sg:1.6213},
+  {P:85,T:316.29,hf:286.6,hg:1184.8,sf:0.4591,sg:1.6165},
+  {P:90,T:320.31,hf:290.8,hg:1185.9,sf:0.4644,sg:1.6119},
+  {P:95,T:324.16,hf:294.8,hg:1186.9,sf:0.4695,sg:1.6075},
+  {P:100,T:327.86,hf:298.6,hg:1187.8,sf:0.4744,sg:1.6034},
+  {P:110,T:334.82,hf:305.9,hg:1189.6,sf:0.4836,sg:1.5958},
+  {P:120,T:341.30,hf:312.7,hg:1191.1,sf:0.4920,sg:1.5886},
+  {P:130,T:347.37,hf:319.0,hg:1192.5,sf:0.4999,sg:1.5821},
+  {P:140,T:353.08,hf:325.1,hg:1193.8,sf:0.5073,sg:1.5761},
+  {P:150,T:358.48,hf:330.8,hg:1194.9,sf:0.5142,sg:1.5704},
+  {P:160,T:363.60,hf:336.2,hg:1196.0,sf:0.5208,sg:1.5651},
+  {P:170,T:368.47,hf:341.3,hg:1196.9,sf:0.5270,sg:1.5600},
+  {P:180,T:373.13,hf:346.3,hg:1197.8,sf:0.5329,sg:1.5552},
+  {P:190,T:377.59,hf:351.0,hg:1198.6,sf:0.5386,sg:1.5508},
+  {P:200,T:381.86,hf:355.6,hg:1199.3,sf:0.5440,sg:1.5465},
+  {P:250,T:401.04,hf:376.2,hg:1202.1,sf:0.5680,sg:1.5274},
+  {P:300,T:417.43,hf:394.1,hg:1203.9,sf:0.5883,sg:1.5115},
+  {P:350,T:431.82,hf:409.9,hg:1204.9,sf:0.6060,sg:1.4977},
+  {P:400,T:444.70,hf:424.2,hg:1205.5,sf:0.6218,sg:1.4856},
+  {P:450,T:456.39,hf:437.4,hg:1205.6,sf:0.6360,sg:1.4745},
+  {P:500,T:467.13,hf:449.5,hg:1205.3,sf:0.6490,sg:1.4644},
+  {P:600,T:486.33,hf:471.7,hg:1204.1,sf:0.6723,sg:1.4464},
+  {P:700,T:503.23,hf:491.5,hg:1202.0,sf:0.6927,sg:1.4305},
+  {P:800,T:518.36,hf:509.7,hg:1199.3,sf:0.7110,sg:1.4160},
+  {P:900,T:532.12,hf:526.6,hg:1196.0,sf:0.7277,sg:1.4027},
+  {P:1000,T:544.75,hf:542.4,hg:1192.4,sf:0.7432,sg:1.3903},
+  {P:1200,T:567.37,hf:571.7,hg:1183.9,sf:0.7712,sg:1.3673},
+  {P:1400,T:587.25,hf:598.6,hg:1174.1,sf:0.7964,sg:1.3461},
+  {P:1600,T:605.06,hf:624.0,hg:1162.9,sf:0.8196,sg:1.3258},
+  {P:1800,T:621.21,hf:648.3,hg:1150.4,sf:0.8414,sg:1.3060},
+  {P:2000,T:636.00,hf:671.9,hg:1136.3,sf:0.8623,sg:1.2861},
+  {P:2500,T:668.31,hf:730.9,hg:1091.4,sf:0.9131,sg:1.2327},
+  {P:3000,T:695.52,hf:802.5,hg:1015.5,sf:0.9732,sg:1.1575},
+  {P:3203.6,T:705.44,hf:902.5,hg:902.5,sf:1.0580,sg:1.0580},
+];
+
+// ════════════════════════════════════════════════════════════
+// TABLA A-4E — Vapor Sobrecalentado (Inglés)
+// {P(psia), pts:[[T(°F), h(Btu/lbm), s(Btu/lbm·°R)],...]}
+// Fuente: Moran & Shapiro 7e (formulación IAPWS-IF97)
+// ════════════════════════════════════════════════════════════
+const shENG=[
+  {P:1,pts:[[101.70,1105.8,1.9779],[150,1127.5,2.0151],[200,1150.1,2.0508],[250,1172.8,2.0839],
+    [300,1195.7,2.1150],[400,1241.8,2.1720],[500,1288.5,2.2235],[600,1336.1,2.2706],
+    [700,1384.5,2.3142],[800,1433.7,2.3550],[900,1483.8,2.3932],[1000,1534.8,2.4294]]},
+  {P:5,pts:[[162.21,1131.0,1.8441],[200,1148.6,1.8715],[250,1171.7,1.9052],[300,1194.8,1.9367],
+    [400,1241.2,1.9941],[500,1288.2,2.0458],[600,1335.8,2.0930],[700,1384.3,2.1367],
+    [800,1433.5,2.1775],[900,1483.7,2.2158],[1000,1534.7,2.2520]]},
+  {P:10,pts:[[193.19,1143.3,1.7877],[200,1146.6,1.7927],[250,1170.2,1.8272],[300,1193.7,1.8592],
+    [400,1240.5,1.9171],[500,1287.7,1.9690],[600,1335.5,2.0164],[700,1384.0,2.0601],
+    [800,1433.3,2.1009],[900,1483.5,2.1393],[1000,1534.6,2.1755],[1100,1586.6,2.2099]]},
+  {P:14.7,pts:[[211.99,1150.5,1.7567],[250,1168.8,1.7832],[300,1192.6,1.8157],[400,1239.9,1.8741],
+    [500,1287.3,1.9263],[600,1335.2,1.9737],[700,1383.8,2.0175],[800,1433.1,2.0584],
+    [900,1483.4,2.0967],[1000,1534.5,2.1330],[1100,1586.4,2.1674]]},
+  {P:20,pts:[[227.96,1156.4,1.7320],[250,1167.2,1.7475],[300,1191.5,1.7805],[350,1215.4,1.8110],
+    [400,1239.2,1.8395],[500,1286.8,1.8919],[600,1334.8,1.9395],[700,1383.5,1.9834],
+    [800,1432.9,2.0243],[900,1483.2,2.0627],[1000,1534.3,2.0989],[1100,1586.3,2.1334]]},
+  {P:40,pts:[[267.26,1170.0,1.6767],[300,1186.8,1.6993],[350,1211.8,1.7312],[400,1236.4,1.7606],
+    [500,1284.9,1.8140],[600,1333.4,1.8621],[700,1382.4,1.9063],[800,1432.1,1.9474],
+    [900,1482.5,1.9859],[1000,1533.8,2.0223],[1100,1585.9,2.0568]]},
+  {P:60,pts:[[292.73,1178.0,1.6444],[300,1181.9,1.6496],[350,1208.2,1.6830],[400,1233.5,1.7134],
+    [500,1283.0,1.7678],[600,1332.1,1.8165],[700,1381.4,1.8609],[800,1431.2,1.9022],
+    [900,1481.8,1.9408],[1000,1533.2,1.9773],[1100,1585.4,2.0119],[1200,1638.5,2.0448]]},
+  {P:80,pts:[[312.07,1183.6,1.6214],[350,1204.3,1.6476],[400,1230.6,1.6790],[500,1281.1,1.7346],
+    [600,1330.7,1.7838],[700,1380.3,1.8285],[800,1430.4,1.8700],[900,1481.2,1.9087],
+    [1000,1532.6,1.9453],[1100,1584.9,1.9799],[1200,1638.1,2.0130]]},
+  {P:100,pts:[[327.86,1187.8,1.6034],[350,1200.4,1.6191],[400,1227.5,1.6517],[450,1253.6,1.6812],
+    [500,1279.1,1.7085],[600,1329.3,1.7582],[700,1379.2,1.8033],[800,1429.6,1.8449],
+    [900,1480.5,1.8838],[1000,1532.1,1.9204],[1100,1584.5,1.9551],[1200,1637.7,1.9882]]},
+  {P:120,pts:[[341.30,1191.1,1.5886],[350,1196.2,1.5950],[400,1224.4,1.6288],[450,1251.2,1.6590],
+    [500,1277.1,1.6868],[600,1327.8,1.7371],[700,1378.2,1.7825],[800,1428.7,1.8243],
+    [900,1479.8,1.8633],[1000,1531.5,1.9000],[1100,1584.0,1.9348],[1200,1637.3,1.9679]]},
+  {P:140,pts:[[353.08,1193.8,1.5761],[400,1221.2,1.6088],[450,1248.6,1.6399],[500,1275.1,1.6682],
+    [550,1300.9,1.6945],[600,1326.4,1.7191],[700,1377.1,1.7648],[800,1427.9,1.8068],
+    [900,1479.1,1.8459],[1000,1531.0,1.8827],[1100,1583.6,1.9176],[1200,1636.9,1.9507]]},
+  {P:160,pts:[[363.60,1196.0,1.5651],[400,1217.8,1.5911],[450,1246.1,1.6230],[500,1273.0,1.6518],
+    [550,1299.2,1.6785],[600,1325.0,1.7034],[700,1376.0,1.7494],[800,1427.0,1.7916],
+    [900,1478.4,1.8308],[1000,1530.4,1.8677],[1100,1583.1,1.9026],[1200,1636.5,1.9358]]},
+  {P:180,pts:[[373.13,1197.8,1.5553],[400,1214.4,1.5749],[450,1243.4,1.6078],[500,1270.9,1.6372],
+    [550,1297.5,1.6642],[600,1323.5,1.6893],[700,1374.9,1.7357],[800,1426.2,1.7781],
+    [900,1477.7,1.8174],[1000,1529.8,1.8545],[1100,1582.6,1.8894],[1200,1636.1,1.9227]]},
+  {P:200,pts:[[381.86,1199.3,1.5464],[400,1210.8,1.5600],[450,1240.7,1.5938],[500,1268.8,1.6239],
+    [550,1295.7,1.6512],[600,1322.1,1.6767],[700,1373.8,1.7234],[800,1425.3,1.7660],
+    [900,1477.1,1.8055],[1000,1529.3,1.8425],[1100,1582.2,1.8776],[1200,1635.7,1.9109]]},
+  {P:250,pts:[[401.04,1202.1,1.5274],[450,1233.7,1.5632],[500,1263.3,1.5948],[550,1291.3,1.6233],
+    [600,1318.3,1.6494],[700,1371.1,1.6970],[800,1423.2,1.7301],[900,1475.3,1.7799],
+    [1000,1527.9,1.8172],[1100,1581.0,1.8524],[1200,1634.8,1.8858],[1300,1689.3,1.9177]]},
+  {P:300,pts:[[417.43,1203.9,1.5115],[450,1226.2,1.5365],[500,1257.5,1.5701],[550,1286.7,1.5997],
+    [600,1314.5,1.6266],[700,1368.3,1.6751],[800,1421.0,1.7187],[900,1473.6,1.7589],
+    [1000,1526.5,1.7964],[1100,1579.8,1.8317],[1200,1633.8,1.8653],[1300,1688.4,1.8973]]},
+  {P:350,pts:[[431.82,1204.9,1.4978],[450,1218.2,1.5125],[500,1251.5,1.5482],[550,1281.9,1.5790],
+    [600,1310.6,1.6068],[700,1365.4,1.6562],[800,1418.8,1.7004],[900,1471.8,1.7409],
+    [1000,1525.0,1.7787],[1100,1578.6,1.8142],[1200,1632.8,1.8478],[1300,1687.6,1.8799]]},
+  {P:400,pts:[[444.70,1205.5,1.4856],[450,1209.5,1.4901],[500,1245.2,1.5282],[550,1277.0,1.5605],
+    [600,1306.6,1.5892],[700,1362.5,1.6397],[800,1416.6,1.6844],[900,1470.1,1.7252],
+    [1000,1523.6,1.7632],[1100,1577.4,1.7989],[1200,1631.3,1.8327],[1300,1686.8,1.8648]]},
+  {P:450,pts:[[456.39,1205.6,1.4746],[500,1238.5,1.5097],[550,1271.9,1.5436],[600,1302.5,1.5732],
+    [700,1359.6,1.6248],[800,1414.4,1.6701],[900,1468.3,1.7113],[1000,1522.2,1.7495],
+    [1100,1576.3,1.7853],[1200,1630.8,1.8192],[1300,1685.9,1.8515],[1400,1741.7,1.8823]]},
+  {P:500,pts:[[467.13,1205.3,1.4645],[500,1231.5,1.4923],[550,1266.6,1.5279],[600,1298.3,1.5585],
+    [700,1356.7,1.6112],[800,1412.1,1.6571],[900,1466.5,1.6987],[1000,1520.7,1.7371],
+    [1100,1575.1,1.7731],[1200,1629.8,1.8072],[1300,1685.1,1.8395],[1400,1741.0,1.8704]]},
+  {P:600,pts:[[486.33,1204.1,1.4464],[500,1216.2,1.4592],[550,1255.4,1.4990],[600,1289.5,1.5320],
+    [700,1350.6,1.5872],[800,1407.6,1.6343],[900,1462.9,1.6766],[1000,1517.8,1.7155],
+    [1100,1572.7,1.7519],[1200,1627.8,1.7861],[1300,1683.4,1.8186],[1400,1739.5,1.8497]]},
+  {P:700,pts:[[503.23,1202.0,1.4305],[550,1243.2,1.4723],[600,1280.2,1.5081],[700,1344.4,1.5661],
+    [800,1402.9,1.6145],[900,1459.3,1.6576],[1000,1514.9,1.6970],[1100,1570.2,1.7337],
+    [1200,1625.8,1.7682],[1300,1681.7,1.8009],[1400,1738.1,1.8321]]},
+  {P:800,pts:[[518.36,1199.3,1.4160],[550,1229.9,1.4469],[600,1270.4,1.4861],[650,1305.6,1.5186],
+    [700,1338.0,1.5471],[800,1398.2,1.5969],[900,1455.6,1.6408],[1000,1511.9,1.6807],
+    [1100,1567.8,1.7178],[1200,1623.8,1.7526],[1300,1680.0,1.7854],[1400,1736.6,1.8167]]},
+  {P:900,pts:[[532.12,1196.0,1.4027],[550,1215.2,1.4219],[600,1260.0,1.4652],[650,1297.5,1.4999],
+    [700,1331.4,1.5297],[800,1393.4,1.5810],[900,1451.9,1.6257],[1000,1508.9,1.6662],
+    [1100,1565.4,1.7036],[1200,1621.7,1.7386],[1300,1678.3,1.7717],[1400,1735.1,1.8031]]},
+  {P:1000,pts:[[544.75,1192.4,1.3903],[600,1248.8,1.4450],[650,1289.1,1.4822],[700,1324.6,1.5135],
+    [800,1388.5,1.5665],[900,1448.1,1.6120],[1000,1505.9,1.6530],[1100,1562.9,1.6908],
+    [1200,1619.7,1.7261],[1300,1676.5,1.7593],[1400,1733.7,1.7909],[1600,1849.3,1.8499]]},
+  {P:1200,pts:[[567.37,1183.9,1.3673],[600,1223.6,1.4054],[650,1270.8,1.4490],[700,1310.2,1.4837],
+    [800,1378.4,1.5402],[900,1440.4,1.5876],[1000,1499.7,1.6297],[1100,1557.9,1.6682],
+    [1200,1615.5,1.7040],[1300,1673.1,1.7377],[1400,1730.7,1.7696],[1600,1847.1,1.8290]]},
+  {P:1400,pts:[[587.25,1174.1,1.3461],[600,1193.1,1.3641],[650,1250.5,1.4171],[700,1294.8,1.4562],
+    [800,1367.9,1.5168],[900,1432.5,1.5661],[1000,1493.5,1.6094],[1100,1552.8,1.6487],
+    [1200,1611.4,1.6851],[1300,1669.6,1.7192],[1400,1727.8,1.7513],[1600,1844.8,1.8111]]},
+  {P:1600,pts:[[605.06,1162.9,1.3258],[650,1227.4,1.3852],[700,1278.1,1.4299],[800,1357.0,1.4953],
+    [900,1424.4,1.5468],[1000,1487.1,1.5913],[1100,1547.7,1.6315],[1200,1607.1,1.6684],
+    [1300,1666.1,1.7029],[1400,1724.8,1.7354],[1600,1842.6,1.7955]]},
+  {P:1800,pts:[[621.21,1150.4,1.3060],[650,1200.4,1.3517],[700,1259.9,1.4042],[750,1305.9,1.4430],
+    [800,1345.7,1.4753],[900,1416.1,1.5291],[1000,1480.7,1.5749],[1100,1542.5,1.6159],
+    [1200,1602.9,1.6534],[1300,1662.5,1.6883],[1400,1721.8,1.7211],[1600,1840.4,1.7817]]},
+  {P:2000,pts:[[636.00,1136.3,1.2861],[650,1167.2,1.3141],[700,1239.8,1.3782],[750,1291.1,1.4216],
+    [800,1333.8,1.4562],[900,1407.6,1.5126],[1000,1474.1,1.5598],[1100,1537.2,1.6017],
+    [1200,1598.6,1.6398],[1300,1659.0,1.6751],[1400,1718.8,1.7082],[1600,1838.2,1.7692]]},
+  {P:2500,pts:[[668.31,1091.4,1.2327],[700,1176.6,1.3073],[750,1249.1,1.3686],[800,1301.7,1.4112],
+    [900,1385.4,1.4752],[1000,1457.2,1.5262],[1100,1523.8,1.5704],[1200,1587.7,1.6101],
+    [1300,1650.0,1.6465],[1400,1711.3,1.6804],[1500,1772.1,1.7123],[1600,1832.6,1.7424]]},
+  {P:3000,pts:[[695.52,1015.5,1.1575],[700,1058.1,1.1944],[750,1197.1,1.3122],[800,1265.2,1.3675],
+    [900,1361.7,1.4414],[1000,1439.6,1.4967],[1100,1510.1,1.5434],[1200,1576.6,1.5848],
+    [1300,1640.9,1.6224],[1400,1703.7,1.6571],[1500,1765.7,1.6896],[1600,1827.1,1.7201]]},
+];
+
+// ════════════════════════════════════════════════════════════
+// PALETAS
+// ════════════════════════════════════════════════════════════
+// Paleta Material Design 700/800 + A700 — tonos vivos pero oscuros,
+// todos perfectamente visibles sobre fondo blanco (sin amarillos, sin limas).
+const PAL_ISO=['#d50000','#ff3d00','#ff6d00','#e65100','#bf360c',
+  '#c51162','#ad1457','#aa00ff','#6200ea','#4527a0','#311b92',
+  '#2962ff','#0091ea','#0277bd','#1565c0','#283593','#00838f',
+  '#00695c','#004d40','#2e7d32','#33691e','#7b1fa2'];
+
+// ── Grupos de isobaras por presión ──────────────────────────
+const GRP_SI={
+  low:  [0.06,0.35,0.70,1.0,1.5],
+  mid:  [3.0,5.0,7.0,10.0,15.0],
+  high: [20.0,30.0,40.0,60.0,80.0],
+  vhigh:[100,120,140,160,180,200,240,280,320]
+};
+const GRP_ENG={
+  low:  [1,5,10,14.7,20],
+  mid:  [40,60,80,100,120],
+  high: [140,160,180,200,250],
+  vhigh:[300,350,400,500,600,700,800,1000]
+};
+const activeGrp={low:false,mid:false,high:false,vhigh:false};
+
+// ── Grupos de isotermas por temperatura ─────────────────────
+// Sólo se plotean si T aparece tabulado en shSI/shENG a varias P
+const GRP_T_SI={
+  low:  [100,120,160],
+  mid:  [200,240,280],
+  high: [320,360,400],
+  vhigh:[440,500,600,700]
+};
+const GRP_T_ENG={
+  low:  [200,250,300],
+  mid:  [350,400,500],
+  high: [600,700,800],
+  vhigh:[900,1000,1100,1200]
+};
+const activeGrpT={low:false,mid:false,high:false,vhigh:false};
+
+// ── Líneas de isocalidad x = constante ──────────────────────
+const QLINES=[0.80,0.82,0.84,0.86,0.88,0.90,0.92,0.94,0.96,0.98];
+
+// ── Grupos de isoentálpicas h = const ───────────────────────
+const GRP_H_SI={
+  low:  [2000,2200,2400],
+  mid:  [2600,2800,3000],
+  high: [3200,3400,3600],
+  vhigh:[3800,4000,4200]
+};
+const GRP_H_ENG={
+  low:  [800, 900, 1000],
+  mid:  [1100,1200,1300],
+  high: [1400,1500,1600],
+  vhigh:[1700,1800,1900]
+};
+const activeGrpH={low:false,mid:false,high:false,vhigh:false};
+
+// ── Grupos de isoentrópicas s = const ───────────────────────
+const GRP_S_SI={
+  low:  [4.5,5.0,5.5],
+  mid:  [6.0,6.5,7.0],
+  high: [7.5,8.0,8.5],
+  vhigh:[9.0,9.5,10.0]
+};
+const GRP_S_ENG={
+  low:  [1.0,1.2,1.4],
+  mid:  [1.5,1.6,1.7],
+  high: [1.8,1.9,2.0],
+  vhigh:[2.1,2.2,2.3]
+};
+const activeGrpS={low:false,mid:false,high:false,vhigh:false};
+
+// ════════════════════════════════════════════════════════════
+// ESTADO
+// ════════════════════════════════════════════════════════════
+let units='SI';
+let grpIso=[],singles=[];
+let grpTIso=[],singlesT=[];
+let grpHIso=[],singlesH=[];
+let grpSIso=[],singlesS=[];
+let singleId=0,singleCI=0,singleTId=0,singleHId=0,singleSId=0;
+let qxOn=false;
+// Isocalidades personalizadas ingresadas por el usuario — cada entrada:
+// {x:número en (0,1), c:color, id:entero}
+let customsQX=[],customQXId=0,customQXCI=0;
+// Isobaras personalizadas (P arbitraria) — almacenadas en SI (bar)
+// {Pnat:valor en unidad ingresada, Psi:valor en bar, c:color, id}
+let customsP=[],customPId=0,customPCI=0;
+// Isotermas personalizadas (T arbitraria) — almacenadas en SI (°C)
+// {Tnat, Tsi, c:color, id}
+let customsT=[],customTId=0,customTCI=0;
+// Puntos definidos por (T,P), (T,s) o (P,s) — almacenados en SI con metadatos
+// {Tsi, Psi, hSi, sSi, mode:'TP'|'Ts'|'Ps', c:color, id}
+let tpPoints=[],tpPointId=0,tpPointCI=0;
+// Modo activo del capturador de puntos: 'TP' · 'Ts' · 'Ps'
+let pointMode='TP';
+// Isoentálpicas personalizadas (h arbitraria) — almacenadas en SI (kJ/kg)
+// {hSi:valor en kJ/kg, c:color, id}
+let customsH=[],customHId=0,customHCI=0;
+// Isoentrópicas personalizadas (s arbitraria) — almacenadas en SI (kJ/(kg·K))
+// {sSi:valor en kJ/(kg·K), c:color, id}
+let customsS=[],customSId=0,customSCI=0;
+let fcOn=false,overTrace=false;
+// Puntos marcados de la trayectoria libre — siempre en unidades SI.
+// Cada elemento: {s:número (kJ/(kg·K)), h:número (kJ/kg)}
+let fcMarks=[];
+let fcMode='path'; // 'path' ⇒ traza segmentos con flechas · 'points' ⇒ marcadores independientes
+let fcSSI=null,fcHSI=null;
+
+// ── Conversiones ─────────────────────────────────────────────
+const CS=0.238846; // kJ/(kg·K) → Btu/(lbm·°R)
+const CH=0.429923; // kJ/kg     → Btu/lbm
+function getSat(){return units==='SI'?satSI:satENG;}
+function getSH() {return units==='SI'?shSI:shENG;}
+function getGRP(){return units==='SI'?GRP_SI:GRP_ENG;}
+
+// ── Interpolación saturación por P ──────────────────────────
+function satAtP(P){
+  const s=getSat();
+  if(P<=s[0].P)return{...s[0]};
+  if(P>=s[s.length-1].P)return{...s[s.length-1]};
+  for(let i=0;i<s.length-1;i++){
+    if(s[i].P<=P&&P<=s[i+1].P){
+      const f=(P-s[i].P)/(s[i+1].P-s[i].P);
+      return{P,T:s[i].T+f*(s[i+1].T-s[i].T),
+        hf:s[i].hf+f*(s[i+1].hf-s[i].hf),
+        hg:s[i].hg+f*(s[i+1].hg-s[i].hg),
+        sf:s[i].sf+f*(s[i+1].sf-s[i].sf),
+        sg:s[i].sg+f*(s[i+1].sg-s[i].sg)};
+    }
+  }
+  return{...s[s.length-1]};
+}
+
+// ════════════════════════════════════════════════════════════
+// CONSTRUCCIÓN DE ISOBARA EN DIAGRAMA DE MOLLIER h–s
+// Eje X = s (lineal), Eje Y = h (lineal)
+// Tramo bifásico: en la cúpula, a P=cte se tiene T=T_sat=cte y
+//   dh/ds = T, por lo que (s,h) describe una recta entre
+//   (sf,hf) y (sg,hg). Se extiende desde x=X_MIN hasta x=1.
+// Tramo sobrecalentado: curva monótona s↑, h↑ anclada en (sg,hg).
+// En supercrítico se grafica directamente la curva tabulada.
+// ════════════════════════════════════════════════════════════
+const X_MIN_ISOBAR=0.50;   // Cobertura mínima de calidad en la cúpula
+function buildIsobar(P_native,color){
+  const sat=getSat(),sh=getSH();
+  const Pcrit=sat[sat.length-1].P;
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const pU=units==='SI'?'bar':'psia';
+  const Plbl=`${P_native} ${pU}`;
+
+  // Datos de tabla A-4/A-4E para esta presión
+  const shEntry=sh.find(iso=>Math.abs(iso.P-P_native)<0.001);
+  if(!shEntry)return[];
+
+  // Saturación a esta presión (solo subcrítico)
+  const isSub=P_native<Pcrit*0.9999;
+  let hfS=null,hgS=null,sfS=null,sgS=null,Tsat=null;
+  if(isSub){
+    const s=satAtP(P_native);
+    hfS=s.hf; hgS=s.hg; sfS=s.sf; sgS=s.sg; Tsat=s.T;
+  } else {
+    Tsat=sat[sat.length-1].T;
+  }
+
+  // Puntos sobrecalentados ordenados por T ascendente
+  const supPts=shEntry.pts
+    .map(([T,h,s])=>({T,h,s}))
+    .sort((a,b)=>a.T-b.T);
+
+  // ── Tramo bifásico (cúpula): (sX_MIN,hX_MIN) → (sg,hg) ──────
+  const bipX=[],bipY=[],bipT=[];
+  if(isSub){
+    const nBip=24;
+    for(let k=0;k<=nBip;k++){
+      const x=X_MIN_ISOBAR+(1-X_MIN_ISOBAR)*(k/nBip);
+      bipX.push(sfS+x*(sgS-sfS));
+      bipY.push(hfS+x*(hgS-hfS));
+      bipT.push(Tsat);
+    }
+  }
+
+  // ── Tramo sobrecalentado: anclado en (sg, hg) para continuidad ──
+  const supX=[],supY=[],supT=[];
+  if(isSub&&sgS!==null&&hgS!==null){
+    if(supPts.length===0||Math.abs(supPts[0].s-sgS)>0.001){
+      supX.push(sgS);supY.push(hgS);supT.push(Tsat);
+    }
+  }
+  supPts.forEach(pt=>{
+    if(!isSub||pt.s>=(sgS||0)-0.001){
+      supX.push(pt.s);supY.push(pt.h);supT.push(pt.T);
+    }
+  });
+
+  // ── Concatenación bifásico + sobrecalentado ─────────────────
+  // El tramo bifásico termina exactamente en (sg,hg) y el
+  // sobrecalentado arranca también en (sg,hg), por lo que se
+  // omite el primer punto del sobrecalentado para no duplicar.
+  const xAll=bipX.length>0?[...bipX,...supX.slice(1)]:[...supX];
+  const yAll=bipY.length>0?[...bipY,...supY.slice(1)]:[...supY];
+  const tArr=bipT.length>0?[...bipT,...supT.slice(1)]:[...supT];
+
+  const tU=units==='SI'?'°C':'°F';
+  const main={x:xAll,y:yAll,mode:'lines',meta:'isobar',name:Plbl,
+    line:{color,width:2.0},showlegend:false,connectgaps:false,
+    customdata:tArr,
+    hovertemplate:`<b>P = ${Plbl}</b><br>T = %{customdata:.1f} ${tU}<br>h = %{y:.1f} ${hU}<br>s = %{x:.4g} ${sU}<extra></extra>`};
+
+  // Etiqueta al final del tramo sobrecalentado (mayor s, mayor h)
+  const lx=supX.length>0?supX[supX.length-1]:(bipX[0]||0);
+  const ly=supY.length>0?supY[supY.length-1]:(bipY[0]||0);
+  const lbl={x:[lx],y:[ly],mode:'text',text:[`<b>${Plbl}</b>`],
+    textposition:'top right',textfont:{color,size:11,family:'IBM Plex Sans, sans-serif',weight:700},
+    showlegend:false,hoverinfo:'skip'};
+  return[main,lbl];
+}
+
+// ════════════════════════════════════════════════════════════
+// CONSTRUCCIÓN DE ISOTERMA EN DIAGRAMA h–s
+// Región sobrecalentada: para cada P en la tabla con T_target
+//   por encima de T_sat(P), se interpola (h,s) a T=T_target.
+// Anclaje: el borde izquierdo se apoya en la curva de saturación
+//   de vapor en el punto (sg, hg) evaluado a Psat(T_target).
+// Al estar fijada T, un aumento de P reduce s — la curva se
+//   ordena por s↑, equivalente a P↓.
+// ════════════════════════════════════════════════════════════
+function buildIsotherm(T_native,color){
+  const sat=getSat(),sh=getSH();
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const pU=units==='SI'?'bar':'psia';
+  const tU=units==='SI'?'°C':'°F';
+  const Tlbl=`${T_native} ${tU}`;
+
+  const pts=[];
+
+  // Ancla en saturación: encontrar Psat tal que T_sat = T_target
+  let satAnchor=null;
+  for(let i=0;i<sat.length-1;i++){
+    if(sat[i].T<=T_native&&T_native<=sat[i+1].T){
+      const f=(T_native-sat[i].T)/(sat[i+1].T-sat[i].T);
+      satAnchor={
+        P:  sat[i].P +f*(sat[i+1].P -sat[i].P ),
+        hg: sat[i].hg+f*(sat[i+1].hg-sat[i].hg),
+        sg: sat[i].sg+f*(sat[i+1].sg-sat[i].sg)
+      };
+      break;
+    }
+  }
+
+  // Para cada isobara tabulada con T_target > T_sat(P), interpolar
+  sh.forEach(iso=>{
+    const ordered=iso.pts.slice().sort((a,b)=>a[0]-b[0]);
+    const Tsat_iso=ordered[0][0];
+    // Sólo sobrecalentado estricto (o saturación exacta, con tolerancia)
+    if(T_native<Tsat_iso-0.1)return;
+    if(Math.abs(T_native-Tsat_iso)<0.1){
+      pts.push({P:iso.P,h:ordered[0][1],s:ordered[0][2]});
+      return;
+    }
+    // Bracketing en T ascendente
+    for(let i=0;i<ordered.length-1;i++){
+      if(ordered[i][0]<=T_native&&T_native<=ordered[i+1][0]){
+        const f=(T_native-ordered[i][0])/(ordered[i+1][0]-ordered[i][0]);
+        const h=ordered[i][1]+f*(ordered[i+1][1]-ordered[i][1]);
+        const s=ordered[i][2]+f*(ordered[i+1][2]-ordered[i][2]);
+        pts.push({P:iso.P,h,s});
+        return;
+      }
+    }
+  });
+
+  if(pts.length===0&&!satAnchor)return[];
+
+  // Ordenar por s ascendente (equivalente a P descendente)
+  pts.sort((a,b)=>a.s-b.s);
+
+  // Añadir ancla de saturación si queda a la izquierda del primer punto
+  if(satAnchor){
+    if(pts.length===0||satAnchor.sg<pts[0].s-1e-4){
+      pts.unshift({P:satAnchor.P,h:satAnchor.hg,s:satAnchor.sg});
+    }
+  }
+  if(pts.length<2)return[];
+
+  const main={x:pts.map(p=>p.s),y:pts.map(p=>p.h),mode:'lines',meta:'isotherm',
+    name:Tlbl,line:{color,width:2.0,shape:'spline',smoothing:0.6},showlegend:false,
+    customdata:pts.map(p=>p.P),
+    hovertemplate:`<b>T = ${Tlbl}</b><br>P = %{customdata:.4g} ${pU}<br>h = %{y:.1f} ${hU}<br>s = %{x:.4g} ${sU}<extra></extra>`};
+
+  // Etiqueta: punto de mayor s (extremo derecho de la isoterma)
+  const lp=pts[pts.length-1];
+  const lbl={x:[lp.s],y:[lp.h],mode:'text',text:[`<b>${Tlbl}</b>`],
+    textposition:'bottom right',textfont:{color,size:11,family:'IBM Plex Sans, sans-serif',weight:700},
+    showlegend:false,hoverinfo:'skip'};
+  return[main,lbl];
+}
+
+// ════════════════════════════════════════════════════════════
+// LÍNEAS DE ISOCALIDAD x = constante
+// En la cúpula (wet region), a cada x∈(0,1), recorriendo P:
+//   h(x,P) = hf + x·(hg-hf)
+//   s(x,P) = sf + x·(sg-sf)
+// ════════════════════════════════════════════════════════════
+function buildQualityLines(){
+  const sat=getSat();
+  const Pcrit=sat[sat.length-1].P;
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const pU=units==='SI'?'bar':'psia';
+  const tU=units==='SI'?'°C':'°F';
+  const traces=[];
+  QLINES.forEach(x=>{
+    const xs=[],ys=[],meta=[];
+    sat.forEach(r=>{
+      if(r.P>=Pcrit*0.9999)return;
+      xs.push(r.sf+x*(r.sg-r.sf));
+      ys.push(r.hf+x*(r.hg-r.hf));
+      meta.push([r.P,r.T]);
+    });
+    if(xs.length<2)return;
+    traces.push({x:xs,y:ys,mode:'lines',meta:'quality',name:`x=${x.toFixed(2)}`,
+      line:{color:'#f50057',width:1.8,shape:'spline',smoothing:0.8},showlegend:false,
+      customdata:meta,opacity:0.90,
+      hovertemplate:`<b>x = ${x.toFixed(2)}</b><br>P = %{customdata[0]:.4g} ${pU}<br>T = %{customdata[1]:.2f} ${tU}<br>h = %{y:.1f} ${hU}<br>s = %{x:.4g} ${sU}<extra></extra>`});
+    // Etiqueta a la mitad
+    const mid=Math.floor(xs.length*0.62);
+    traces.push({x:[xs[mid]],y:[ys[mid]],mode:'text',text:[`<b>${x.toFixed(2)}</b>`],
+      textposition:'top right',
+      textfont:{color:'#880e4f',size:10.5,family:'IBM Plex Sans, sans-serif',weight:700},
+      showlegend:false,hoverinfo:'skip'});
+  });
+  return traces;
+}
+
+// ── Isocalidad personalizada (x arbitraria en (0,1)) ───────────
+// Recorre la cúpula de saturación con la misma ley de mezcla que
+// buildQualityLines, pero usa color configurable y etiqueta del
+// valor exacto de x. La trama de saturación garantiza continuidad.
+function buildCustomQualityLine(xVal,color){
+  const sat=getSat();
+  const Pcrit=sat[sat.length-1].P;
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const pU=units==='SI'?'bar':'psia';
+  const tU=units==='SI'?'°C':'°F';
+  const xs=[],ys=[],meta=[];
+  sat.forEach(r=>{
+    if(r.P>=Pcrit*0.9999)return;
+    xs.push(r.sf+xVal*(r.sg-r.sf));
+    ys.push(r.hf+xVal*(r.hg-r.hf));
+    meta.push([r.P,r.T]);
+  });
+  if(xs.length<2)return[];
+  const lbl=xVal.toFixed(4).replace(/0+$/,'').replace(/\.$/,'');
+  const main={x:xs,y:ys,mode:'lines',meta:'quality',name:`x=${lbl}`,
+    line:{color,width:2.2,shape:'spline',smoothing:0.8,dash:'dash'},
+    showlegend:false,customdata:meta,opacity:0.95,
+    hovertemplate:`<b>x = ${lbl}</b><br>P = %{customdata[0]:.4g} ${pU}<br>T = %{customdata[1]:.2f} ${tU}<br>h = %{y:.1f} ${hU}<br>s = %{x:.4g} ${sU}<extra></extra>`};
+  const mid=Math.floor(xs.length*0.55);
+  const lblT={x:[xs[mid]],y:[ys[mid]],mode:'text',text:[`<b>${lbl}</b>`],
+    textposition:'top right',
+    textfont:{color,size:11,family:'IBM Plex Sans, sans-serif',weight:700},
+    showlegend:false,hoverinfo:'skip'};
+  return[main,lblT];
+}
+
+// ════════════════════════════════════════════════════════════
+// HELPERS PARA INTERPOLACIÓN ARBITRARIA EN (T,P)
+// ════════════════════════════════════════════════════════════
+// Interpola (h,s) sobre una isobara tabulada para una T dada.
+// Devuelve null si T queda fuera de los puntos disponibles.
+function interpAtT(sortedPts,T){
+  if(sortedPts.length===0)return null;
+  if(T<sortedPts[0][0]-0.05)return null;
+  if(T>sortedPts[sortedPts.length-1][0]+0.05)return null;
+  for(let i=0;i<sortedPts.length-1;i++){
+    if(sortedPts[i][0]<=T&&T<=sortedPts[i+1][0]){
+      const f=(T-sortedPts[i][0])/(sortedPts[i+1][0]-sortedPts[i][0]);
+      return{h:sortedPts[i][1]+f*(sortedPts[i+1][1]-sortedPts[i][1]),
+             s:sortedPts[i][2]+f*(sortedPts[i+1][2]-sortedPts[i][2])};
+    }
+  }
+  return null;
+}
+
+// Localiza las dos isobaras tabuladas que envuelven a P_native.
+// Devuelve {lower,upper,f} con f∈[0,1] o null si fuera de rango.
+function bracketIsobars(P_native){
+  const sh=getSH();
+  const shSorted=sh.slice().sort((a,b)=>a.P-b.P);
+  if(P_native<shSorted[0].P-1e-6||P_native>shSorted[shSorted.length-1].P+1e-6)return null;
+  for(let i=0;i<shSorted.length-1;i++){
+    if(shSorted[i].P<=P_native&&P_native<=shSorted[i+1].P){
+      const f=(P_native-shSorted[i].P)/(shSorted[i+1].P-shSorted[i].P);
+      return{lower:shSorted[i],upper:shSorted[i+1],f};
+    }
+  }
+  return null;
+}
+
+// ════════════════════════════════════════════════════════════
+// ISOBARA PERSONALIZADA — interpolación bilineal entre dos
+// isobaras tabuladas adyacentes para una P arbitraria.
+// ════════════════════════════════════════════════════════════
+function buildCustomIsobar(P_native,color){
+  const sat=getSat();
+  const Pcrit=sat[sat.length-1].P;
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const pU=units==='SI'?'bar':'psia';
+  const tU=units==='SI'?'°C':'°F';
+  const Plbl=`${(+P_native.toFixed(4))} ${pU}`;
+
+  const br=bracketIsobars(P_native);
+  if(!br)return[];
+  // Si coincide casi exacto con una tabulada, reusar buildIsobar
+  if(Math.abs(br.lower.P-P_native)<1e-4)return buildIsobar(br.lower.P,color);
+  if(Math.abs(br.upper.P-P_native)<1e-4)return buildIsobar(br.upper.P,color);
+
+  const lowerSorted=br.lower.pts.slice().sort((a,b)=>a[0]-b[0]);
+  const upperSorted=br.upper.pts.slice().sort((a,b)=>a[0]-b[0]);
+  const f=br.f;
+
+  // Saturación a la P pedida (subcrítico)
+  const isSub=P_native<Pcrit*0.9999;
+  let hfS=null,hgS=null,sfS=null,sgS=null,Tsat=null;
+  if(isSub){
+    const s=satAtP(P_native);
+    hfS=s.hf;hgS=s.hg;sfS=s.sf;sgS=s.sg;Tsat=s.T;
+  } else {
+    Tsat=sat[sat.length-1].T;
+  }
+
+  // Tramo bifásico
+  const bipX=[],bipY=[],bipT=[];
+  if(isSub){
+    const nBip=24;
+    for(let k=0;k<=nBip;k++){
+      const x=X_MIN_ISOBAR+(1-X_MIN_ISOBAR)*(k/nBip);
+      bipX.push(sfS+x*(sgS-sfS));
+      bipY.push(hfS+x*(hgS-hfS));
+      bipT.push(Tsat);
+    }
+  }
+
+  // Tramo sobrecalentado: unión de Ts presentes en ambas isobaras
+  const Tset=new Set();
+  lowerSorted.forEach(p=>Tset.add(p[0]));
+  upperSorted.forEach(p=>Tset.add(p[0]));
+  const Ts=Array.from(Tset).sort((a,b)=>a-b);
+
+  const supX=[],supY=[],supT=[];
+  if(isSub&&sgS!==null){supX.push(sgS);supY.push(hgS);supT.push(Tsat);}
+  Ts.forEach(T=>{
+    if(isSub&&T<Tsat-0.5)return;
+    const lv=interpAtT(lowerSorted,T);
+    const uv=interpAtT(upperSorted,T);
+    if(!lv||!uv)return;
+    const h=lv.h+f*(uv.h-lv.h);
+    const s=lv.s+f*(uv.s-lv.s);
+    if(isSub&&s<sgS-1e-3)return;
+    supX.push(s);supY.push(h);supT.push(T);
+  });
+
+  const xAll=bipX.length>0?[...bipX,...supX.slice(1)]:[...supX];
+  const yAll=bipY.length>0?[...bipY,...supY.slice(1)]:[...supY];
+  const tArr=bipT.length>0?[...bipT,...supT.slice(1)]:[...supT];
+  if(xAll.length<2)return[];
+
+  const main={x:xAll,y:yAll,mode:'lines',meta:'isobar',name:Plbl,
+    line:{color,width:2.2,dash:'dash'},showlegend:false,
+    customdata:tArr,
+    hovertemplate:`<b>P = ${Plbl}</b> <i>(personalizada)</i><br>T = %{customdata:.1f} ${tU}<br>h = %{y:.1f} ${hU}<br>s = %{x:.4g} ${sU}<extra></extra>`};
+  const lx=supX.length>0?supX[supX.length-1]:(bipX[0]||0);
+  const ly=supY.length>0?supY[supY.length-1]:(bipY[0]||0);
+  const lbl={x:[lx],y:[ly],mode:'text',text:[`<b>${Plbl}</b>`],
+    textposition:'top right',textfont:{color,size:11,family:'IBM Plex Sans, sans-serif',weight:700},
+    showlegend:false,hoverinfo:'skip'};
+  return[main,lbl];
+}
+
+// ════════════════════════════════════════════════════════════
+// ISOTERMA PERSONALIZADA — reusa buildIsotherm pero con trazo
+// discontinuo para distinguirla.
+// ════════════════════════════════════════════════════════════
+function buildCustomIsotherm(T_native,color){
+  const traces=buildIsotherm(T_native,color);
+  if(traces.length===0)return[];
+  // Modificar la primera (línea) para usar dash y la segunda (etiqueta) para mantener color
+  if(traces[0]&&traces[0].line){
+    traces[0].line={...traces[0].line,dash:'dash',width:2.2};
+    if(traces[0].hovertemplate){
+      traces[0].hovertemplate=traces[0].hovertemplate.replace(/<b>T = /,'<b>T = ').replace(/<\/b>/, '</b> <i>(personalizada)</i>');
+    }
+  }
+  return traces;
+}
+
+// ════════════════════════════════════════════════════════════
+// PUNTO ARBITRARIO POR (T,P) — interpolación bilineal
+// Devuelve {h,s,Tsat,phase} o null si no resoluble
+// ════════════════════════════════════════════════════════════
+function interpHSatTP(T_native,P_native){
+  const sat=getSat();
+  const Pcrit=sat[sat.length-1].P;
+  const isSub=P_native<Pcrit*0.9999;
+
+  const br=bracketIsobars(P_native);
+  if(!br)return null;
+  const lowerSorted=br.lower.pts.slice().sort((a,b)=>a[0]-b[0]);
+  const upperSorted=br.upper.pts.slice().sort((a,b)=>a[0]-b[0]);
+  const f=br.f;
+
+  // Validación: en subcrítico, T debe estar por encima de T_sat(P)
+  let Tsat=null;
+  if(isSub){
+    Tsat=satAtP(P_native).T;
+    if(T_native<Tsat-0.05)return{error:'two-phase',Tsat};
+  }
+
+  const lv=interpAtT(lowerSorted,T_native);
+  const uv=interpAtT(upperSorted,T_native);
+  if(!lv||!uv)return null;
+  const h=lv.h+f*(uv.h-lv.h);
+  const s=lv.s+f*(uv.s-lv.s);
+  return{h,s,Tsat,phase:isSub?'superheated':'supercritical'};
+}
+
+// ── Interpolación saturación por T ──────────────────────────
+// Las tablas A-3/A-3E almacenan saturación por P; T_sat se asume
+// monótona creciente con P (válido para H₂O hasta el punto crítico).
+function satAtT(T_native){
+  const s=getSat();
+  if(T_native<=s[0].T)return{...s[0],T:T_native};
+  if(T_native>=s[s.length-1].T)return{...s[s.length-1],T:T_native};
+  for(let i=0;i<s.length-1;i++){
+    if(s[i].T<=T_native&&T_native<=s[i+1].T){
+      const f=(T_native-s[i].T)/(s[i+1].T-s[i].T);
+      return{T:T_native,
+        P:s[i].P+f*(s[i+1].P-s[i].P),
+        hf:s[i].hf+f*(s[i+1].hf-s[i].hf),
+        hg:s[i].hg+f*(s[i+1].hg-s[i].hg),
+        sf:s[i].sf+f*(s[i+1].sf-s[i].sf),
+        sg:s[i].sg+f*(s[i+1].sg-s[i].sg)};
+    }
+  }
+  return{...s[s.length-1],T:T_native};
+}
+
+// ════════════════════════════════════════════════════════════
+// PUNTO ARBITRARIO POR (T,s) — busca la P que satisface s a T cte
+// Devuelve {h,P,Psat,phase} o {error,sf,sg,Psat} si bifásico/liq.
+// Recorre todas las isobaras tabuladas evaluando (h,s) en T y
+// localiza el bracket de P donde s(P|T) = s_pedido.
+// ════════════════════════════════════════════════════════════
+function interpHSatTs(T_native,s_native){
+  const sat=getSat();
+  const sh=getSH();
+  const Tcrit=sat[sat.length-1].T;
+  const isSubT=T_native<Tcrit-0.05;
+
+  // Detección bifásico / líquido subenfriado
+  if(isSubT){
+    const sT=satAtT(T_native);
+    const sfT=sT.sf,sgT=sT.sg;
+    if(s_native<sfT-1e-3)return{error:'liquid',sf:sfT,sg:sgT,Psat:sT.P,Tsat:T_native};
+    if(s_native<=sgT+1e-3)return{error:'two-phase',sf:sfT,sg:sgT,Psat:sT.P,Tsat:T_native};
+  }
+
+  // Construye lista (P, h, s) sobre las isobaras tabuladas donde T es alcanzable
+  const shSorted=sh.slice().sort((a,b)=>a.P-b.P);
+  const pts=[];
+  shSorted.forEach(iso=>{
+    const sorted=iso.pts.slice().sort((a,b)=>a[0]-b[0]);
+    const r=interpAtT(sorted,T_native);
+    if(r)pts.push([iso.P,r.h,r.s]);
+  });
+  if(pts.length<2)return null;
+
+  // A T constante, s decrece al aumentar P en sobrecalentado/supercrítico.
+  // Buscar bracket donde s_native ∈ [s_i, s_{i+1}] (en cualquier orden).
+  for(let i=0;i<pts.length-1;i++){
+    const s1=pts[i][2],s2=pts[i+1][2];
+    const sLo=Math.min(s1,s2),sHi=Math.max(s1,s2);
+    if(sLo-1e-6<=s_native&&s_native<=sHi+1e-6){
+      const den=(s2-s1);
+      const f=Math.abs(den)<1e-9?0:(s_native-s1)/den;
+      const P=pts[i][0]+f*(pts[i+1][0]-pts[i][0]);
+      const h=pts[i][1]+f*(pts[i+1][1]-pts[i][1]);
+      return{h,P,phase:isSubT?'superheated':'supercritical'};
+    }
+  }
+  return null;
+}
+
+// ════════════════════════════════════════════════════════════
+// PUNTO ARBITRARIO POR (P,s) — busca la T que satisface s a P cte
+// Devuelve {h,T,Tsat,phase} o {error,sf,sg,Tsat} si bifásico/liq.
+// Reutiliza bracketIsobars y construye (T,h,s) a la P pedida.
+// ════════════════════════════════════════════════════════════
+function interpHSatPs(P_native,s_native){
+  const sat=getSat();
+  const Pcrit=sat[sat.length-1].P;
+  const isSub=P_native<Pcrit*0.9999;
+
+  // Detección bifásico / líquido subenfriado
+  if(isSub){
+    const sP=satAtP(P_native);
+    const sfP=sP.sf,sgP=sP.sg;
+    if(s_native<sfP-1e-3)return{error:'liquid',sf:sfP,sg:sgP,Tsat:sP.T,Psat:P_native};
+    if(s_native<=sgP+1e-3)return{error:'two-phase',sf:sfP,sg:sgP,Tsat:sP.T,Psat:P_native};
+  }
+
+  const br=bracketIsobars(P_native);
+  if(!br)return null;
+  const lowerSorted=br.lower.pts.slice().sort((a,b)=>a[0]-b[0]);
+  const upperSorted=br.upper.pts.slice().sort((a,b)=>a[0]-b[0]);
+  const f=br.f;
+
+  // Unión de Ts presentes en ambas isobaras
+  const Tset=new Set();
+  lowerSorted.forEach(p=>Tset.add(p[0]));
+  upperSorted.forEach(p=>Tset.add(p[0]));
+  const Ts=Array.from(Tset).sort((a,b)=>a-b);
+
+  // (T, h, s) sobre la isobara interpolada bilinealmente
+  const pts=[];
+  Ts.forEach(T=>{
+    const lv=interpAtT(lowerSorted,T);
+    const uv=interpAtT(upperSorted,T);
+    if(!lv||!uv)return;
+    const h=lv.h+f*(uv.h-lv.h);
+    const s=lv.s+f*(uv.s-lv.s);
+    pts.push([T,h,s]);
+  });
+  if(pts.length<2)return null;
+
+  // A P constante, s crece monótonamente con T. Buscar bracket.
+  for(let i=0;i<pts.length-1;i++){
+    const s1=pts[i][2],s2=pts[i+1][2];
+    const sLo=Math.min(s1,s2),sHi=Math.max(s1,s2);
+    if(sLo-1e-6<=s_native&&s_native<=sHi+1e-6){
+      const den=(s2-s1);
+      const fr=Math.abs(den)<1e-9?0:(s_native-s1)/den;
+      const T=pts[i][0]+fr*(pts[i+1][0]-pts[i][0]);
+      const h=pts[i][1]+fr*(pts[i+1][1]-pts[i][1]);
+      return{h,T,phase:isSub?'superheated':'supercritical'};
+    }
+  }
+  return null;
+}
+
+// ════════════════════════════════════════════════════════════
+// TRAZA DE PUNTOS POR (T,P) — marcadores con etiqueta T,P,h,s
+// ════════════════════════════════════════════════════════════
+function buildTPPointsTrace(){
+  if(tpPoints.length===0)return null;
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const pU=units==='SI'?'bar':'psia';
+  const tU=units==='SI'?'°C':'°F';
+  const xs=tpPoints.map(p=>units==='SI'?p.sSi:p.sSi*CS);
+  const ys=tpPoints.map(p=>units==='SI'?p.hSi:p.hSi*CH);
+  const Ts=tpPoints.map(p=>units==='SI'?p.Tsi:p.Tsi*9/5+32);
+  const Ps=tpPoints.map(p=>units==='SI'?p.Psi:p.Psi*14.5038);
+  const labels=tpPoints.map((p,i)=>`T${i+1}`);
+  const MODE_LBL={TP:'(T,P)',Ts:'(T,s)',Ps:'(P,s)'};
+  const modes=tpPoints.map(p=>MODE_LBL[p.mode||'TP']);
+  const cd=tpPoints.map((p,i)=>[Ts[i],Ps[i],modes[i]]);
+  return{x:xs,y:ys,mode:'markers+text',meta:'tppoint',name:'Puntos',
+    text:labels.map(l=>`<b>${l}</b>`),textposition:'bottom right',
+    textfont:{size:11.5,color:'#4a148c',family:"'IBM Plex Sans',sans-serif",weight:700},
+    marker:{size:13,color:'#7b1fa2',symbol:'diamond',line:{color:'#fff',width:2}},
+    customdata:cd,showlegend:false,
+    hovertemplate:`<b>%{text}</b> <i>%{customdata[2]}</i><br>T = %{customdata[0]:.2f} ${tU}<br>P = %{customdata[1]:.4g} ${pU}<br>h = %{y:.2f} ${hU}<br>s = %{x:.4f} ${sU}<extra></extra>`};
+}
+
+// ════════════════════════════════════════════════════════════
+// ISOENTÁLPICA  h = const  (recta horizontal en plano h-s)
+// ════════════════════════════════════════════════════════════
+function buildHLine(h_native,color){
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const xR=units==='SI'?[4.0,10.2]:[0.95,2.50];
+  const lbl=`h = ${h_native} ${hU}`;
+  const main={x:[xR[0],xR[1]],y:[h_native,h_native],mode:'lines',meta:'hline',
+    name:lbl,line:{color,width:1.8},showlegend:false,
+    hovertemplate:`<b>h = ${h_native} ${hU}</b><br>s = %{x:.4g} ${sU}<extra></extra>`};
+  const lblT={x:[xR[0]+(xR[1]-xR[0])*0.015],y:[h_native],mode:'text',
+    text:[`<b>${h_native}</b>`],textposition:'top right',
+    textfont:{color,size:11,family:'IBM Plex Sans, sans-serif',weight:700},
+    showlegend:false,hoverinfo:'skip'};
+  return[main,lblT];
+}
+
+// ════════════════════════════════════════════════════════════
+// ISOENTRÓPICA  s = const  (recta vertical en plano h-s)
+// ════════════════════════════════════════════════════════════
+function buildSLine(s_native,color){
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const yR=units==='SI'?[1800,4300]:[770,1950];
+  const lbl=`s = ${s_native} ${sU}`;
+  const main={x:[s_native,s_native],y:[yR[0],yR[1]],mode:'lines',meta:'sline',
+    name:lbl,line:{color,width:1.8},showlegend:false,
+    hovertemplate:`<b>s = ${s_native} ${sU}</b><br>h = %{y:.1f} ${hU}<extra></extra>`};
+  const lblT={x:[s_native],y:[yR[1]-(yR[1]-yR[0])*0.015],mode:'text',
+    text:[`<b>${s_native}</b>`],textposition:'bottom right',
+    textfont:{color,size:11,family:'IBM Plex Sans, sans-serif',weight:700},
+    showlegend:false,hoverinfo:'skip'};
+  return[main,lblT];
+}
+
+// ════════════════════════════════════════════════════════════
+// TRAZA DE SATURACIÓN DE VAPOR  (X = s, Y = h)
+// En el diagrama de Mollier clásico solo interesa la frontera
+// izquierda de la zona de vapor: la curva de saturación x=1.
+// ════════════════════════════════════════════════════════════
+const trVap={mode:'lines+markers',name:'Vapor saturado',meta:'sat',
+  line:{color:'#2e7d32',width:2.5},marker:{size:4,color:'#2e7d32'},showlegend:false,
+  hoverlabel:{bgcolor:'#fff',bordercolor:'#2e7d32',
+    font:{family:"'IBM Plex Mono',monospace",size:12,color:'#2e7d32'}}};
+
+// ════════════════════════════════════════════════════════════
+// LAYOUT — X lineal (s), Y lineal (h)
+// ════════════════════════════════════════════════════════════
+const layout={
+  paper_bgcolor:'#fff',plot_bgcolor:'#fafcff',
+  font:{family:"'IBM Plex Sans',sans-serif",color:'#1a2233',size:11.5},
+  margin:{l:90,r:92,t:40,b:75},
+  xaxis:{type:'linear',showgrid:true,gridcolor:'#e3edf9',zeroline:false,
+    showline:true,linecolor:'#1976d2',linewidth:2.5,tickcolor:'#1976d2',
+    tickwidth:2,ticklen:7,mirror:'ticks',
+    tickfont:{size:11.5,color:'#0d3b66',family:"'IBM Plex Sans',sans-serif"},
+    minor:{showgrid:true,gridcolor:'#eef4fb',tickcolor:'#90b8e0',ticklen:4}},
+  yaxis:{type:'linear',showgrid:true,gridcolor:'#e3edf9',zeroline:false,
+    showline:true,linecolor:'#7b1fa2',linewidth:2.5,tickcolor:'#7b1fa2',
+    tickwidth:2,ticklen:7,side:'left',
+    tickfont:{size:11.5,color:'#4a148c',family:"'IBM Plex Sans',sans-serif"},
+    minor:{showgrid:true,gridcolor:'#eef4fb',tickcolor:'#b39ddb',ticklen:4}},
+  yaxis2:{type:'linear',overlaying:'y',side:'right',showgrid:false,zeroline:false,
+    showline:true,linecolor:'#7b1fa2',linewidth:2.5,tickcolor:'#7b1fa2',
+    tickwidth:2,ticklen:7,matches:'y',
+    tickfont:{size:11.5,color:'#4a148c',family:"'IBM Plex Sans',sans-serif"}},
+  dragmode:'pan',showlegend:false,hovermode:'closest',
+  hoverlabel:{bgcolor:'#fff',bordercolor:'#1976d2',
+    font:{family:"'IBM Plex Mono',monospace",size:12,color:'#1a2233'}},
+  annotations:[],shapes:[]
+};
+const config={responsive:true,displayModeBar:true,scrollZoom:true,
+  modeBarButtonsToRemove:['lasso2d','select2d'],displaylogo:false,
+  toImageButtonOptions:{format:'png',filename:'diagrama_mollier_hs_agua',scale:2}};
+
+// ════════════════════════════════════════════════════════════
+// RENDERIZADO CENTRAL
+// ════════════════════════════════════════════════════════════
+function rebuild(){
+  const sat=getSat();
+  const hgD=sat.map(d=>d.hg);
+  const sgD=sat.map(d=>d.sg);
+  const tUl=units==='SI'?'°C':'°F';
+  const hUl=units==='SI'?'kJ/kg':'Btu/lbm';
+  const sUl=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const pUl=units==='SI'?'bar':'psia';
+  const sU=units==='SI'?'(kJ/(kg·K))':'(Btu/(lbm·°R))';
+  const hU=units==='SI'?'(kJ/kg)':'(Btu/lbm)';
+  // Rango ampliado para abarcar cúpula (x≥0.5) + sobrecalentado.
+  // Punto crítico en SI ≈ (4.43, 2099); en ING ≈ (1.06, 902).
+  // Límite inferior de cúpula a x=0.5: s≈4.4, h≈1800 (SI).
+  const xR=units==='SI'?[4.0,10.2]:[0.95,2.50];
+  const yR=units==='SI'?[1800,4300]:[770,1950];
+
+  const hV=sat.map(d=>`<b>Vapor Saturado</b><br>T<sub>sat</sub>=${d.T.toFixed(2)} ${tUl}<br>P=${d.P.toFixed(4)} ${pUl}<br>h<sub>g</sub>=${d.hg.toFixed(2)} ${hUl}<br>s<sub>g</sub>=${d.sg.toFixed(4)} ${sUl}<extra></extra>`);
+
+  // Punto crítico (vértice superior de la cúpula)
+  const crit=sat[sat.length-1];
+  const critPt={x:[crit.sg],y:[crit.hg],mode:'markers+text',
+    text:['<b>Punto crítico</b>'],textposition:'top right',
+    textfont:{size:11.5,color:'#bf360c',family:"'IBM Plex Sans',sans-serif",weight:700},
+    marker:{size:12,color:'#e65100',symbol:'star',line:{color:'#fff',width:2}},
+    showlegend:false,hovertemplate:`<b>Punto Crítico</b><br>T = ${crit.T} ${tUl}<br>h = ${crit.hg.toFixed(1)} ${hUl}<br>s = ${crit.sg.toFixed(4)} ${sUl}<br>P = ${crit.P} ${pUl}<extra></extra>`};
+
+  const gIso =grpIso.flatMap(i=>buildIsobar(i.P,i.c));
+  const sIso =singles.flatMap(i=>buildIsobar(i.P,i.c));
+  const gT_  =grpTIso.flatMap(i=>buildIsotherm(i.T,i.c));
+  const sT_  =singlesT.flatMap(i=>buildIsotherm(i.T,i.c));
+  const gH_  =grpHIso.flatMap(i=>buildHLine(i.h,i.c));
+  const sH_  =singlesH.flatMap(i=>buildHLine(i.h,i.c));
+  const gS_  =grpSIso.flatMap(i=>buildSLine(i.s,i.c));
+  const sS_  =singlesS.flatMap(i=>buildSLine(i.s,i.c));
+  const qL   =qxOn?buildQualityLines():[];
+  const qLC  =customsQX.flatMap(i=>buildCustomQualityLine(i.x,i.c));
+  const cP_  =customsP.flatMap(i=>buildCustomIsobar(units==='SI'?i.Psi:i.Psi*14.5038,i.c));
+  const cT_  =customsT.flatMap(i=>buildCustomIsotherm(units==='SI'?i.Tsi:(i.Tsi*9/5+32),i.c));
+  const tpTr =buildTPPointsTrace();
+  const cH_  =customsH.flatMap(i=>buildHLine(units==='SI'?i.hSi:i.hSi*CH,i.c));
+  const cS_  =customsS.flatMap(i=>buildSLine(units==='SI'?i.sSi:i.sSi*CS,i.c));
+
+  // Traza ancla invisible para forzar el renderizado del yaxis2 (eje derecho)
+  const y2Anchor={x:[xR[0]],y:[yR[0]],yaxis:'y2',mode:'markers',
+    marker:{size:0.1,color:'rgba(0,0,0,0)'},showlegend:false,hoverinfo:'skip',meta:'axis2'};
+
+  // Trayectoria de cursor libre (puntos + segmentos con flechas)
+  const fcPath=buildFCPath();
+
+  Plotly.react('chart',[
+    // Ancla eje derecho
+    y2Anchor,
+    // Líneas de isocalidad primero (capa de fondo)
+    ...qL,
+    // Isocalidades personalizadas (capa sobre el conjunto estándar)
+    ...qLC,
+    // Isoentálpicas e isoentrópicas (rectas de referencia)
+    ...gH_,...sH_,
+    ...gS_,...sS_,
+    ...cH_,...cS_,
+    // Saturación de vapor
+    {...trVap,x:sgD,y:hgD,hovertemplate:hV},
+    // Isobaras e isotermas
+    ...gIso,...sIso,
+    ...gT_,...sT_,
+    // Personalizadas (P, T arbitrarias)
+    ...cP_,...cT_,
+    // Punto crítico
+    critPt,
+    // Trayectoria del usuario en la capa superior
+    ...(fcPath.trace?[fcPath.trace]:[]),
+    // Puntos por (T,P) en la capa superior
+    ...(tpTr?[tpTr]:[])
+  ],{...layout,
+    annotations:fcPath.annotations,
+    xaxis:{...layout.xaxis,range:xR,
+      title:{text:`<b>Entropía Específica  s  ${sU}</b>`,
+        font:{size:14,color:'#0d47a1',family:"'IBM Plex Sans',sans-serif"},standoff:16}},
+    yaxis:{...layout.yaxis,range:yR,
+      title:{text:`<b>Entalpía Específica  h  ${hU}</b>`,
+        font:{size:14,color:'#4a148c',family:"'IBM Plex Sans',sans-serif"},standoff:16}},
+    yaxis2:{...layout.yaxis2,range:yR,
+      title:{text:`<b>h  ${hU}</b>`,
+        font:{size:13,color:'#4a148c',family:"'IBM Plex Sans',sans-serif"},standoff:12}}
+  },config);
+  // Actualizar/crear handles tras cada redibujado
+  setTimeout(buildAxHandles,80);
+}
+
+// ════════════════════════════════════════════════════════════
+// GESTIÓN DE GRUPOS E ISOBARAS
+// ════════════════════════════════════════════════════════════
+function toggleGrp(g){
+  activeGrp[g]=document.getElementById(`sh-${g}`).checked;
+  const gr=getGRP();grpIso=[];let ci=0;
+  ['low','mid','high','vhigh'].forEach(k=>{
+    if(!activeGrp[k])return;
+    gr[k].forEach(P=>{grpIso.push({P,c:PAL_ISO[ci%PAL_ISO.length]});ci++;});
+  });rebuild();
+}
+
+function getGRP_T(){return units==='SI'?GRP_T_SI:GRP_T_ENG;}
+function getGRP_H(){return units==='SI'?GRP_H_SI:GRP_H_ENG;}
+function getGRP_S(){return units==='SI'?GRP_S_SI:GRP_S_ENG;}
+
+function toggleGrpT(g){
+  activeGrpT[g]=document.getElementById(`st-${g}`).checked;
+  const gr=getGRP_T();grpTIso=[];let ci=0;
+  ['low','mid','high','vhigh'].forEach(k=>{
+    if(!activeGrpT[k])return;
+    // Paleta desfasada para distinguir visualmente isotermas de isobaras
+    gr[k].forEach(T=>{grpTIso.push({T,c:PAL_ISO[(ci*5+2)%PAL_ISO.length]});ci++;});
+  });rebuild();
+}
+
+function toggleGrpH(g){
+  activeGrpH[g]=document.getElementById(`sh-h-${g}`).checked;
+  const gr=getGRP_H();grpHIso=[];let ci=0;
+  ['low','mid','high','vhigh'].forEach(k=>{
+    if(!activeGrpH[k])return;
+    gr[k].forEach(h=>{grpHIso.push({h,c:PAL_ISO[(ci*7+5)%PAL_ISO.length]});ci++;});
+  });rebuild();
+}
+
+function toggleGrpS(g){
+  activeGrpS[g]=document.getElementById(`sh-s-${g}`).checked;
+  const gr=getGRP_S();grpSIso=[];let ci=0;
+  ['low','mid','high','vhigh'].forEach(k=>{
+    if(!activeGrpS[k])return;
+    gr[k].forEach(s=>{grpSIso.push({s,c:PAL_ISO[(ci*11+8)%PAL_ISO.length]});ci++;});
+  });rebuild();
+}
+
+function toggleQx(){
+  qxOn=!qxOn;
+  document.getElementById('tog-qx').classList.toggle('active',qxOn);
+  rebuild();
+}
+
+function updLabels(){
+  const g=getGRP(),gt=getGRP_T(),gh=getGRP_H(),gs=getGRP_S();
+  const pU=units==='SI'?'bar':'psia';
+  const tU=units==='SI'?'°C':'°F';
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  document.getElementById('lbl-low').textContent  =`Bajas (${g.low[0]}–${g.low[g.low.length-1]} ${pU})`;
+  document.getElementById('lbl-mid').textContent  =`Medias (${g.mid[0]}–${g.mid[g.mid.length-1]} ${pU})`;
+  document.getElementById('lbl-high').textContent =`Altas (${g.high[0]}–${g.high[g.high.length-1]} ${pU})`;
+  document.getElementById('lbl-vhigh').textContent=`Muy altas (${g.vhigh[0]}–${g.vhigh[g.vhigh.length-1]} ${pU})`;
+  document.getElementById('lbl-tlow').textContent  =`Bajas (${gt.low[0]}–${gt.low[gt.low.length-1]} ${tU})`;
+  document.getElementById('lbl-tmid').textContent  =`Medias (${gt.mid[0]}–${gt.mid[gt.mid.length-1]} ${tU})`;
+  document.getElementById('lbl-thigh').textContent =`Altas (${gt.high[0]}–${gt.high[gt.high.length-1]} ${tU})`;
+  document.getElementById('lbl-tvhigh').textContent=`Muy altas (${gt.vhigh[0]}–${gt.vhigh[gt.vhigh.length-1]} ${tU})`;
+  document.getElementById('lbl-hlow').textContent  =`Bajas (${gh.low[0]}–${gh.low[gh.low.length-1]} ${hU})`;
+  document.getElementById('lbl-hmid').textContent  =`Medias (${gh.mid[0]}–${gh.mid[gh.mid.length-1]} ${hU})`;
+  document.getElementById('lbl-hhigh').textContent =`Altas (${gh.high[0]}–${gh.high[gh.high.length-1]} ${hU})`;
+  document.getElementById('lbl-hvhigh').textContent=`Muy altas (${gh.vhigh[0]}–${gh.vhigh[gh.vhigh.length-1]} ${hU})`;
+  document.getElementById('lbl-slow').textContent  =`Bajas (${gs.low[0]}–${gs.low[gs.low.length-1]} ${sU})`;
+  document.getElementById('lbl-smid').textContent  =`Medias (${gs.mid[0]}–${gs.mid[gs.mid.length-1]} ${sU})`;
+  document.getElementById('lbl-shigh').textContent =`Altas (${gs.high[0]}–${gs.high[gs.high.length-1]} ${sU})`;
+  document.getElementById('lbl-svhigh').textContent=`Muy altas (${gs.vhigh[0]}–${gs.vhigh[gs.vhigh.length-1]} ${sU})`;
+}
+
+function populateSels(){
+  const sel=document.getElementById('sel-single'),sh=getSH();
+  const prev=parseFloat(sel.value);sel.innerHTML='';
+  const pU=units==='SI'?'bar':'psia';
+  sh.forEach(iso=>{
+    const o=document.createElement('option');
+    o.value=iso.P;o.textContent=`${iso.P} ${pU}`;
+    if(Math.abs(iso.P-prev)<0.001)o.selected=true;
+    sel.appendChild(o);
+  });
+  // Selector de isotermas: unión de grupos + cualquier T tabulada comúnmente
+  const selT=document.getElementById('sel-singleT');
+  const prevT=parseFloat(selT.value);selT.innerHTML='';
+  const tU=units==='SI'?'°C':'°F';
+  const gt=getGRP_T();
+  const allT=[...new Set([...gt.low,...gt.mid,...gt.high,...gt.vhigh])].sort((a,b)=>a-b);
+  allT.forEach(T=>{
+    const o=document.createElement('option');
+    o.value=T;o.textContent=`${T} ${tU}`;
+    if(Math.abs(T-prevT)<0.001)o.selected=true;
+    selT.appendChild(o);
+  });
+  // Selector h = const
+  const selH=document.getElementById('sel-singleH');
+  const prevH=parseFloat(selH.value);selH.innerHTML='';
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const gh=getGRP_H();
+  const allH=[...new Set([...gh.low,...gh.mid,...gh.high,...gh.vhigh])].sort((a,b)=>a-b);
+  allH.forEach(h=>{
+    const o=document.createElement('option');
+    o.value=h;o.textContent=`${h} ${hU}`;
+    if(Math.abs(h-prevH)<0.001)o.selected=true;
+    selH.appendChild(o);
+  });
+  // Selector s = const
+  const selS=document.getElementById('sel-singleS');
+  const prevS=parseFloat(selS.value);selS.innerHTML='';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const gs=getGRP_S();
+  const allS=[...new Set([...gs.low,...gs.mid,...gs.high,...gs.vhigh])].sort((a,b)=>a-b);
+  allS.forEach(s=>{
+    const o=document.createElement('option');
+    o.value=s;o.textContent=`${s.toFixed(2)} ${sU}`;
+    if(Math.abs(s-prevS)<0.001)o.selected=true;
+    selS.appendChild(o);
+  });
+}
+
+function addSingle(){
+  const P=parseFloat(document.getElementById('sel-single').value);
+  if(singles.find(i=>i.P===P))return;
+  singles.push({P,c:PAL_ISO[(singles.length*3)%PAL_ISO.length],id:++singleId});
+  renderSingles();rebuild();
+}
+function rmSingle(id){singles=singles.filter(i=>i.id!==id);renderSingles();rebuild();}
+function clearSingles(){singles=[];renderSingles();rebuild();}
+function renderSingles(){
+  const l=document.getElementById('list-single');if(!l)return;l.innerHTML='';
+  const pU=units==='SI'?'bar':'psia';
+  singles.forEach(i=>l.appendChild(mkIsoRow(`${i.P} ${pU}`,i.c,()=>rmSingle(i.id))));
+}
+
+function addSingleT(){
+  const T=parseFloat(document.getElementById('sel-singleT').value);
+  if(singlesT.find(i=>i.T===T))return;
+  singlesT.push({T,c:PAL_ISO[(singlesT.length*5+3)%PAL_ISO.length],id:++singleTId});
+  renderSinglesT();rebuild();
+}
+function rmSingleT(id){singlesT=singlesT.filter(i=>i.id!==id);renderSinglesT();rebuild();}
+function clearSinglesT(){singlesT=[];renderSinglesT();rebuild();}
+function renderSinglesT(){
+  const l=document.getElementById('list-singleT');if(!l)return;l.innerHTML='';
+  const tU=units==='SI'?'°C':'°F';
+  singlesT.forEach(i=>l.appendChild(mkIsoRow(`${i.T} ${tU}`,i.c,()=>rmSingleT(i.id))));
+}
+
+function addSingleH(){
+  const h=parseFloat(document.getElementById('sel-singleH').value);
+  if(isNaN(h)||singlesH.find(i=>i.h===h))return;
+  singlesH.push({h,c:PAL_ISO[(singlesH.length*7+1)%PAL_ISO.length],id:++singleHId});
+  renderSinglesH();rebuild();
+}
+function rmSingleH(id){singlesH=singlesH.filter(i=>i.id!==id);renderSinglesH();rebuild();}
+function clearSinglesH(){singlesH=[];renderSinglesH();rebuild();}
+function renderSinglesH(){
+  const l=document.getElementById('list-singleH');if(!l)return;l.innerHTML='';
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  singlesH.forEach(i=>l.appendChild(mkIsoRow(`${i.h} ${hU}`,i.c,()=>rmSingleH(i.id))));
+}
+
+function addSingleS(){
+  const s=parseFloat(document.getElementById('sel-singleS').value);
+  if(isNaN(s)||singlesS.find(i=>i.s===s))return;
+  singlesS.push({s,c:PAL_ISO[(singlesS.length*11+4)%PAL_ISO.length],id:++singleSId});
+  renderSinglesS();rebuild();
+}
+function rmSingleS(id){singlesS=singlesS.filter(i=>i.id!==id);renderSinglesS();rebuild();}
+function clearSinglesS(){singlesS=[];renderSinglesS();rebuild();}
+function renderSinglesS(){
+  const l=document.getElementById('list-singleS');if(!l)return;l.innerHTML='';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  singlesS.forEach(i=>l.appendChild(mkIsoRow(`${i.s} ${sU}`,i.c,()=>rmSingleS(i.id))));
+}
+
+// ── Isocalidades personalizadas (x en (0,1), dimensional libre) ─────────────
+// Se acepta cualquier valor estrictamente entre 0 y 1.  Al no depender de las
+// unidades (x es adimensional), las entradas sobreviven al cambio SI⇄Inglés;
+// sólo se redibujan para actualizar unidades en el hovertemplate.
+function addCustomQX(){
+  const inp=document.getElementById('inp-customQX');
+  const msg=document.getElementById('msg-customQX');
+  const x=parseFloat(inp.value);
+  msg.textContent='';
+  if(isNaN(x)){msg.textContent='Ingresa un número.';return;}
+  if(x<=0||x>=1){msg.textContent='Debe cumplir 0 < x < 1.';return;}
+  if(customsQX.some(c=>Math.abs(c.x-x)<1e-4)){msg.textContent='Valor ya graficado.';return;}
+  customsQX.push({x,c:PAL_ISO[(customQXCI*3+2)%PAL_ISO.length],id:++customQXId});
+  customQXCI++;
+  inp.value='';
+  renderCustomsQX();rebuild();
+}
+function rmCustomQX(id){customsQX=customsQX.filter(c=>c.id!==id);renderCustomsQX();rebuild();}
+function clearCustomsQX(){
+  customsQX=[];customQXCI=0;
+  const msg=document.getElementById('msg-customQX');if(msg)msg.textContent='';
+  renderCustomsQX();rebuild();
+}
+function renderCustomsQX(){
+  const l=document.getElementById('list-customQX');if(!l)return;l.innerHTML='';
+  customsQX.forEach(i=>{
+    const lbl=i.x.toFixed(4).replace(/0+$/,'').replace(/\.$/,'');
+    l.appendChild(mkIsoRow(`x = ${lbl}`,i.c,()=>rmCustomQX(i.id)));
+  });
+}
+
+// ── Isobaras personalizadas (P arbitraria, dentro de tabla A-4/A-4E) ─────────
+// Se almacena el valor en SI (bar) para sobrevivir cambios de unidad.
+function getCustomPRangeNative(){
+  const sh=getSH();
+  const ps=sh.map(r=>r.P).sort((a,b)=>a-b);
+  return[ps[0],ps[ps.length-1]];
+}
+function addCustomP(){
+  const inp=document.getElementById('inp-customP');
+  const msg=document.getElementById('msg-customP');
+  const Pn=parseFloat(inp.value);
+  msg.textContent='';
+  if(isNaN(Pn)){msg.textContent='Ingresa un número.';return;}
+  const r=getCustomPRangeNative();
+  const pU=units==='SI'?'bar':'psia';
+  if(Pn<r[0]||Pn>r[1]){msg.textContent=`Fuera de rango (${r[0]}–${r[1]} ${pU}).`;return;}
+  const Psi=units==='SI'?Pn:Pn/14.5038;
+  if(customsP.some(c=>Math.abs(c.Psi-Psi)/Math.max(Psi,1e-3)<5e-3)){msg.textContent='Valor ya graficado.';return;}
+  // Validar interpolabilidad
+  const test=buildCustomIsobar(Pn,'#000');
+  if(test.length===0){msg.textContent='No interpolable con la tabla.';return;}
+  customsP.push({Psi,c:PAL_ISO[(customPCI*9+4)%PAL_ISO.length],id:++customPId});
+  customPCI++;
+  inp.value='';
+  renderCustomsP();rebuild();
+}
+function rmCustomP(id){customsP=customsP.filter(c=>c.id!==id);renderCustomsP();rebuild();}
+function clearCustomsP(){
+  customsP=[];customPCI=0;
+  const m=document.getElementById('msg-customP');if(m)m.textContent='';
+  renderCustomsP();rebuild();
+}
+function renderCustomsP(){
+  const l=document.getElementById('list-customP');if(!l)return;l.innerHTML='';
+  const pU=units==='SI'?'bar':'psia';
+  customsP.forEach(i=>{
+    const Pdisp=units==='SI'?i.Psi:i.Psi*14.5038;
+    l.appendChild(mkIsoRow(`${(+Pdisp.toFixed(4))} ${pU}`,i.c,()=>rmCustomP(i.id)));
+  });
+}
+
+// ── Isotermas personalizadas (T arbitraria) ─────────────────────────────────
+function getCustomTRangeNative(){
+  const sh=getSH();
+  let mn=Infinity,mx=-Infinity;
+  sh.forEach(iso=>iso.pts.forEach(p=>{if(p[0]<mn)mn=p[0];if(p[0]>mx)mx=p[0];}));
+  return[mn,mx];
+}
+function addCustomT(){
+  const inp=document.getElementById('inp-customT');
+  const msg=document.getElementById('msg-customT');
+  const Tn=parseFloat(inp.value);
+  msg.textContent='';
+  if(isNaN(Tn)){msg.textContent='Ingresa un número.';return;}
+  const r=getCustomTRangeNative();
+  const tU=units==='SI'?'°C':'°F';
+  if(Tn<r[0]||Tn>r[1]){msg.textContent=`Fuera de rango (${r[0]}–${r[1]} ${tU}).`;return;}
+  const Tsi=units==='SI'?Tn:(Tn-32)*5/9;
+  if(customsT.some(c=>Math.abs(c.Tsi-Tsi)<0.05)){msg.textContent='Valor ya graficado.';return;}
+  const test=buildCustomIsotherm(Tn,'#000');
+  if(test.length===0){msg.textContent='No interpolable con la tabla.';return;}
+  customsT.push({Tsi,c:PAL_ISO[(customTCI*13+7)%PAL_ISO.length],id:++customTId});
+  customTCI++;
+  inp.value='';
+  renderCustomsT();rebuild();
+}
+function rmCustomT(id){customsT=customsT.filter(c=>c.id!==id);renderCustomsT();rebuild();}
+function clearCustomsT(){
+  customsT=[];customTCI=0;
+  const m=document.getElementById('msg-customT');if(m)m.textContent='';
+  renderCustomsT();rebuild();
+}
+function renderCustomsT(){
+  const l=document.getElementById('list-customT');if(!l)return;l.innerHTML='';
+  const tU=units==='SI'?'°C':'°F';
+  customsT.forEach(i=>{
+    const Tdisp=units==='SI'?i.Tsi:(i.Tsi*9/5+32);
+    l.appendChild(mkIsoRow(`${(+Tdisp.toFixed(2))} ${tU}`,i.c,()=>rmCustomT(i.id)));
+  });
+}
+
+// ── Configuración del modo activo del capturador de puntos ──────────────────
+// Define etiqueta visible, placeholders y unidades de los dos inputs.
+const PT_MODE_CFG={
+  TP:{lbl:'(T, P)',a:{ph:'T',uSI:'°C',uENG:'°F'},b:{ph:'P',uSI:'bar',uENG:'psia'}},
+  Ts:{lbl:'(T, s)',a:{ph:'T',uSI:'°C',uENG:'°F'},b:{ph:'s',uSI:'kJ/(kg·K)',uENG:'Btu/(lbm·°R)'}},
+  Ps:{lbl:'(P, s)',a:{ph:'P',uSI:'bar',uENG:'psia'},b:{ph:'s',uSI:'kJ/(kg·K)',uENG:'Btu/(lbm·°R)'}}
+};
+function setPointMode(mode){
+  if(!PT_MODE_CFG[mode])return;
+  pointMode=mode;
+  ['TP','Ts','Ps'].forEach(m=>{
+    const b=document.getElementById('pm-'+m);
+    if(b)b.classList.toggle('active',m===mode);
+  });
+  refreshPointInputs();
+  const m=document.getElementById('msg-tp');if(m)m.textContent='';
+}
+function refreshPointInputs(){
+  const cfg=PT_MODE_CFG[pointMode]||PT_MODE_CFG.TP;
+  const lb=document.getElementById('pt-mode-lb');if(lb)lb.textContent=cfg.lbl;
+  const ia=document.getElementById('inp-pt-a');
+  const ib=document.getElementById('inp-pt-b');
+  const ua=document.getElementById('unit-pt-a');
+  const ub=document.getElementById('unit-pt-b');
+  if(ia){ia.placeholder=cfg.a.ph;ia.value='';}
+  if(ib){ib.placeholder=cfg.b.ph;ib.value='';}
+  if(ua)ua.textContent=units==='SI'?cfg.a.uSI:cfg.a.uENG;
+  if(ub)ub.textContent=units==='SI'?cfg.b.uSI:cfg.b.uENG;
+}
+
+// ── Dispatcher unificado de trazo de punto ──────────────────────────────────
+// Lee el modo activo, los dos valores capturados, valida rangos, resuelve
+// el estado restante y empuja el resultado a tpPoints.
+function addPoint(){
+  const msg=document.getElementById('msg-tp');
+  msg.textContent='';
+  const a=parseFloat(document.getElementById('inp-pt-a').value);
+  const b=parseFloat(document.getElementById('inp-pt-b').value);
+  if(isNaN(a)||isNaN(b)){msg.textContent='Captura ambos valores numéricos.';return;}
+  const tU=units==='SI'?'°C':'°F';
+  const pU=units==='SI'?'bar':'psia';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const rT=getCustomTRangeNative();
+  const rP=getCustomPRangeNative();
+  const rS=getCustomSRangeNative();
+
+  let Tn=null,Pn=null,sn=null,hRes=null;
+
+  if(pointMode==='TP'){
+    Tn=a; Pn=b;
+    if(Tn<rT[0]||Tn>rT[1]){msg.textContent=`T fuera de rango (${rT[0]}–${rT[1]} ${tU}).`;return;}
+    if(Pn<rP[0]||Pn>rP[1]){msg.textContent=`P fuera de rango (${rP[0]}–${rP[1]} ${pU}).`;return;}
+    const r=interpHSatTP(Tn,Pn);
+    if(!r){msg.textContent='Estado fuera del dominio interpolable.';return;}
+    if(r.error==='two-phase'){msg.textContent=`Estado bifásico: T < T_sat = ${r.Tsat.toFixed(2)} ${tU}.`;return;}
+    hRes=r.h; sn=r.s;
+  }
+  else if(pointMode==='Ts'){
+    Tn=a; sn=b;
+    if(Tn<rT[0]||Tn>rT[1]){msg.textContent=`T fuera de rango (${rT[0]}–${rT[1]} ${tU}).`;return;}
+    if(sn<rS[0]||sn>rS[1]){msg.textContent=`s fuera de rango (${rS[0]}–${rS[1]} ${sU}).`;return;}
+    const r=interpHSatTs(Tn,sn);
+    if(!r){msg.textContent='Estado fuera del dominio interpolable.';return;}
+    if(r.error==='two-phase'){msg.textContent=`Bifásico a T=${r.Tsat.toFixed(2)} ${tU}: s∈[${r.sf.toFixed(4)},${r.sg.toFixed(4)}].`;return;}
+    if(r.error==='liquid'){msg.textContent=`Líquido subenfriado (s < s_f=${r.sf.toFixed(4)} a T=${r.Tsat.toFixed(2)} ${tU}).`;return;}
+    hRes=r.h; Pn=r.P;
+  }
+  else if(pointMode==='Ps'){
+    Pn=a; sn=b;
+    if(Pn<rP[0]||Pn>rP[1]){msg.textContent=`P fuera de rango (${rP[0]}–${rP[1]} ${pU}).`;return;}
+    if(sn<rS[0]||sn>rS[1]){msg.textContent=`s fuera de rango (${rS[0]}–${rS[1]} ${sU}).`;return;}
+    const r=interpHSatPs(Pn,sn);
+    if(!r){msg.textContent='Estado fuera del dominio interpolable.';return;}
+    if(r.error==='two-phase'){msg.textContent=`Bifásico a P=${Pn} ${pU}: s∈[${r.sf.toFixed(4)},${r.sg.toFixed(4)}], T_sat=${r.Tsat.toFixed(2)} ${tU}.`;return;}
+    if(r.error==='liquid'){msg.textContent=`Líquido subenfriado (s < s_f=${r.sf.toFixed(4)} a T_sat=${r.Tsat.toFixed(2)} ${tU}).`;return;}
+    hRes=r.h; Tn=r.T;
+  }
+  else{msg.textContent='Modo no reconocido.';return;}
+
+  // Conversión a SI para almacenamiento canónico
+  const Tsi=units==='SI'?Tn:(Tn-32)*5/9;
+  const Psi=units==='SI'?Pn:Pn/14.5038;
+  const hSi=units==='SI'?hRes:hRes/CH;
+  const sSi=units==='SI'?sn:sn/CS;
+  tpPoints.push({Tsi,Psi,hSi,sSi,mode:pointMode,c:'#7b1fa2',id:++tpPointId});
+  tpPointCI++;
+  refreshPointInputs();
+  renderTPPoints();rebuild();
+}
+// Alias para compatibilidad con cualquier handler heredado
+function addTPPoint(){return addPoint();}
+function rmTPPoint(id){tpPoints=tpPoints.filter(p=>p.id!==id);renderTPPoints();rebuild();}
+function clearTPPoints(){
+  tpPoints=[];tpPointCI=0;
+  const m=document.getElementById('msg-tp');if(m)m.textContent='';
+  renderTPPoints();rebuild();
+}
+function renderTPPoints(){
+  const l=document.getElementById('list-tp');if(!l)return;l.innerHTML='';
+  const tU=units==='SI'?'°C':'°F';
+  const pU=units==='SI'?'bar':'psia';
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const MODE_LBL={TP:'(T,P)',Ts:'(T,s)',Ps:'(P,s)'};
+  tpPoints.forEach((p,i)=>{
+    const Tdisp=units==='SI'?p.Tsi:(p.Tsi*9/5+32);
+    const Pdisp=units==='SI'?p.Psi:p.Psi*14.5038;
+    const hDisp=units==='SI'?p.hSi:p.hSi*CH;
+    const sDisp=units==='SI'?p.sSi:p.sSi*CS;
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:6px;padding:5px 8px;background:#faf4fc;border:1px solid #e1bee7;border-radius:5px';
+    const idx=document.createElement('div');
+    idx.style.cssText='display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:2.6em';
+    const idxN=document.createElement('div');
+    idxN.style.cssText='font-weight:700;color:#4a148c;font-size:.78rem;line-height:1';
+    idxN.textContent=`T${i+1}`;
+    const idxM=document.createElement('div');
+    idxM.style.cssText='font-family:\'IBM Plex Mono\',monospace;font-size:.58rem;color:#7b1fa2;letter-spacing:.02em;margin-top:1px';
+    idxM.textContent=MODE_LBL[p.mode||'TP'];
+    idx.appendChild(idxN);idx.appendChild(idxM);
+    const coord=document.createElement('div');
+    coord.style.cssText='flex:1;font-family:\'IBM Plex Mono\',monospace;font-size:.62rem;color:#311b92;line-height:1.35';
+    coord.innerHTML=`T = ${(+Tdisp.toFixed(2))} ${tU} · P = ${(+Pdisp.toFixed(3))} ${pU}<br>h = ${hDisp.toFixed(1)} ${hU}<br>s = ${sDisp.toFixed(4)} ${sU}`;
+    const btn=document.createElement('button');
+    btn.textContent='✕';btn.title='Eliminar';
+    btn.style.cssText='border:none;background:none;color:#6b7a99;cursor:pointer;font-size:.82rem;padding:2px 4px';
+    btn.onclick=()=>rmTPPoint(p.id);
+    row.appendChild(idx);row.appendChild(coord);row.appendChild(btn);
+    l.appendChild(row);
+  });
+}
+
+// ── Isoentálpicas personalizadas (h arbitraria) ───────────────────────────
+function getCustomHRangeNative(){
+  return units==='SI'?[1800,4300]:[770,1950];
+}
+function addCustomH(){
+  const inp=document.getElementById('inp-customH');
+  const msg=document.getElementById('msg-customH');
+  const hn=parseFloat(inp.value);
+  msg.textContent='';
+  if(isNaN(hn)){msg.textContent='Ingresa un número.';return;}
+  const r=getCustomHRangeNative();
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  if(hn<r[0]||hn>r[1]){msg.textContent=`Fuera de rango (${r[0]}–${r[1]} ${hU}).`;return;}
+  const hSi=units==='SI'?hn:hn/CH;
+  if(customsH.some(c=>Math.abs(c.hSi-hSi)<0.5)){msg.textContent='Valor ya graficado.';return;}
+  customsH.push({hSi,c:PAL_ISO[(customHCI*7+9)%PAL_ISO.length],id:++customHId});
+  customHCI++;
+  inp.value='';
+  renderCustomsH();rebuild();
+}
+function rmCustomH(id){customsH=customsH.filter(c=>c.id!==id);renderCustomsH();rebuild();}
+function clearCustomsH(){
+  customsH=[];customHCI=0;
+  const m=document.getElementById('msg-customH');if(m)m.textContent='';
+  renderCustomsH();rebuild();
+}
+function renderCustomsH(){
+  const l=document.getElementById('list-customH');if(!l)return;l.innerHTML='';
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  customsH.forEach(i=>{
+    const hd=units==='SI'?i.hSi:i.hSi*CH;
+    l.appendChild(mkIsoRow(`${(+hd.toFixed(2))} ${hU}`,i.c,()=>rmCustomH(i.id)));
+  });
+}
+
+// ── Isoentrópicas personalizadas (s arbitraria) ───────────────────────────
+function getCustomSRangeNative(){
+  return units==='SI'?[4.0,10.2]:[0.95,2.50];
+}
+function addCustomS(){
+  const inp=document.getElementById('inp-customS');
+  const msg=document.getElementById('msg-customS');
+  const sn=parseFloat(inp.value);
+  msg.textContent='';
+  if(isNaN(sn)){msg.textContent='Ingresa un número.';return;}
+  const r=getCustomSRangeNative();
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  if(sn<r[0]||sn>r[1]){msg.textContent=`Fuera de rango (${r[0]}–${r[1]} ${sU}).`;return;}
+  const sSi=units==='SI'?sn:sn/CS;
+  if(customsS.some(c=>Math.abs(c.sSi-sSi)<1e-3)){msg.textContent='Valor ya graficado.';return;}
+  customsS.push({sSi,c:PAL_ISO[(customSCI*11+6)%PAL_ISO.length],id:++customSId});
+  customSCI++;
+  inp.value='';
+  renderCustomsS();rebuild();
+}
+function rmCustomS(id){customsS=customsS.filter(c=>c.id!==id);renderCustomsS();rebuild();}
+function clearCustomsS(){
+  customsS=[];customSCI=0;
+  const m=document.getElementById('msg-customS');if(m)m.textContent='';
+  renderCustomsS();rebuild();
+}
+function renderCustomsS(){
+  const l=document.getElementById('list-customS');if(!l)return;l.innerHTML='';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  customsS.forEach(i=>{
+    const sd=units==='SI'?i.sSi:i.sSi*CS;
+    l.appendChild(mkIsoRow(`${(+sd.toFixed(4))} ${sU}`,i.c,()=>rmCustomS(i.id)));
+  });
+}
+
+function mkIsoRow(txt,color,onRm){
+  const r=document.createElement('div');
+  r.style.cssText='display:flex;align-items:center;gap:6px;padding:5px 8px;background:#f5f8fd;border:1px solid #d9e5f5;border-radius:5px;margin-top:4px';
+  const d=document.createElement('div');d.style.cssText=`width:9px;height:9px;border-radius:50%;background:${color};flex-shrink:0`;
+  const s=document.createElement('span');s.style.cssText='font-family:"IBM Plex Mono",monospace;font-size:.7rem;color:#1a2233;flex:1';s.textContent=txt;
+  const b=document.createElement('button');b.textContent='✕';b.style.cssText='border:none;background:none;color:#6b7a99;cursor:pointer;font-size:.75rem;padding:0';b.onclick=onRm;
+  r.appendChild(d);r.appendChild(s);r.appendChild(b);return r;
+}
+
+// ════════════════════════════════════════════════════════════
+// CAMBIO DE UNIDADES
+// ════════════════════════════════════════════════════════════
+function setUnits(sys){
+  if(sys===units)return;units=sys;
+  document.getElementById('btn-si').classList.toggle('active',sys==='SI');
+  document.getElementById('btn-ing').classList.toggle('active',sys==='ING');
+  grpIso=[];singles=[];grpTIso=[];singlesT=[];
+  grpHIso=[];singlesH=[];grpSIso=[];singlesS=[];
+  Object.keys(activeGrp ).forEach(k=>{activeGrp [k]=false;document.getElementById(`sh-${k}`).checked=false;});
+  Object.keys(activeGrpT).forEach(k=>{activeGrpT[k]=false;document.getElementById(`st-${k}`).checked=false;});
+  Object.keys(activeGrpH).forEach(k=>{activeGrpH[k]=false;document.getElementById(`sh-h-${k}`).checked=false;});
+  Object.keys(activeGrpS).forEach(k=>{activeGrpS[k]=false;document.getElementById(`sh-s-${k}`).checked=false;});
+  // Las isocalidades personalizadas son adimensionales → se conservan;
+  // sólo limpiamos mensajes y el campo de entrada.
+  const mcQ=document.getElementById('msg-customQX');if(mcQ)mcQ.textContent='';
+  const icQ=document.getElementById('inp-customQX');if(icQ)icQ.value='';
+  // Las isobaras/isotermas personalizadas y los puntos (T,P) están en SI:
+  // se conservan, sólo se refrescan las etiquetas de unidades visibles.
+  const mcP=document.getElementById('msg-customP');if(mcP)mcP.textContent='';
+  const icP=document.getElementById('inp-customP');if(icP)icP.value='';
+  const mcT=document.getElementById('msg-customT');if(mcT)mcT.textContent='';
+  const icT=document.getElementById('inp-customT');if(icT)icT.value='';
+  const mTP=document.getElementById('msg-tp');if(mTP)mTP.textContent='';
+  // El capturador de puntos (T,P)/(T,s)/(P,s) refresca sus inputs y unidades
+  // según el modo activo.
+  refreshPointInputs();
+  const uP=document.getElementById('unit-customP');if(uP)uP.textContent=units==='SI'?'bar':'psia';
+  const uT=document.getElementById('unit-customT');if(uT)uT.textContent=units==='SI'?'°C':'°F';
+  const mcH=document.getElementById('msg-customH');if(mcH)mcH.textContent='';
+  const icH=document.getElementById('inp-customH');if(icH)icH.value='';
+  const mcS=document.getElementById('msg-customS');if(mcS)mcS.textContent='';
+  const icS=document.getElementById('inp-customS');if(icS)icS.value='';
+  const uH=document.getElementById('unit-customH');if(uH)uH.textContent=units==='SI'?'kJ/kg':'Btu/lbm';
+  const uS=document.getElementById('unit-customS');if(uS)uS.textContent=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  updLabels();populateSels();renderSingles();renderSinglesT();renderSinglesH();renderSinglesS();renderCustomsQX();renderCustomsP();renderCustomsT();renderCustomsH();renderCustomsS();renderTPPoints();updFCLabels();updFCMarksCounter();rebuild();
+}
+function updFCLabels(){
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm',sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const fh=document.getElementById('fr-h'),fs=document.getElementById('fr-s');
+  if(fh&&fh.textContent.includes('—'))fh.textContent=`— ${hU}`;
+  if(fs&&fs.textContent.includes('—'))fs.textContent=`— ${sU}`;
+}
+
+// ════════════════════════════════════════════════════════════
+// SIDEBAR Y CURSOR LIBRE
+// ════════════════════════════════════════════════════════════
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
+
+const CD=document.getElementById('chart');
+function getSVG(){return CD.querySelector('svg.ch-ov');}
+
+function px2data(mx,my){
+  const la=CD._fullLayout;if(!la)return null;
+  const xa=la.xaxis,ya=la.yaxis;
+  const pL=la.margin.l,pR=la.width-la.margin.r,pT=la.margin.t,pB=la.height-la.margin.b;
+  if(mx<pL||mx>pR||my<pT||my>pB)return null;
+  const s=xa.range[0]+(mx-pL)/(pR-pL)*(xa.range[1]-xa.range[0]);
+  const h=ya.range[0]+(pB-my)/(pB-pT)*(ya.range[1]-ya.range[0]);
+  return{s,h};
+}
+
+function data2px(s,h){
+  const la=CD._fullLayout;if(!la)return null;
+  const xa=la.xaxis,ya=la.yaxis;
+  const xF=(s-xa.range[0])/(xa.range[1]-xa.range[0]);
+  const yF=(h-ya.range[0])/(ya.range[1]-ya.range[0]);
+  const pL=la.margin.l,pR=la.width-la.margin.r,pT=la.margin.t,pB=la.height-la.margin.b;
+  return{px:pL+xF*(pR-pL),py:pB-yF*(pB-pT)};
+}
+
+function moveCH(px,py,show,cpx,cpy,ct){
+  const svg=getSVG();const la=CD._fullLayout;if(!la||!svg)return;
+  const pL=la.margin.l,pR=la.width-la.margin.r,pT=la.margin.t,pB=la.height-la.margin.b;
+  const op=show?'0.85':'0',oc=(show&&cpx!=null)?'0.9':'0';
+  const q=id=>svg.querySelector('#'+id);
+  q('chvl').setAttribute('x1',px);q('chvl').setAttribute('x2',px);q('chvl').setAttribute('y1',pT);q('chvl').setAttribute('y2',pB);q('chvl').setAttribute('opacity',op);
+  q('chhl').setAttribute('x1',pL);q('chhl').setAttribute('x2',pR);q('chhl').setAttribute('y1',py);q('chhl').setAttribute('y2',py);q('chhl').setAttribute('opacity',op);
+  q('chdt').setAttribute('cx',px);q('chdt').setAttribute('cy',py);q('chdt').setAttribute('opacity',op);
+  if(cpx!=null){
+    q('chcd').setAttribute('cx',cpx);q('chcd').setAttribute('cy',cpy);q('chcd').setAttribute('opacity',oc);
+    q('chcl').setAttribute('x1',cpx);q('chcl').setAttribute('x2',cpx);q('chcl').setAttribute('y1',py);q('chcl').setAttribute('y2',cpy);q('chcl').setAttribute('opacity',oc);
+    const t=q('chct');const gR=(cpx+130<pR);
+    t.setAttribute('x',cpx+(gR?10:-10));t.setAttribute('y',cpy-8);t.setAttribute('text-anchor',gR?'start':'end');t.textContent=ct;t.setAttribute('opacity',oc);
+    try{const bb=t.getBBox();const bg=q('chcb');bg.setAttribute('x',bb.x-4);bg.setAttribute('y',bb.y-2);bg.setAttribute('width',bb.width+8);bg.setAttribute('height',bb.height+4);bg.setAttribute('opacity',oc);}catch(e){}
+  }else{['chcd','chcl','chct','chcb'].forEach(id=>{const el=q(id);if(el)el.setAttribute('opacity','0');});}
+}
+
+function hideFCLines(){
+  const svg=getSVG();if(!svg)return;
+  ['fcvl','fchl','fcdt','fclb','fclbbg'].forEach(id=>{const el=svg.querySelector('#'+id);if(el)el.setAttribute('opacity','0');});
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm',sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const fh=document.getElementById('fr-h'),fs=document.getElementById('fr-s');
+  if(fh)fh.textContent=`— ${hU}`;if(fs)fs.textContent=`— ${sU}`;
+}
+
+function toggleFC(){
+  fcOn=!fcOn;
+  document.getElementById('tog-fc').classList.toggle('active',fcOn);
+  document.getElementById('fc-panel').style.display=fcOn?'flex':'none';
+  if(!fcOn)hideFCLines();
+}
+
+function buildFCPath(){
+  if(fcMarks.length===0)return{trace:null,annotations:[]};
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const xs=fcMarks.map(m=>units==='SI'?m.s:m.s*CS);
+  const ys=fcMarks.map(m=>units==='SI'?m.h:m.h*CH);
+  const labels=fcMarks.map((m,i)=>`${i+1}`);
+  const isPath=fcMode==='path';
+  const traceName=isPath?'Trayectoria':'Puntos';
+  const hoverLabel=isPath?'Punto':'Marca';
+  const trace={x:xs,y:ys,mode:'markers+text',meta:'fcmark',name:traceName,
+    marker:{size:12,color:'#e65100',symbol:'circle',line:{color:'#fff',width:2}},
+    text:labels.map(l=>`<b>${l}</b>`),textposition:'top right',
+    textfont:{size:12,color:'#bf360c',family:"'IBM Plex Sans',sans-serif",weight:700},
+    customdata:labels,showlegend:false,
+    hovertemplate:`<b>${hoverLabel} %{customdata}</b><br>h = %{y:.2f} ${hU}<br>s = %{x:.4f} ${sU}<extra></extra>`};
+  const annotations=[];
+  if(isPath){
+    for(let i=1;i<xs.length;i++){
+      annotations.push({
+        x:xs[i],y:ys[i],xref:'x',yref:'y',
+        ax:xs[i-1],ay:ys[i-1],axref:'x',ayref:'y',
+        showarrow:true,arrowhead:3,arrowsize:1.5,arrowwidth:2.4,
+        arrowcolor:'#e65100',standoff:8,startstandoff:8,
+        opacity:0.95,text:''
+      });
+    }
+  }
+  return{trace,annotations};
+}
+
+function toggleInfo(key){
+  const box=document.getElementById(`info-${key}`);
+  const btn=document.getElementById(`info-${key}-btn`);
+  if(!box||!btn)return;
+  const open=box.classList.toggle('open');
+  btn.classList.toggle('active',open);
+}
+
+function setFCMode(mode){
+  if(mode!=='path'&&mode!=='points')return;
+  if(mode===fcMode)return;
+  fcMode=mode;
+  document.getElementById('fcm-path').classList.toggle('active',mode==='path');
+  document.getElementById('fcm-points').classList.toggle('active',mode==='points');
+  const lb=document.getElementById('fc-mode-lb');
+  if(lb)lb.textContent=mode==='path'?'Trayectoria':'Puntos';
+  updFCMarksCounter();rebuild();
+}
+
+function updFCMarksCounter(){
+  const el=document.getElementById('fr-nmk');
+  const ml=document.getElementById('fr-mlist');
+  if(!el)return;
+  const n=fcMarks.length;
+  const suffix=(fcMode==='path'&&n>1)?` · ${n-1} segmento${n-1===1?'':'s'}`:'';
+  el.textContent = n===0?'0 puntos'
+                 : n===1?'1 punto'
+                 : `${n} puntos${suffix}`;
+  if(!ml)return;
+  ml.innerHTML='';
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  fcMarks.forEach((m,i)=>{
+    const sDisp=units==='SI'?m.s:m.s*CS;
+    const hDisp=units==='SI'?m.h:m.h*CH;
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:6px;padding:5px 8px;background:#fff8f0;border:1px solid #ffcc80;border-radius:5px';
+    const idx=document.createElement('div');
+    idx.style.cssText='font-weight:700;color:#bf360c;font-size:.78rem;min-width:1.3em;text-align:center';
+    idx.textContent=String(i+1);
+    const coord=document.createElement('div');
+    coord.style.cssText='flex:1;font-family:\'IBM Plex Mono\',monospace;font-size:.65rem;color:#4a148c;line-height:1.35';
+    coord.innerHTML=`h = ${hDisp.toFixed(1)} ${hU}<br>s = ${sDisp.toFixed(4)} ${sU}`;
+    const btn=document.createElement('button');
+    btn.textContent='✕';btn.title='Eliminar este punto';
+    btn.style.cssText='border:none;background:none;color:#6b7a99;cursor:pointer;font-size:.82rem;padding:2px 4px';
+    btn.onmouseover=()=>{btn.style.color='#e53935';};
+    btn.onmouseout=()=>{btn.style.color='#6b7a99';};
+    btn.onclick=()=>removeFCMark(i);
+    row.appendChild(idx);row.appendChild(coord);row.appendChild(btn);
+    ml.appendChild(row);
+  });
+}
+
+function addFCMark(sDisp,hDisp){
+  const sSI = units==='SI'? sDisp : sDisp/CS;
+  const hSI = units==='SI'? hDisp : hDisp/CH;
+  fcMarks.push({s:sSI,h:hSI});
+  updFCMarksCounter();rebuild();
+}
+
+function undoFCMark(){
+  if(fcMarks.length===0)return;
+  fcMarks.pop();
+  updFCMarksCounter();rebuild();
+}
+
+function clearFCMarks(){
+  fcMarks=[];
+  updFCMarksCounter();rebuild();
+}
+
+function removeFCMark(idx){
+  if(idx<0||idx>=fcMarks.length)return;
+  fcMarks.splice(idx,1);
+  updFCMarksCounter();rebuild();
+}
+
+CD.addEventListener('mousemove',function(e){
+  if(!fcOn||overTrace)return;
+  const la=CD._fullLayout;if(!la)return;
+  const rect=CD.getBoundingClientRect();
+  const mx=e.clientX-rect.left,my=e.clientY-rect.top;
+  const coords=px2data(mx,my);if(!coords){hideFCLines();return;}
+  const{s,h}=coords;
+  const svg=getSVG();if(!svg)return;
+  const q=id=>svg.querySelector('#'+id);
+  if(!q('fcvl'))return;
+  const pL=la.margin.l,pR=la.width-la.margin.r,pT=la.margin.t,pB=la.height-la.margin.b;
+  q('fcvl').setAttribute('x1',mx);q('fcvl').setAttribute('x2',mx);q('fcvl').setAttribute('y1',pT);q('fcvl').setAttribute('y2',pB);q('fcvl').setAttribute('opacity','0.75');
+  q('fchl').setAttribute('x1',pL);q('fchl').setAttribute('x2',pR);q('fchl').setAttribute('y1',my);q('fchl').setAttribute('y2',my);q('fchl').setAttribute('opacity','0.75');
+  q('fcdt').setAttribute('cx',mx);q('fcdt').setAttribute('cy',my);q('fcdt').setAttribute('opacity','0.95');
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm',sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const hStr=h.toFixed(1),sStr=s.toFixed(4);
+  const lbTxt=`h = ${hStr} ${hU}   s = ${sStr} ${sU}`;
+  const lb=q('fclb'),lbbg=q('fclbbg');
+  const gR=(mx+260<pR);
+  lb.setAttribute('x',mx+(gR?14:-14));lb.setAttribute('y',my-12);
+  lb.setAttribute('text-anchor',gR?'start':'end');lb.textContent=lbTxt;lb.setAttribute('opacity','1');
+  try{const bb=lb.getBBox();lbbg.setAttribute('x',bb.x-5);lbbg.setAttribute('y',bb.y-3);lbbg.setAttribute('width',bb.width+10);lbbg.setAttribute('height',bb.height+6);lbbg.setAttribute('opacity','0.92');}catch(err){}
+  document.getElementById('fr-h').textContent=`${hStr} ${hU}`;
+  document.getElementById('fr-s').textContent=`${sStr} ${sU}`;
+  fcSSI=units==='SI'?s:s/CS;
+  fcHSI=units==='SI'?h:h/CH;
+});
+
+CD.addEventListener('mouseleave',function(){
+  moveCH(0,0,false,null,null,'');
+  if(fcOn)hideFCLines();
+  fcSSI=null;fcHSI=null;
+});
+
+let _fcmdX=null,_fcmdY=null;
+CD.addEventListener('mousedown',function(e){
+  if(!fcOn)return;
+  if(e.button!==0)return;
+  _fcmdX=e.clientX;_fcmdY=e.clientY;
+},true);
+document.addEventListener('mouseup',function(e){
+  if(!fcOn||_fcmdX==null)return;
+  if(e.button!==0){_fcmdX=null;_fcmdY=null;return;}
+  const dx=Math.abs(e.clientX-_fcmdX),dy=Math.abs(e.clientY-_fcmdY);
+  _fcmdX=null;_fcmdY=null;
+  if(dx>3||dy>3)return;
+  if(overTrace)return;
+  const rect=CD.getBoundingClientRect();
+  const mx=e.clientX-rect.left,my=e.clientY-rect.top;
+  const la=CD._fullLayout;if(!la)return;
+  const pL=la.margin.l,pR=la.width-la.margin.r,pT=la.margin.t,pB=la.height-la.margin.b;
+  if(mx<pL||mx>pR||my<pT||my>pB)return;
+  const c=px2data(mx,my);if(!c)return;
+  addFCMark(c.s,c.h);
+},true);
+
+let axHandles=[];
+let isDraggingHandle=false;
+
+function posAxHandles(){
+  const la=CD._fullLayout;if(!la||axHandles.length!==4)return;
+  const W=CD.clientWidth,H=CD.clientHeight;
+  const mL=la.margin.l,mT=la.margin.t,mR=la.margin.r||30,mB=la.margin.b;
+  const pR=W-mR, pB=H-mB;
+  const xLen=pR-mL, yLen=pB-mT;
+  const s=(h,x,y)=>{h.style.left=(x-13)+'px';h.style.top=(y-13)+'px';};
+  s(axHandles[0], mL + xLen*0.10,   pB+28);
+  s(axHandles[1], mL-52, mT + yLen*0.82);
+  s(axHandles[2], mL + xLen*0.90,   pB+28);
+  s(axHandles[3], mL-52, mT + yLen*0.18);
+}
+
+function buildAxHandles(){
+  axHandles.forEach(h=>h.remove()); axHandles=[];
+  const SPECS=[
+    {sym:'↔',ax:'x',type:'zoom',cur:'ew-resize',clr:'#1976d2',tip:'Escalar X'},
+    {sym:'↕',ax:'y',type:'zoom',cur:'ns-resize',clr:'#7b1fa2',tip:'Escalar Y'},
+    {sym:'↔',ax:'x',type:'pan', cur:'ew-resize',clr:'#1976d2',round:true,tip:'Pan X'},
+    {sym:'↕',ax:'y',type:'pan', cur:'ns-resize',clr:'#7b1fa2',round:true,tip:'Pan Y'},
+  ];
+  SPECS.forEach(({sym,ax,type,cur,clr,tip,round})=>{
+    const h=document.createElement('div');
+    h.className='ax-drag-handle'+(round?' round':'');
+    const isPan=type==='pan';
+    const bgDefault=isPan?'rgba(25,118,210,0.16)':'rgba(255,255,255,0.95)';
+    h.style.cssText+=`;border:2.5px solid ${clr};color:${clr};cursor:${cur};background:${bgDefault}`;
+    h.textContent=sym; h.title=tip;
+    let dragging=false,startMouse=0,startRange=[0,0],startHalf=0;
+    h.addEventListener('mousedown',function(ev){
+      dragging=true; isDraggingHandle=true;
+      const axObj=CD._fullLayout[ax==='x'?'xaxis':'yaxis'];
+      startRange=[axObj.range[0],axObj.range[1]];
+      startHalf=(axObj.range[1]-axObj.range[0])/2;
+      startMouse=ax==='x'?ev.clientX:ev.clientY;
+      ev.preventDefault(); ev.stopPropagation();
+      h.style.transform='scale(1.25)';
+      function onMove(ev2){
+        if(!dragging)return;
+        const la=CD._fullLayout;
+        const W2=CD.clientWidth,H2=CD.clientHeight;
+        const mL2=la.margin.l,mT2=la.margin.t,mR2=la.margin.r||30,mB2=la.margin.b;
+        const plotPx=ax==='x'?(W2-mR2-mL2):(H2-mT2-mB2);
+        const delta=ax==='x'?(ev2.clientX-startMouse):-(ev2.clientY-startMouse);
+        let nr;
+        if(type==='zoom'){
+          const center=(startRange[0]+startRange[1])/2;
+          const factor=Math.pow(1.003,-delta);
+          const newHalf=Math.max(startHalf*factor, startHalf*0.02);
+          nr=[center-newHalf, center+newHalf];
+        }else{
+          const span=startRange[1]-startRange[0];
+          const dv=delta*span/plotPx;
+          nr=[startRange[0]-dv, startRange[1]-dv];
+        }
+        const upd={}; upd[ax==='x'?'xaxis.range':'yaxis.range']=nr;
+        Plotly.relayout('chart',upd);
+      }
+      function onUp(){
+        dragging=false; isDraggingHandle=false;
+        h.style.transform='scale(1)';
+        document.removeEventListener('mousemove',onMove);
+        document.removeEventListener('mouseup',onUp);
+        posAxHandles();
+      }
+      document.addEventListener('mousemove',onMove);
+      document.addEventListener('mouseup',onUp);
+    });
+    h.addEventListener('mouseenter',()=>{
+      if(!dragging)h.style.background=ax==='x'?'rgba(25,118,210,0.30)':'rgba(123,31,162,0.22)';
+    });
+    h.addEventListener('mouseleave',()=>{
+      if(!dragging)h.style.background=bgDefault;
+    });
+    CD.appendChild(h); axHandles.push(h);
+  });
+  posAxHandles();
+}
+
+(function init(){
+  CD.style.position='relative';
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.classList.add('ch-ov');
+  svg.style.cssText='position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10';
+  function mkL(id,stroke,sw,dash){
+    const l=document.createElementNS('http://www.w3.org/2000/svg','line');
+    l.id=id;l.setAttribute('stroke',stroke);l.setAttribute('stroke-width',sw);
+    if(dash)l.setAttribute('stroke-dasharray',dash);l.setAttribute('opacity','0');svg.appendChild(l);}
+  function mkC(id,r,fill,stroke,sw){
+    const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.id=id;c.setAttribute('r',r);c.setAttribute('fill',fill);
+    c.setAttribute('stroke',stroke);c.setAttribute('stroke-width',sw);c.setAttribute('opacity','0');svg.appendChild(c);}
+  function mkR(id,fill,stroke){
+    const r=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    r.id=id;r.setAttribute('fill',fill);r.setAttribute('stroke',stroke);
+    r.setAttribute('stroke-width','1');r.setAttribute('rx','3');r.setAttribute('opacity','0');svg.appendChild(r);}
+  function mkT(id,fill,size,weight){
+    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.id=id;t.setAttribute('font-family','IBM Plex Mono,monospace');
+    t.setAttribute('font-size',size||'11');if(weight)t.setAttribute('font-weight',weight);
+    t.setAttribute('fill',fill);t.setAttribute('opacity','0');svg.appendChild(t);}
+  mkL('chvl','#1976d2','1.5','5,4');mkL('chhl','#1976d2','1.5','5,4');
+  mkC('chdt','5','#fff','#1976d2','2');
+  mkC('chcd','6','#fff8e1','#f57c00','2');mkL('chcl','#f57c00','1.2','3,3');
+  mkR('chcb','#fff','#f57c00');mkT('chct','#f57c00');
+  mkL('fcvl','#e65100','1.2','4,3');mkL('fchl','#e65100','1.2','4,3');
+  mkC('fcdt','4','#fff3e0','#e65100','2');
+  mkR('fclbbg','#fff3e0','#e65100');mkT('fclb','#bf360c','11','500');
+  CD.appendChild(svg);
+
+  populateSels();updLabels();updFCMarksCounter();refreshPointInputs();rebuild();
+
+  CD.on('plotly_hover',function(data){
+    const pt=data.points[0],meta=pt.data.meta;
+    const isSat=meta==='sat';
+    const isOverlay=['isobar','isotherm','quality','hline','sline','fcmark','tppoint'].indexOf(meta)>=0;
+    if(fcOn&&(isSat||isOverlay)){overTrace=true;hideFCLines();return;}
+    overTrace=false;if(!isSat)return;
+    const sat=getSat();const idx=pt.pointIndex;
+    const sH=sat[idx].sg, hH=sat[idx].hg;
+    const co=data2px(sH,hH);if(!co)return;
+    const pU=units==='SI'?'bar':'psia';
+    const tU=units==='SI'?'°C':'°F';
+    const ct=`P=${sat[idx].P} ${pU}  T<sub>sat</sub>=${sat[idx].T.toFixed(2)} ${tU}`;
+    moveCH(co.px,co.py,true,null,null,ct);
+  });
+  CD.on('plotly_unhover',function(){overTrace=false;moveCH(0,0,false,null,null,'');});
+
+  CD.on('plotly_relayout',function(){
+    if(!isDraggingHandle)posAxHandles();
+  });
+
+  window.addEventListener('resize',function(){setTimeout(posAxHandles,120);});
+})();
+
+// ═══════════════════════════════════════════════════════════════
+// MEJORAS v2.0
+// ═══════════════════════════════════════════════════════════════
+
+// Descargar PNG de alta resolución
+function downloadChart(){
+  var el=document.getElementById('chart');
+  var lay=el&&el._fullLayout;
+  var fname=(document.title||'diagrama').toLowerCase()
+    .replace(/[áä]/g,'a').replace(/[éë]/g,'e').replace(/[íï]/g,'i')
+    .replace(/[óö]/g,'o').replace(/[úü]/g,'u')
+    .replace(/[^a-z0-9]+/g,'_').replace(/(^_+|_+$)/g,'');
+  Plotly.downloadImage('chart',{format:'png',scale:3,filename:fname||'diagrama_termodinamico',
+    width:lay?lay.width:1280,height:lay?lay.height:720});
+}
+
+// Cerrar panel lateral con tecla Escape
+document.addEventListener('keydown',function(e){
+  if(e.key==='Escape'){
+    var sb=document.getElementById('sidebar');
+    if(sb&&sb.classList.contains('open'))sb.classList.remove('open');
+  }
+});
+
+// Reiniciar todo: limpiar curvas, cursor libre y volver a estado inicial
+function resetAll(){
+  try{
+    // Desactivar todos los grupos
+    Object.keys(activeGrp).forEach(function(k){
+      activeGrp[k]=false;
+      var cb=document.getElementById('sh-'+k);
+      if(cb){cb.checked=false;var sr=cb.closest&&cb.closest('.sr');if(sr)sr.classList.remove('active');}
+    });
+    grpIso=[];
+    if(typeof singles!=='undefined')singles=[];
+    if(typeof customs!=='undefined')customs=[];
+    if(typeof customId!=='undefined')customId=0;
+    if(typeof customCI!=='undefined')customCI=0;
+    if(typeof singleId!=='undefined')singleId=0;
+    if(typeof singleCI!=='undefined')singleCI=0;
+    // Limpiar campos de texto
+    var mc=document.getElementById('msg-custom');if(mc)mc.textContent='';
+    var ic=document.getElementById('inp-custom');if(ic)ic.value='';
+    // Apagar cursor libre si está encendido
+    if(typeof fcOn!=='undefined'&&fcOn&&typeof toggleFC==='function')toggleFC();
+    if(typeof fcMarks!=='undefined')fcMarks=[];
+    // Re-renderizar listas y gráfica
+    if(typeof renderSingles==='function')renderSingles();
+    if(typeof renderCustoms==='function')renderCustoms();
+    if(typeof updFCMarksCounter==='function')updFCMarksCounter();
+    if(typeof rebuild==='function')rebuild();
+  }catch(err){console.warn('resetAll:',err);}
+}
+
+</script>
+</body>
+</html>

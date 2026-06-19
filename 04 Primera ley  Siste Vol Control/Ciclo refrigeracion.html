@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Simulador de Ciclo de Compresión de Vapor y Bomba de Calor</title>
+<style>
+:root{
+  --bg:#f0f4fa; --panel:#ffffff; --border:#d8e2ef; --text:#0f172a;
+  --muted:#5a6a82; --primary:#1d56d4; --primary2:#1040cc; --danger:#dc2626;
+  --success:#16a34a; --accent:#0ea5e9;
+  --panel-shadow:0 2px 8px rgba(0,0,0,.07); --radius:10px; --transition:.15s ease;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--text)}
+.app{max-width:1380px;margin:0 auto;padding:16px}
+.app-header{background:linear-gradient(135deg,var(--primary) 0%,var(--primary2) 100%);
+  color:#fff;padding:12px 18px;border-radius:var(--radius);margin-bottom:10px;
+  box-shadow:0 4px 12px rgba(29,86,212,.3);display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
+.app-header h1{margin:0;font-size:19px;font-weight:700;line-height:1.2}
+.app-header .subtitle{color:rgba(255,255,255,.78);font-size:12.5px;display:block;margin-top:2px}
+.mode-bar{margin-left:auto;display:flex;gap:6px;align-items:center}
+.mode-btn{border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.08);color:#fff;
+  border-radius:6px;padding:7px 16px;font-size:13px;cursor:pointer;transition:all var(--transition)}
+.mode-btn:hover{background:rgba(255,255,255,.18)}
+.mode-btn.on{background:rgba(255,255,255,.26);border-color:#fff;font-weight:600}
+.toolbar{background:linear-gradient(135deg,var(--primary),var(--primary2));border-radius:var(--radius);
+  padding:8px 12px;margin-bottom:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+  box-shadow:0 2px 8px rgba(29,86,212,.25)}
+.tb-btn{background:rgba(255,255,255,.14);border:1.5px solid rgba(255,255,255,.35);color:#fff;
+  border-radius:6px;padding:6px 12px;font-size:13px;cursor:pointer;font-weight:600;
+  display:inline-flex;align-items:center;gap:6px;transition:all var(--transition)}
+.tb-btn:hover{background:rgba(255,255,255,.26)}
+.tb-sel{background:rgba(255,255,255,.16);border:1.5px solid rgba(255,255,255,.35);color:#fff;
+  border-radius:6px;padding:6px 8px;font-size:13px;cursor:pointer}
+.tb-sel option{color:#0f172a}
+.tb-label{color:rgba(255,255,255,.85);font-size:12.5px;font-weight:600;margin-right:2px}
+.layout{display:grid;grid-template-columns:278px 1fr 340px;gap:14px;align-items:start}
+.col-main,.col-right{display:flex;flex-direction:column;gap:14px;min-width:0}
+.col-right{position:sticky;top:10px;max-height:calc(100vh - 24px);overflow-y:auto;padding-right:4px}
+@media (max-width:1180px){.layout{grid-template-columns:1fr}.col-right{position:static;max-height:none}}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
+  padding:14px;box-shadow:var(--panel-shadow);transition:box-shadow var(--transition)}
+.panel:hover{box-shadow:0 4px 16px rgba(0,0,0,.1)}
+.panel-title{margin:0 0 12px;font-size:14px;color:var(--text);font-weight:700;
+  border-bottom:1px solid var(--border);padding-bottom:7px}
+.sidebar{position:sticky;top:10px}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:13px;font-size:13px}
+.field>label{color:var(--muted);font-weight:600;display:flex;justify-content:space-between}
+.field .val{color:var(--primary);font-weight:700}
+select,input[type=number]{border:1px solid var(--border);border-radius:6px;padding:6px 8px;
+  font-size:13px;background:#fff;color:var(--text);width:100%}
+input[type=range]{width:100%;accent-color:var(--primary)}
+.subhead{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;
+  letter-spacing:.04em;margin:14px 0 8px}
+.radio-row{display:flex;gap:8px}
+.radio-row label{flex:1;display:flex;align-items:center;gap:5px;font-size:12.5px;
+  border:1px solid var(--border);border-radius:6px;padding:6px 8px;cursor:pointer;color:var(--muted)}
+.radio-row label.on{border-color:var(--primary);background:#eff6ff;color:var(--primary);font-weight:600}
+.radio-row input{accent-color:var(--primary)}
+.alert{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:8px;
+  padding:10px 12px;margin-bottom:14px;font-size:13px}
+.alert ul{margin:6px 0 0;padding-left:18px}.alert b{color:#7f1d1d}
+.cop-panel{background:linear-gradient(135deg,#f0fdf4,#ecfdf5);border:2px solid #6ee7b7;
+  border-radius:10px;padding:12px 16px}
+.cop-title{font-size:12px;font-weight:700;color:#065f46;margin-bottom:8px;
+  display:flex;align-items:center;gap:6px;text-transform:uppercase;letter-spacing:.03em}
+.cop-row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0;border-bottom:1px dashed #a7f3d0}
+.cop-row span{color:var(--muted)}.cop-row strong{color:#065f46}
+.cop-row.highlight{border-bottom:none;margin-top:3px}
+.cop-row.highlight strong{font-size:17px;color:#047857}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+@media (max-width:640px){.cards{grid-template-columns:repeat(2,1fr)}}
+.card{background:linear-gradient(135deg,#eff6ff,#e8f0fe);border:1px solid #bfdbfe;
+  border-radius:8px;padding:10px 12px}
+.card .lbl{font-size:11px;color:var(--muted);font-weight:600}
+.card .num{font-size:17px;font-weight:700;color:var(--primary);margin-top:3px}
+.card .unit{font-size:11px;color:var(--muted);font-weight:500}
+.table-wrap{overflow-x:auto}
+.tech-table{width:100%;border-collapse:collapse;font-size:13px}
+.tech-table th,.tech-table td{border:1px solid var(--border);padding:7px 9px;text-align:right}
+.tech-table th{background:#f1f5f9;color:var(--text);font-weight:600}
+.tech-table td.state-label{text-align:left;font-weight:700;color:var(--primary)}
+.tech-table tbody tr:nth-child(even) td{background:rgba(0,0,0,.025)}
+.tech-table tbody tr:hover td{background:rgba(37,99,235,.06)}
+.diagram-tabs{display:flex;gap:6px;align-items:center;margin-bottom:10px}
+.diagram-tabs .tab{border:1px solid var(--border);background:#fff;color:var(--text);
+  border-radius:6px;padding:5px 14px;font-size:13px;cursor:pointer;transition:all var(--transition)}
+.diagram-tabs .tab.on{background:var(--primary);color:#fff;border-color:var(--primary);font-weight:600}
+canvas{width:100%;height:auto;border:1px solid var(--border);border-radius:8px;background:#fafcff;display:block}
+.sens-controls{display:grid;grid-template-columns:1.4fr 1fr 1fr auto;gap:10px;align-items:end;margin-bottom:12px}
+@media (max-width:760px){.sens-controls{grid-template-columns:1fr 1fr}}
+.btn{border:1px solid var(--primary);background:var(--primary);color:#fff;border-radius:6px;
+  padding:8px 16px;font-size:13px;cursor:pointer;font-weight:600;transition:all var(--transition)}
+.btn:hover{transform:translateY(-1px);box-shadow:0 3px 8px rgba(0,0,0,.15)}
+.assumption{font-size:11.5px;font-style:italic;color:#0369a1;background:#f0f9ff;
+  border-left:3px solid #38bdf8;padding:5px 10px;margin:0;border-radius:0 6px 6px 0}
+.hint{color:var(--muted);font-size:12px;margin:8px 0 0}
+.eqblock{font-size:12.5px;line-height:1.5;margin-bottom:12px}
+.eqblock .eqname{font-weight:700;color:var(--primary);margin-bottom:3px;font-size:12px}
+.eqblock .eq{background:#f8fafc;border:1px solid var(--border);border-radius:6px;
+  padding:6px 9px;font-family:"Cambria Math","Georgia",serif;color:#0f172a;overflow-x:auto;white-space:nowrap}
+.eqblock .eq .num{color:#047857;font-weight:600}
+.check-ok{background:#f0fdf4;border:1px solid #86efac;color:#065f46;border-radius:6px;
+  padding:7px 10px;font-size:12px;margin-top:4px}
+.app-footer{background:var(--panel);border-radius:10px;padding:11px 16px;margin-top:14px;
+  box-shadow:var(--panel-shadow);color:var(--muted);font-size:12px;line-height:1.6}
+.app-footer b{color:var(--text)}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:6px}
+::-webkit-scrollbar-thumb:hover{background:var(--muted)}
+@media print{.mode-bar,.toolbar,.sidebar input,.btn{display:none!important}
+  body{background:#fff}.panel{box-shadow:none}.col-right{overflow:visible;max-height:none}
+  .app-header{background:#fff!important;color:#000!important;border-bottom:2px solid var(--primary)}
+  .app-header h1,.app-header .subtitle{color:#000!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="app-header">
+    <div>
+      <h1>❄️ Simulador de Ciclo de Compresión de Vapor</h1>
+      <span class="subtitle">Refrigeración y bomba de calor · estados, COP, diagramas y balances</span>
+    </div>
+    <div class="mode-bar">
+      <button class="mode-btn on" id="mb-ref" onclick="setModo('Refrigeración')">Refrigeración</button>
+      <button class="mode-btn" id="mb-bc" onclick="setModo('Bomba de calor')">Bomba de calor</button>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <span class="tb-label">Unidades:</span>
+    <select class="tb-sel" id="units" onchange="setUnits(this.value)">
+      <option value="SI">Internacional (SI)</option>
+      <option value="IMP">Inglés (Imperial)</option>
+    </select>
+    <button class="tb-btn" onclick="guardar()">💾 Guardar</button>
+    <button class="tb-btn" onclick="document.getElementById('loadfile').click()">📂 Cargar</button>
+    <input type="file" id="loadfile" accept=".json" style="display:none" onchange="cargarFile(this)">
+    <button class="tb-btn" onclick="exportCSV()">📄 CSV</button>
+    <button class="tb-btn" onclick="window.print()">🖨️ Imprimir</button>
+    <button class="tb-btn" onclick="nuevo()" style="margin-left:auto">✦ Nueva simulación</button>
+  </div>
+
+  <div class="layout">
+    <aside class="panel sidebar">
+      <h2 class="panel-title">Parámetros de operación</h2>
+      <div class="field">
+        <label>Refrigerante</label>
+        <select id="fluid" onchange="onFluid()">
+          <option value="R134a">R134a</option>
+          <option value="R410A">R410A</option>
+          <option value="R290">R290 (propano)</option>
+          <option value="R717">R717 (amoniaco)</option>
+        </select>
+      </div>
+      <div class="subhead">Temperaturas</div>
+      <div class="field">
+        <label>Evaporación <span class="val"><span id="Te-v"></span> <span id="Te-u"></span></span></label>
+        <input type="range" id="Te" oninput="onSlider('Te')">
+      </div>
+      <div class="field">
+        <label>Condensación <span class="val"><span id="Tc-v"></span> <span id="Tc-u"></span></span></label>
+        <input type="range" id="Tc" oninput="onSlider('Tc')">
+      </div>
+      <div class="subhead">Estados intermedios</div>
+      <div class="field">
+        <label>Sobrecalentamiento <span class="val"><span id="sh-v"></span> <span id="sh-u"></span></span></label>
+        <input type="range" id="sh" oninput="onSlider('sh')">
+      </div>
+      <div class="field">
+        <label>Subenfriamiento <span class="val"><span id="sc-v"></span> <span id="sc-u"></span></span></label>
+        <input type="range" id="sc" oninput="onSlider('sc')">
+      </div>
+      <div class="subhead">Compresor</div>
+      <div class="field">
+        <label>Eficiencia isentrópica <span class="val"><span id="eta-v"></span></span></label>
+        <input type="range" id="eta" min="0.30" max="1" step="0.01" value="0.75" oninput="onSlider('eta')">
+      </div>
+      <div class="subhead">Dimensionamiento</div>
+      <div class="radio-row" id="dimrow">
+        <label class="on" id="lbl-cap"><input type="radio" name="dim" value="cap" checked onchange="onDimMode()">Capacidad</label>
+        <label id="lbl-mdot"><input type="radio" name="dim" value="mdot" onchange="onDimMode()">Flujo</label>
+      </div>
+      <div class="field" style="margin-top:10px">
+        <label id="dim-lbl"></label>
+        <input type="number" id="dimval" min="0.0001" step="0.5" oninput="onDim()">
+      </div>
+    </aside>
+
+    <main class="col-main">
+      <div id="alert-box"></div>
+      <section class="panel">
+        <h2 class="panel-title">Indicadores de desempeño</h2>
+        <div class="cop-panel" style="margin-bottom:12px">
+          <div class="cop-title">⚙️ Coeficientes de desempeño</div>
+          <div class="cop-row"><span>COP refrigeración</span><strong id="copr">—</strong></div>
+          <div class="cop-row"><span>COP bomba de calor</span><strong id="copbc">—</strong></div>
+          <div class="cop-row highlight"><span id="cop-main-lbl">COP del modo</span><strong id="copmain">—</strong></div>
+        </div>
+        <div class="cards">
+          <div class="card"><div class="lbl">Q evaporador (Q̇L)</div><div class="num"><span id="Qe">—</span> <span class="unit" id="Qe-u"></span></div></div>
+          <div class="card"><div class="lbl">Q condensador (Q̇H)</div><div class="num"><span id="Qc">—</span> <span class="unit" id="Qc-u"></span></div></div>
+          <div class="card"><div class="lbl">W compresor (Ẇc)</div><div class="num"><span id="W">—</span> <span class="unit" id="W-u"></span></div></div>
+          <div class="card"><div class="lbl">Flujo másico (ṁ)</div><div class="num"><span id="mdot">—</span> <span class="unit" id="mdot-u"></span></div></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2 class="panel-title">Estados termodinámicos</h2>
+        <div class="table-wrap">
+          <table class="tech-table">
+            <thead><tr>
+              <th style="text-align:left">Estado</th>
+              <th>P [<span id="th-P"></span>]</th><th>T [<span id="th-T"></span>]</th>
+              <th>h [<span id="th-h"></span>]</th><th>s [<span id="th-s"></span>]</th><th>Título x</th>
+            </tr></thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <p class="hint">Estado 1: salida del evaporador · 2: descarga del compresor · 3: salida del condensador · 4: salida de la válvula.</p>
+      </section>
+
+      <section class="panel">
+        <h2 class="panel-title">Diagramas termodinámicos</h2>
+        <div class="diagram-tabs">
+          <button class="tab on" id="tab-ph" onclick="setDiag('ph')">Diagrama P–h</button>
+          <button class="tab" id="tab-ts" onclick="setDiag('ts')">Diagrama T–s</button>
+        </div>
+        <canvas id="diag" width="840" height="470"></canvas>
+        <p class="assumption" style="margin-top:10px">Curva azul: líquido saturado · roja: vapor saturado · verde: ciclo 1-2-3-4. La campana cierra en el punto crítico.</p>
+      </section>
+
+      <section class="panel">
+        <h2 class="panel-title">Análisis de sensibilidad del COP</h2>
+        <div class="sens-controls">
+          <div class="field" style="margin:0">
+            <label>Variable independiente</label>
+            <select id="svar"><option value="Te">Temperatura de evaporación</option>
+              <option value="Tc">Temperatura de condensación</option></select>
+          </div>
+          <div class="field" style="margin:0"><label>Mínimo [<span id="sg-u1"></span>]</label><input type="number" id="smin" value="-30"></div>
+          <div class="field" style="margin:0"><label>Máximo [<span id="sg-u2"></span>]</label><input type="number" id="smax" value="15"></div>
+          <button class="btn" onclick="runSens()">Calcular</button>
+        </div>
+        <canvas id="senscv" width="840" height="360"></canvas>
+        <p class="assumption" style="margin-top:10px">Se barre la variable seleccionada manteniendo fijos los demás parámetros. Los puntos inviables se omiten.</p>
+      </section>
+    </main>
+
+    <aside class="col-right">
+      <section class="panel">
+        <h2 class="panel-title">Esquema del ciclo</h2>
+        <canvas id="sch" width="320" height="300"></canvas>
+        <p class="assumption" style="margin-top:8px">Flujo: 1→2 compresión, 2→3 condensación, 3→4 expansión, 4→1 evaporación.</p>
+      </section>
+      <section class="panel">
+        <h2 class="panel-title">Balance de masa y energía</h2>
+        <div id="balances"></div>
+      </section>
+      <section class="panel">
+        <h2 class="panel-title">Cálculos realizados</h2>
+        <div id="calculos"></div>
+      </section>
+    </aside>
+  </div>
+
+  <footer class="app-footer">
+    <b>Modelo:</b> régimen permanente · caída de presión despreciable en intercambiadores · compresión adiabática real (η<sub>is</sub>) · expansión isentálpica (h₃=h₄).
+    <b>Propiedades:</b> tablas de saturación generadas con CoolProp embebidas; región sobrecalentada aproximada con c<sub>p</sub> del vapor.
+    Error típico del COP &lt; 1.5 % frente a CoolProp. Herramienta con fines académicos.
+  </footer>
+</div>
+
+<script>
+/* === Tablas de propiedades (CoolProp embebido).
+   tab = [T[°C],P[kPa],hf,hg,sf,sg,cpf,cpv] (kJ); hc,sc = punto crítico === */
+var REFDATA = {"R134a":{"M":102.032,"Tcrit":101.06,"Pcrit":4059.28,"Ttriple":-103.3,"hc":389.636,"sc":1.56209,"tab":[[-60.0,15.9064,123.364,361.31,0.68462,1.80095,1.223,0.714],[-58.0,18.0913,125.814,362.576,0.69605,1.7965,1.2259,0.7188],[-56.0,20.5179,128.27,363.843,0.70741,1.79225,1.2289,0.7237],[-54.0,23.206,130.731,365.112,0.71868,1.78818,1.2319,0.7286],[-52.0,26.1763,133.199,366.382,0.72988,1.78429,1.2349,0.7335],[-50.0,29.4505,135.674,367.652,0.74101,1.78057,1.2381,0.7385],[-48.0,33.0514,138.154,368.923,0.75207,1.77702,1.2413,0.7435],[-46.0,37.0026,140.642,370.194,0.76305,1.77363,1.2445,0.7486],[-44.0,41.3287,143.136,371.464,0.77397,1.77039,1.2478,0.7538],[-42.0,46.0553,145.636,372.734,0.78482,1.76729,1.2512,0.759],[-40.0,51.209,148.144,374.003,0.79561,1.76434,1.2546,0.7643],[-38.0,56.8172,150.659,375.27,0.80633,1.76152,1.2581,0.7696],[-36.0,62.9084,153.181,376.536,0.817,1.75883,1.2617,0.775],[-34.0,69.5119,155.71,377.799,0.8276,1.75626,1.2654,0.7805],[-32.0,76.6579,158.247,379.06,0.83814,1.75381,1.2691,0.786],[-30.0,84.3777,160.792,380.319,0.84863,1.75147,1.2729,0.7917],[-28.0,92.7033,163.344,381.574,0.85906,1.74924,1.2767,0.7974],[-26.0,101.6677,165.905,382.825,0.86943,1.74712,1.2807,0.8032],[-24.0,111.3045,168.473,384.072,0.87975,1.74509,1.2847,0.809],[-22.0,121.6484,171.05,385.316,0.89002,1.74316,1.2888,0.815],[-20.0,132.735,173.636,386.554,0.90025,1.74132,1.293,0.8211],[-18.0,144.6004,176.23,387.788,0.91042,1.73957,1.2973,0.8272],[-16.0,157.2817,178.833,389.016,0.92054,1.7379,1.3017,0.8335],[-14.0,170.8167,181.445,390.239,0.93062,1.73631,1.3062,0.8398],[-12.0,185.2442,184.066,391.455,0.94066,1.73479,1.3108,0.8463],[-10.0,200.6033,186.697,392.665,0.95065,1.73335,1.3156,0.8528],[-8.0,216.9343,189.337,393.868,0.9606,1.73198,1.3204,0.8595],[-6.0,234.2779,191.987,395.064,0.97051,1.73066,1.3254,0.8663],[-4.0,252.6756,194.648,396.252,0.98037,1.72941,1.3304,0.8732],[-2.0,272.1698,197.319,397.432,0.99021,1.72822,1.3357,0.8803],[0.0,292.8032,200.0,398.603,1.0,1.72709,1.341,0.8874],[2.0,314.6194,202.692,399.766,1.00976,1.726,1.3466,0.8947],[4.0,337.6628,205.396,400.919,1.01948,1.72496,1.3522,0.9022],[6.0,361.9781,208.111,402.063,1.02918,1.72397,1.3581,0.9097],[8.0,387.6109,210.838,403.196,1.03884,1.72302,1.3641,0.9175],[10.0,414.6075,213.577,404.318,1.04847,1.72211,1.3704,0.9254],[12.0,443.0145,216.329,405.429,1.05808,1.72124,1.3768,0.9334],[14.0,472.8796,219.093,406.528,1.06765,1.7204,1.3835,0.9416],[16.0,504.2507,221.871,407.615,1.07721,1.71958,1.3903,0.95],[18.0,537.1767,224.662,408.688,1.08673,1.7188,1.3975,0.9586],[20.0,571.7069,227.468,409.748,1.09624,1.71804,1.4049,0.9674],[22.0,607.8914,230.288,410.794,1.10573,1.7173,1.4125,0.9764],[24.0,645.7808,233.123,411.825,1.11519,1.71658,1.4205,0.9856],[26.0,685.4266,235.973,412.839,1.12464,1.71587,1.4288,0.995],[28.0,726.8808,238.839,413.838,1.13408,1.71518,1.4375,1.0047],[30.0,770.1963,241.722,414.819,1.1435,1.71449,1.4465,1.0147],[32.0,815.4265,244.623,415.781,1.15291,1.71381,1.4559,1.0249],[34.0,862.6258,247.541,416.724,1.16231,1.71313,1.4658,1.0354],[36.0,911.8492,250.477,417.648,1.1717,1.71245,1.4761,1.0462],[38.0,963.1527,253.433,418.549,1.18109,1.71176,1.487,1.0573],[40.0,1016.593,256.409,419.429,1.19048,1.71106,1.4984,1.0688],[42.0,1072.228,259.406,420.284,1.19986,1.71034,1.5105,1.0807],[44.0,1130.1164,262.425,421.114,1.20925,1.70961,1.5232,1.0929],[46.0,1190.3179,265.467,421.917,1.21864,1.70885,1.5367,1.1056],[48.0,1252.8936,268.532,422.692,1.22804,1.70807,1.5509,1.1187],[50.0,1317.9055,271.623,423.437,1.23745,1.70725,1.5661,1.1324],[52.0,1385.4171,274.74,424.149,1.24688,1.70639,1.5824,1.1465],[54.0,1455.4935,277.886,424.828,1.25633,1.70548,1.5997,1.1612],[56.0,1528.2009,281.06,425.469,1.26579,1.70453,1.6184,1.1765],[58.0,1603.6078,284.266,426.071,1.27529,1.70351,1.6384,1.1925],[60.0,1681.7842,287.505,426.63,1.28482,1.70242,1.6602,1.2092],[62.0,1762.8024,290.779,427.143,1.29439,1.70126,1.6838,1.2266],[64.0,1846.7369,294.091,427.606,1.304,1.70001,1.7095,1.2449],[66.0,1933.6649,297.443,428.015,1.31366,1.69866,1.7379,1.264],[68.0,2023.6667,300.839,428.365,1.32338,1.6972,1.7691,1.2842],[70.0,2116.8257,304.282,428.65,1.33318,1.6956,1.8039,1.3054],[72.0,2213.2292,307.777,428.863,1.34305,1.69387,1.8429,1.3277],[74.0,2312.969,311.329,428.996,1.35301,1.69197,1.8871,1.3513],[76.0,2416.1417,314.943,429.04,1.36309,1.68987,1.9376,1.3763],[78.0,2522.85,318.627,428.984,1.37329,1.68756,1.9961,1.4027],[80.0,2633.2033,322.39,428.814,1.38364,1.68499,2.0648,1.4308],[82.0,2747.3196,326.243,428.511,1.39417,1.68213,2.147,1.4606],[84.0,2865.3267,330.201,428.055,1.40491,1.6789,2.2473,1.4922],[86.0,2987.3651,334.282,427.415,1.41592,1.67524,2.373,1.526],[88.0,3113.5912,338.512,426.554,1.42727,1.67105,2.5358,1.5619],[90.0,3244.1826,342.928,425.416,1.43904,1.66618,2.7559,1.6003],[92.0,3379.3464,347.586,423.917,1.45138,1.66042,3.0719,1.6412],[94.0,3519.3332,352.578,421.922,1.46453,1.6534,3.5669,1.6848],[96.0,3664.4658,358.073,419.184,1.47895,1.64449,4.4602,1.7314],[98.0,3815.2049,364.47,415.138,1.49568,1.63219,6.5735,1.7812],[100.0,3972.3788,373.298,407.683,1.51878,1.61093,17.5915,1.8348]]},"R410A":{"M":72.585,"Tcrit":71.34,"Pcrit":4901.2,"Ttriple":-73.15,"hc":368.706,"sc":1.51854,"tab":[[-60.0,63.9629,114.792,394.762,0.6509,1.96456,1.3584,0.7515],[-58.0,71.427,117.513,395.838,0.66359,1.95738,1.3603,0.7578],[-56.0,79.5732,120.239,396.906,0.67617,1.95041,1.3625,0.7643],[-54.0,88.4454,122.97,397.965,0.68866,1.94363,1.3648,0.7709],[-52.0,98.0889,125.705,399.013,0.70105,1.93704,1.3673,0.7776],[-50.0,108.5502,128.446,400.052,0.71335,1.93063,1.3699,0.7844],[-48.0,119.8772,131.193,401.08,0.72557,1.9244,1.3728,0.7914],[-46.0,132.1194,133.945,402.097,0.7377,1.91833,1.3758,0.7986],[-44.0,145.3273,136.705,403.103,0.74975,1.91242,1.3791,0.8059],[-42.0,159.553,139.471,404.098,0.76172,1.90667,1.3825,0.8133],[-40.0,174.8498,142.245,405.08,0.77362,1.90106,1.3862,0.8209],[-38.0,191.2721,145.026,406.05,0.78544,1.89559,1.39,0.8286],[-36.0,208.8756,147.815,407.007,0.7972,1.89025,1.3941,0.8365],[-34.0,227.7173,150.614,407.951,0.80889,1.88504,1.3985,0.8445],[-32.0,247.8554,153.421,408.882,0.82051,1.87996,1.403,0.8527],[-30.0,269.349,156.238,409.797,0.83208,1.87499,1.4078,0.8611],[-28.0,292.2587,159.064,410.699,0.84358,1.87013,1.4129,0.8696],[-26.0,316.6459,161.902,411.584,0.85503,1.86537,1.4182,0.8783],[-24.0,342.5733,164.75,412.454,0.86642,1.86071,1.4238,0.8872],[-22.0,370.1047,167.61,413.307,0.87777,1.85615,1.4297,0.8963],[-20.0,399.3046,170.482,414.143,0.88907,1.85167,1.4359,0.9056],[-18.0,430.2391,173.367,414.962,0.90032,1.84728,1.4424,0.9151],[-16.0,462.9751,176.264,415.761,0.91153,1.84296,1.4492,0.9248],[-14.0,497.5803,179.176,416.541,0.9227,1.83872,1.4563,0.9347],[-12.0,534.1238,182.102,417.301,0.93383,1.83454,1.4639,0.9449],[-10.0,572.6756,185.043,418.041,0.94493,1.83042,1.4718,0.9553],[-8.0,613.3067,188.0,418.758,0.95599,1.82636,1.4801,0.966],[-6.0,656.0893,190.974,419.452,0.96703,1.82236,1.4888,0.9769],[-4.0,701.0966,193.964,420.123,0.97804,1.81839,1.4979,0.9882],[-2.0,748.4026,196.973,420.768,0.98903,1.81447,1.5076,0.9998],[0.0,798.083,200.0,421.388,1.0,1.81058,1.5177,1.0116],[2.0,850.2141,203.047,421.98,1.01095,1.80672,1.5284,1.0239],[4.0,904.8736,206.114,422.544,1.02188,1.80288,1.5397,1.0365],[6.0,962.1405,209.203,423.078,1.03281,1.79906,1.5515,1.0495],[8.0,1022.095,212.315,423.58,1.04373,1.79524,1.5641,1.063],[10.0,1084.8184,215.449,424.05,1.05464,1.79144,1.5773,1.0769],[12.0,1150.3939,218.609,424.484,1.06555,1.78763,1.5914,1.0912],[14.0,1218.9057,221.794,424.882,1.07647,1.78381,1.6063,1.1061],[16.0,1290.4398,225.006,425.241,1.08739,1.77997,1.6221,1.1216],[18.0,1365.0839,228.247,425.56,1.09832,1.77611,1.639,1.1376],[20.0,1442.9274,231.517,425.835,1.10927,1.77222,1.6569,1.1543],[22.0,1524.0615,234.819,426.064,1.12024,1.76829,1.6762,1.1716],[24.0,1608.5798,238.155,426.244,1.13124,1.7643,1.6968,1.1897],[26.0,1696.5779,241.526,426.372,1.14226,1.76026,1.719,1.2086],[28.0,1788.1538,244.934,426.444,1.15333,1.75614,1.7429,1.2283],[30.0,1883.4084,248.382,426.457,1.16443,1.75194,1.7689,1.249],[32.0,1982.4453,251.872,426.405,1.17559,1.74764,1.7972,1.2706],[34.0,2085.3713,255.408,426.285,1.18681,1.74322,1.8281,1.2933],[36.0,2192.297,258.992,426.089,1.1981,1.73868,1.8622,1.3171],[38.0,2303.3365,262.63,425.812,1.20946,1.73399,1.8999,1.3422],[40.0,2418.6085,266.324,425.447,1.22092,1.72914,1.9421,1.3687],[42.0,2538.2368,270.081,424.984,1.23249,1.72408,1.9895,1.3966],[44.0,2662.3503,273.907,424.413,1.24418,1.71881,2.0433,1.4261],[46.0,2791.0844,277.809,423.722,1.25601,1.71328,2.1053,1.4573],[48.0,2924.5817,281.797,422.897,1.26802,1.70745,2.1774,1.4904],[50.0,3062.9929,285.882,421.919,1.28023,1.70127,2.2627,1.5254],[52.0,3206.4785,290.079,420.767,1.29268,1.69468,2.3656,1.5627],[54.0,3355.2103,294.407,419.413,1.30543,1.6876,2.4924,1.6023],[56.0,3509.374,298.891,417.819,1.31856,1.67993,2.653,1.6444],[58.0,3669.1718,303.566,415.936,1.33215,1.67153,2.8638,1.6892],[60.0,3834.8277,308.483,413.696,1.34635,1.66221,3.1534,1.7369],[62.0,4006.5932,313.721,410.994,1.36138,1.65167,3.5771,1.7877],[64.0,4184.7586,319.407,407.669,1.37762,1.63945,4.2564,1.8417],[66.0,4369.6715,325.782,403.429,1.39574,1.62473,5.519,1.8992],[68.0,4561.7768,333.405,397.655,1.41736,1.60572,8.6244,1.9603],[70.0,4761.73,344.343,388.389,1.44844,1.57681,25.093,2.0252]]},"R290":{"M":44.096,"Tcrit":96.74,"Pcrit":4251.17,"Ttriple":-187.62,"hc":555.235,"sc":2.05163,"tab":[[-60.0,42.6932,60.811,504.437,0.42938,2.51066,2.172,1.3959],[-58.0,47.4085,65.167,506.846,0.44968,2.50257,2.1796,1.4055],[-56.0,52.5292,69.539,509.255,0.46987,2.49481,2.1873,1.4152],[-54.0,58.0795,73.927,511.663,0.48994,2.48737,2.1952,1.425],[-52.0,64.0841,78.332,514.071,0.5099,2.48024,2.2032,1.435],[-50.0,70.5685,82.753,516.478,0.52975,2.4734,2.2115,1.4451],[-48.0,77.5587,87.191,518.883,0.5495,2.46685,2.22,1.4555],[-46.0,85.0815,91.647,521.286,0.56915,2.46058,2.2286,1.4659],[-44.0,93.1642,96.12,523.686,0.5887,2.45457,2.2375,1.4766],[-42.0,101.8345,100.612,526.084,0.60815,2.44882,2.2466,1.4874],[-40.0,111.1212,105.123,528.479,0.62751,2.44332,2.2558,1.4984],[-38.0,121.053,109.653,530.869,0.64678,2.43805,2.2653,1.5095],[-36.0,131.6598,114.203,533.256,0.66597,2.43301,2.275,1.5208],[-34.0,142.9714,118.773,535.637,0.68508,2.42819,2.2849,1.5324],[-32.0,155.0185,123.363,538.013,0.70411,2.42358,2.295,1.5441],[-30.0,167.8322,127.975,540.384,0.72306,2.41917,2.3054,1.556],[-28.0,181.4439,132.608,542.748,0.74193,2.41495,2.316,1.5681],[-26.0,195.8858,137.262,545.106,0.76074,2.41092,2.3268,1.5804],[-24.0,211.1902,141.94,547.456,0.77948,2.40708,2.3379,1.5929],[-22.0,227.3899,146.64,549.798,0.79815,2.4034,2.3492,1.6056],[-20.0,244.5183,151.363,552.132,0.81676,2.39989,2.3608,1.6185],[-18.0,262.6089,156.11,554.457,0.83531,2.39654,2.3727,1.6317],[-16.0,281.6958,160.882,556.772,0.8538,2.39333,2.3848,1.6451],[-14.0,301.8134,165.678,559.077,0.87224,2.39028,2.3972,1.6587],[-12.0,322.9964,170.5,561.371,0.89063,2.38736,2.41,1.6726],[-10.0,345.2799,175.348,563.653,0.90897,2.38457,2.423,1.6868],[-8.0,368.6995,180.223,565.923,0.92726,2.3819,2.4363,1.7012],[-6.0,393.2907,185.125,568.18,0.9455,2.37936,2.45,1.7159],[-4.0,419.0898,190.055,570.424,0.96371,2.37693,2.464,1.7309],[-2.0,446.1332,195.013,572.653,0.98187,2.37461,2.4784,1.7461],[0.0,474.4575,200.0,574.866,1.0,2.37238,2.4932,1.7617],[2.0,504.0999,205.017,577.063,1.0181,2.37025,2.5083,1.7776],[4.0,535.0977,210.065,579.244,1.03616,2.36821,2.5239,1.7939],[6.0,567.4885,215.143,581.406,1.0542,2.36626,2.5399,1.8105],[8.0,601.3104,220.254,583.549,1.0722,2.36438,2.5563,1.8274],[10.0,636.6016,225.397,585.673,1.09019,2.36258,2.5733,1.8448],[12.0,673.4007,230.574,587.775,1.10816,2.36083,2.5907,1.8625],[14.0,711.7467,235.786,589.855,1.12611,2.35915,2.6087,1.8806],[16.0,751.679,241.032,591.912,1.14404,2.35753,2.6272,1.8992],[18.0,793.237,246.315,593.944,1.16197,2.35595,2.6464,1.9182],[20.0,836.4609,251.635,595.95,1.17988,2.35442,2.6662,1.9378],[22.0,881.391,256.994,597.928,1.19779,2.35292,2.6867,1.9578],[24.0,928.068,262.392,599.878,1.2157,2.35145,2.708,1.9783],[26.0,976.5332,267.83,601.797,1.23361,2.35,2.73,1.9994],[28.0,1026.8283,273.31,603.684,1.25153,2.34857,2.7529,2.0211],[30.0,1078.9952,278.833,605.537,1.26945,2.34715,2.7767,2.0434],[32.0,1133.0767,284.401,607.354,1.28739,2.34573,2.8015,2.0663],[34.0,1189.1159,290.015,609.132,1.30534,2.34431,2.8274,2.09],[36.0,1247.1566,295.676,610.87,1.32332,2.34287,2.8545,2.1143],[38.0,1307.243,301.386,612.565,1.34132,2.34141,2.8829,2.1395],[40.0,1369.4204,307.148,614.214,1.35935,2.33993,2.9127,2.1655],[42.0,1433.7344,312.963,615.815,1.37742,2.3384,2.9442,2.1923],[44.0,1500.2318,318.833,617.363,1.39554,2.33683,2.9773,2.2201],[46.0,1568.96,324.761,618.856,1.4137,2.33519,3.0124,2.2489],[48.0,1639.9677,330.749,620.29,1.43192,2.33349,3.0496,2.2788],[50.0,1713.3043,336.801,621.66,1.4502,2.3317,3.0893,2.3099],[52.0,1789.0207,342.919,622.962,1.46855,2.32982,3.1317,2.3422],[54.0,1867.1692,349.108,624.189,1.48698,2.32782,3.1773,2.3759],[56.0,1947.8035,355.37,625.336,1.5055,2.3257,3.2263,2.4111],[58.0,2030.979,361.711,626.396,1.52413,2.32342,3.2795,2.4478],[60.0,2116.7529,368.136,627.361,1.54287,2.32098,3.3375,2.4862],[62.0,2205.1846,374.65,628.22,1.56175,2.31833,3.401,2.5264],[64.0,2296.3357,381.26,628.965,1.58077,2.31547,3.471,2.5686],[66.0,2390.2704,387.974,629.581,1.59995,2.31234,3.5489,2.6128],[68.0,2487.0556,394.801,630.056,1.61933,2.30893,3.6362,2.6594],[70.0,2586.7619,401.752,630.372,1.63893,2.30517,3.735,2.7083],[72.0,2689.4634,408.839,630.51,1.65878,2.30103,3.848,2.7599],[74.0,2795.2389,416.079,630.447,1.67892,2.29643,3.9791,2.8143],[76.0,2904.1723,423.489,630.155,1.6994,2.29131,4.1333,2.8719],[78.0,3016.3544,431.095,629.597,1.72029,2.28558,4.3181,2.9328],[80.0,3131.8838,438.927,628.73,1.74166,2.27911,4.5445,2.9973],[82.0,3250.8692,447.027,627.491,1.76362,2.27176,4.8294,3.0659],[84.0,3373.4321,455.449,625.8,1.78632,2.26329,5.2008,3.1386],[86.0,3499.7113,464.275,623.538,1.80996,2.25341,5.7075,3.2159],[88.0,3629.869,473.628,620.528,1.83488,2.24164,6.4445,3.298],[90.0,3764.1021,483.708,616.474,1.86161,2.2272,7.6233,3.3853],[92.0,3902.6638,494.902,610.828,1.89117,2.20864,9.828,3.4781],[94.0,4045.9138,508.127,602.294,1.92601,2.18249,15.463,3.5767]]},"R717":{"M":17.031,"Tcrit":132.41,"Pcrit":11363.39,"Ttriple":-77.65,"hc":1247.802,"sc":3.99517,"tab":[[-60.0,21.8381,76.536,1520.652,0.37464,7.14975,4.3636,2.0719],[-58.0,24.8751,85.274,1524.115,0.41542,7.10304,4.3712,2.0804],[-56.0,28.2569,94.027,1527.548,0.45589,7.05742,4.3789,2.0893],[-54.0,32.0131,102.796,1530.95,0.49607,7.01286,4.3865,2.0987],[-52.0,36.1752,111.58,1534.32,0.53594,6.96931,4.3942,2.1085],[-50.0,40.776,120.38,1537.657,0.57553,6.92676,4.4019,2.1187],[-48.0,45.8503,129.196,1540.96,0.61483,6.88515,4.4096,2.1294],[-46.0,51.4342,138.028,1544.228,0.65384,6.84446,4.4172,2.1405],[-44.0,57.566,146.876,1547.459,0.69258,6.80467,4.4248,2.152],[-42.0,64.2852,155.739,1550.654,0.73105,6.76573,4.4324,2.164],[-40.0,71.6333,164.617,1553.811,0.76925,6.72762,4.44,2.1765],[-38.0,79.6534,173.512,1556.929,0.80719,6.69031,4.4476,2.1894],[-36.0,88.3903,182.422,1560.007,0.84487,6.65378,4.4552,2.2028],[-34.0,97.8905,191.348,1563.044,0.88229,6.618,4.4627,2.2166],[-32.0,108.2023,200.289,1566.04,0.91946,6.58295,4.4703,2.2308],[-30.0,119.3756,209.247,1568.993,0.95638,6.54859,4.478,2.2456],[-28.0,131.4619,218.22,1571.902,0.99306,6.51491,4.4857,2.2607],[-26.0,144.5144,227.21,1574.766,1.0295,6.48189,4.4934,2.2764],[-24.0,158.588,236.216,1577.585,1.06571,6.44949,4.5013,2.2925],[-22.0,173.7392,245.238,1580.357,1.10169,6.41771,4.5093,2.309],[-20.0,190.0261,254.277,1583.081,1.13744,6.38652,4.5173,2.326],[-18.0,207.5084,263.334,1585.757,1.17297,6.3559,4.5256,2.3435],[-16.0,226.2473,272.407,1588.383,1.20828,6.32582,4.534,2.3614],[-14.0,246.3057,281.499,1590.957,1.24338,6.29628,4.5426,2.3798],[-12.0,267.7478,290.608,1593.48,1.27828,6.26725,4.5514,2.3986],[-10.0,290.6395,299.737,1595.949,1.31296,6.23872,4.5604,2.418],[-8.0,315.0481,308.884,1598.363,1.34745,6.21066,4.5697,2.4378],[-6.0,341.0424,318.051,1600.722,1.38174,6.18306,4.5792,2.4581],[-4.0,368.6924,327.238,1603.023,1.41584,6.1559,4.589,2.4789],[-2.0,398.0699,336.446,1605.266,1.44976,6.12916,4.5992,2.5002],[0.0,429.2478,345.675,1607.448,1.48349,6.10283,4.6097,2.5221],[2.0,462.3004,354.926,1609.569,1.51705,6.0769,4.6206,2.5444],[4.0,497.3033,364.201,1611.627,1.55043,6.05134,4.6318,2.5673],[6.0,534.3335,373.498,1613.62,1.58365,6.02614,4.6435,2.5908],[8.0,573.4693,382.82,1615.547,1.6167,6.00129,4.6556,2.6148],[10.0,614.7902,392.168,1617.406,1.6496,5.97677,4.6682,2.6395],[12.0,658.3769,401.541,1619.195,1.68234,5.95256,4.6812,2.6647],[14.0,704.3115,410.942,1620.912,1.71493,5.92865,4.6948,2.6905],[16.0,752.677,420.371,1622.556,1.74738,5.90504,4.7089,2.717],[18.0,803.5579,429.828,1624.124,1.77969,5.88169,4.7236,2.7442],[20.0,857.0398,439.316,1625.616,1.81187,5.8586,4.7389,2.7721],[22.0,913.2092,448.835,1627.027,1.84392,5.83576,4.7549,2.8007],[24.0,972.154,458.387,1628.357,1.87584,5.81315,4.7715,2.8301],[26.0,1033.9632,467.972,1629.603,1.90765,5.79075,4.7888,2.8602],[28.0,1098.7268,477.592,1630.763,1.93934,5.76856,4.8069,2.8912],[30.0,1166.5361,487.248,1631.835,1.97092,5.74657,4.8257,2.923],[32.0,1237.4831,496.941,1632.815,2.0024,5.72474,4.8454,2.9557],[34.0,1311.6614,506.674,1633.702,2.03378,5.70309,4.8659,2.9894],[36.0,1389.1653,516.447,1634.493,2.06507,5.68158,4.8874,3.024],[38.0,1470.0904,526.262,1635.185,2.09627,5.66021,4.9099,3.0596],[40.0,1554.5332,536.121,1635.775,2.12738,5.63897,4.9333,3.0963],[42.0,1642.5916,546.026,1636.26,2.15843,5.61784,4.9579,3.1341],[44.0,1734.3642,555.977,1636.637,2.1894,5.59681,4.9837,3.173],[46.0,1829.951,565.978,1636.903,2.22031,5.57586,5.0107,3.2132],[48.0,1929.4531,576.031,1637.055,2.25116,5.55499,5.039,3.2546],[50.0,2032.9727,586.136,1637.088,2.28196,5.53417,5.0688,3.2974],[52.0,2140.6131,596.297,1637.0,2.31271,5.5134,5.1,3.3415],[54.0,2252.4788,606.516,1636.785,2.34343,5.49266,5.1329,3.3872],[56.0,2368.6758,616.795,1636.441,2.37412,5.47193,5.1675,3.4344],[58.0,2489.311,627.138,1635.962,2.40478,5.45121,5.2039,3.4832],[60.0,2614.4929,637.546,1635.344,2.43543,5.43047,5.2424,3.5337],[62.0,2744.3311,648.024,1634.582,2.46607,5.4097,5.2831,3.586],[64.0,2878.937,658.573,1633.671,2.49671,5.38889,5.3261,3.6402],[66.0,3018.4231,669.198,1632.605,2.52736,5.36801,5.3717,3.6964],[68.0,3162.9038,679.903,1631.378,2.55803,5.34706,5.4201,3.7547],[70.0,3312.4949,690.69,1629.984,2.58874,5.326,5.4716,3.8152],[72.0,3467.3142,701.566,1628.416,2.61948,5.30483,5.5264,3.878],[74.0,3627.4812,712.533,1626.666,2.65027,5.28352,5.585,3.9434],[76.0,3793.1174,723.599,1624.727,2.68114,5.26206,5.6476,4.0113],[78.0,3964.3466,734.767,1622.589,2.71208,5.2404,5.7148,4.082],[80.0,4141.2947,746.044,1620.243,2.74311,5.21854,5.787,4.1557],[82.0,4324.0903,757.437,1617.679,2.77425,5.19645,5.8648,4.2325],[84.0,4512.8644,768.953,1614.886,2.80553,5.17409,5.9491,4.3126],[86.0,4707.7512,780.6,1611.85,2.83695,5.15144,6.0405,4.3962],[88.0,4908.8878,792.388,1608.558,2.86854,5.12846,6.14,4.4835],[90.0,5116.415,804.327,1604.994,2.90032,5.10511,6.2489,4.5748],[92.0,5330.4774,816.428,1601.141,2.93233,5.08135,6.3684,4.6704],[94.0,5551.2235,828.704,1596.98,2.96459,5.05713,6.5003,4.7705],[96.0,5778.8067,841.17,1592.488,2.99714,5.0324,6.6467,4.8754],[98.0,6013.3856,853.843,1587.641,3.03001,5.0071,6.81,4.9855],[100.0,6255.1245,866.743,1582.41,3.06326,4.98117,6.9933,5.1011],[102.0,6504.1943,879.892,1576.762,3.09694,4.95451,7.2008,5.2226],[104.0,6760.7733,893.317,1570.657,3.13111,4.92705,7.4374,5.3504],[106.0,7025.0485,907.051,1564.048,3.16584,4.89866,7.7097,5.485],[108.0,7297.2167,921.13,1556.88,3.20124,4.86921,8.0266,5.6268],[110.0,7577.4864,935.601,1549.083,3.23739,4.83855,8.4,5.7763],[112.0,7866.0797,950.522,1540.574,3.27446,4.80646,8.8462,5.9341],[114.0,8163.2354,965.964,1531.242,3.31259,4.77269,9.3889,6.1007],[116.0,8469.2126,982.019,1520.949,3.35201,4.7369,10.0631,6.2768],[118.0,8784.296,998.808,1509.508,3.39302,4.69866,10.9234,6.4629],[120.0,9108.8031,1016.498,1496.663,3.43601,4.65734,12.0604,6.6598],[122.0,9443.096,1035.329,1482.044,3.48155,4.61204,13.6362,6.8681],[124.0,9787.5986,1055.669,1465.078,3.53054,4.56141,15.9759,7.0884],[126.0,10142.826,1078.139,1444.803,3.58447,4.50308,19.8434,7.3216],[128.0,10509.437,1103.956,1419.348,3.64631,4.43253,27.5513,7.5684],[130.0,10888.3422,1136.206,1384.055,3.72359,4.33837,50.547,7.83]]}};
+/* === END REFDATA === */
+
+var MODO="Refrigeración", DIAG="ph", UN="SI", LASTR=null;
+var STATE={fluid:"R134a",Te:-10,Tc:45,sh:5,sc:5,eta:0.75,dimMode:"cap",dimval:10};
+var DEF={fluid:"R134a",Te:-10,Tc:45,sh:5,sc:5,eta:0.75,dimMode:"cap",dimval:10};
+
+var CV={
+  SI:{T:function(c){return c;},P:function(b){return b;},H:function(h){return h;},
+      S:function(s){return s;},Q:function(k){return k;},M:function(m){return m;},dT:function(k){return k;},
+      lT:"°C",lP:"bar",lH:"kJ/kg",lS:"kJ/kg·K",lQ:"kW",lM:"kg/s",ldT:"K",lCap:"kW"},
+  IMP:{T:function(c){return c*1.8+32;},P:function(b){return b*14.50377;},H:function(h){return h*0.4299226;},
+      S:function(s){return s*0.2388459;},Q:function(k){return k*3412.142;},M:function(m){return m*2.204623;},
+      dT:function(k){return k*1.8;},
+      lT:"°F",lP:"psia",lH:"BTU/lb",lS:"BTU/lb·°R",lQ:"BTU/h",lM:"lb/s",ldT:"°F",lCap:"BTU/h"}
+};
+function el(id){return document.getElementById(id);}
+function u(){return CV[UN];}
+function nf(x,d){if(x==null||isNaN(x))return"—";
+  return x.toLocaleString("es",{minimumFractionDigits:d,maximumFractionDigits:d});}
+
+function interp(tab,col,T){
+  if(T<=tab[0][0])return tab[0][col];
+  if(T>=tab[tab.length-1][0])return tab[tab.length-1][col];
+  for(var i=0;i<tab.length-1;i++){var a=tab[i],b=tab[i+1];
+    if(T>=a[0]&&T<=b[0]){var f=(T-a[0])/(b[0]-a[0]);return a[col]+f*(b[col]-a[col]);}}
+  return tab[tab.length-1][col];}
+
+function validar(d,Te,Tc,sh,sc,eta,dimval){
+  var e=[];
+  if(Te>=Tc)e.push("La temperatura de evaporación debe ser menor que la de condensación (T_evap < T_cond).");
+  if(Tc>=d.Tcrit)e.push("La condensación ("+Tc.toFixed(1)+" °C) alcanza o supera la temperatura crítica ("+d.Tcrit.toFixed(1)+" °C).");
+  if(Te<=d.Ttriple)e.push("La evaporación está por debajo del punto triple ("+d.Ttriple.toFixed(1)+" °C).");
+  if(!(eta>0&&eta<=1))e.push("La eficiencia isentrópica debe estar en el intervalo (0, 1].");
+  if(sh<0)e.push("El sobrecalentamiento no puede ser negativo.");
+  if(sc<0)e.push("El subenfriamiento no puede ser negativo.");
+  if(sc>(Tc-Te))e.push("El subenfriamiento supera la diferencia entre condensación y evaporación.");
+  if(dimval<=0)e.push("La capacidad o el flujo másico deben ser positivos.");
+  return e;}
+
+function calcular(fluid,Te,Tc,sh,sc,eta,modo,dimMode,dimval){
+  var d=REFDATA[fluid],tab=d.tab,K=273.15;
+  var err=validar(d,Te,Tc,sh,sc,eta,dimval);
+  if(err.length)return{error:err};
+  var Pe=interp(tab,1,Te),Pc=interp(tab,1,Tc);
+  var hf_e=interp(tab,2,Te),hg_e=interp(tab,3,Te),sf_e=interp(tab,4,Te),sg_e=interp(tab,5,Te),cpv_e=interp(tab,7,Te);
+  var hf_c=interp(tab,2,Tc),hg_c=interp(tab,3,Tc),sf_c=interp(tab,4,Tc),sg_c=interp(tab,5,Tc),cpf_c=interp(tab,6,Tc),cpv_c=interp(tab,7,Tc);
+  var T1=Te+sh,h1=hg_e+cpv_e*sh,s1=sg_e+cpv_e*Math.log((T1+K)/(Te+K));
+  var T2s=(Tc+K)*Math.exp((s1-sg_c)/cpv_c),h2s=hg_c+cpv_c*(T2s-(Tc+K));
+  var h2=h1+(h2s-h1)/eta,T2=Tc+(h2-hg_c)/cpv_c,s2=sg_c+cpv_c*Math.log((T2+K)/(Tc+K));
+  var T3=Tc-sc,h3=hf_c-cpf_c*sc,s3=sf_c-cpf_c*Math.log((Tc+K)/(T3+K));
+  var h4=h3,T4=Te,x4=(h4-hf_e)/(hg_e-hf_e),s4=sf_e+x4*(sg_e-sf_e);
+  var qe=h1-h4,qc=h2-h3,w=h2-h1;
+  var mdot=(dimMode==="cap")?dimval/((modo==="Refrigeración")?qe:qc):dimval;
+  var estados=[
+    {n:"1 · Salida evaporador",P:Pe,T:T1,h:h1,s:s1,x:(sh>0?-1:1)},
+    {n:"2 · Descarga compresor",P:Pc,T:T2,h:h2,s:s2,x:-1},
+    {n:"3 · Salida condensador",P:Pc,T:T3,h:h3,s:s3,x:(sc>0?-1:0)},
+    {n:"4 · Salida válvula",P:Pe,T:T4,h:h4,s:s4,x:x4}];
+  return{estados:estados,mdot:mdot,qe:qe,qc:qc,w:w,Qe:mdot*qe,Qc:mdot*qc,W:mdot*w,
+         COPr:qe/w,COPbc:qc/w,fluid:fluid};}
+
+function setSlider(id,min,max,step,val){var s=el(id);s.min=min;s.max=max;s.step=step;s.value=val;}
+function configInputs(){
+  if(UN==="SI"){
+    setSlider("Te",-40,20,0.5,STATE.Te);setSlider("Tc",20,70,0.5,STATE.Tc);
+    setSlider("sh",0,20,0.5,STATE.sh);setSlider("sc",0,20,0.5,STATE.sc);
+  }else{
+    setSlider("Te",CV.IMP.T(-40),CV.IMP.T(20),1,CV.IMP.T(STATE.Te));
+    setSlider("Tc",CV.IMP.T(20),CV.IMP.T(70),1,CV.IMP.T(STATE.Tc));
+    setSlider("sh",0,CV.IMP.dT(20),1,CV.IMP.dT(STATE.sh));
+    setSlider("sc",0,CV.IMP.dT(20),1,CV.IMP.dT(STATE.sc));
+  }
+  el("eta").value=STATE.eta;
+  el("dimval").value=(STATE.dimMode==="cap")?u().Q(STATE.dimval).toFixed(UN==="SI"?2:0)
+                                            :u().M(STATE.dimval).toFixed(4);
+  el("dim-lbl").textContent=(STATE.dimMode==="cap")?("Capacidad del efecto útil ["+u().lCap+"]")
+                                                   :("Flujo másico ["+u().lM+"]");
+  el("lbl-cap").classList.toggle("on",STATE.dimMode==="cap");
+  el("lbl-mdot").classList.toggle("on",STATE.dimMode==="mdot");
+  document.querySelector('input[name=dim][value='+STATE.dimMode+']').checked=true;}
+
+function onSlider(id){
+  var v=+el(id).value;
+  if(id==="eta"){STATE.eta=v;}
+  else if(UN==="SI"){STATE[id]=v;}
+  else{STATE[id]=(id==="Te"||id==="Tc")?(v-32)/1.8:v/1.8;}
+  run();}
+function onFluid(){STATE.fluid=el("fluid").value;run();}
+function onDim(){
+  var v=+el("dimval").value;
+  STATE.dimval=(STATE.dimMode==="cap")?(UN==="SI"?v:v/3412.142):(UN==="SI"?v:v/2.204623);
+  run();}
+function onDimMode(){
+  STATE.dimMode=document.querySelector('input[name=dim]:checked').value;
+  STATE.dimval=(STATE.dimMode==="cap")?10:0.05;
+  configInputs();run();}
+function setUnits(v){UN=v;el("units").value=v;configInputs();run();}
+function setModo(m){MODO=m;
+  el("mb-ref").classList.toggle("on",m==="Refrigeración");
+  el("mb-bc").classList.toggle("on",m==="Bomba de calor");run();}
+function setDiag(d){DIAG=d;
+  el("tab-ph").classList.toggle("on",d==="ph");
+  el("tab-ts").classList.toggle("on",d==="ts");run();}
+
+function run(){
+  el("Te-u").textContent=u().lT;el("Tc-u").textContent=u().lT;
+  el("sh-u").textContent=u().ldT;el("sc-u").textContent=u().ldT;
+  el("Te-v").textContent=(+el("Te").value).toFixed(1);
+  el("Tc-v").textContent=(+el("Tc").value).toFixed(1);
+  el("sh-v").textContent=(+el("sh").value).toFixed(1);
+  el("sc-v").textContent=(+el("sc").value).toFixed(1);
+  el("eta-v").textContent=STATE.eta.toFixed(2);
+  el("th-P").textContent=u().lP;el("th-T").textContent=u().lT;
+  el("th-h").textContent=u().lH;el("th-s").textContent=u().lS;
+  el("Qe-u").textContent=u().lQ;el("Qc-u").textContent=u().lQ;
+  el("W-u").textContent=u().lQ;el("mdot-u").textContent=u().lM;
+  el("sg-u1").textContent=u().lT;el("sg-u2").textContent=u().lT;
+
+  var r=calcular(STATE.fluid,STATE.Te,STATE.Tc,STATE.sh,STATE.sc,STATE.eta,MODO,STATE.dimMode,STATE.dimval);
+  LASTR=r;
+  var ab=el("alert-box");
+  if(r.error){
+    ab.innerHTML='<div class="alert"><b>⚠️ Configuración no válida</b><ul><li>'+r.error.join("</li><li>")+'</li></ul></div>';
+    el("tbody").innerHTML="";["copr","copbc","copmain","Qe","Qc","W","mdot"].forEach(function(i){el(i).textContent="—";});
+    el("balances").innerHTML="";el("calculos").innerHTML="";
+    clearCanvas("diag");clearCanvas("sch");return;}
+  ab.innerHTML="";
+  el("copr").textContent=r.COPr.toFixed(3);
+  el("copbc").textContent=r.COPbc.toFixed(3);
+  el("cop-main-lbl").textContent="COP ("+MODO.toLowerCase()+")";
+  el("copmain").textContent=((MODO==="Refrigeración")?r.COPr:r.COPbc).toFixed(3);
+  el("Qe").textContent=nf(u().Q(r.Qe),UN==="SI"?2:0);
+  el("Qc").textContent=nf(u().Q(r.Qc),UN==="SI"?2:0);
+  el("W").textContent=nf(u().Q(r.W),UN==="SI"?2:0);
+  el("mdot").textContent=nf(u().M(r.mdot),4);
+  var rows="";
+  r.estados.forEach(function(e){
+    rows+="<tr><td class='state-label'>"+e.n+"</td><td>"+nf(u().P(e.P/100),3)+
+      "</td><td>"+nf(u().T(e.T),2)+"</td><td>"+nf(u().H(e.h),2)+"</td><td>"+
+      nf(u().S(e.s),4)+"</td><td>"+(e.x<0?"—":e.x.toFixed(3))+"</td></tr>";});
+  el("tbody").innerHTML=rows;
+  drawDiagram(STATE.fluid,r);drawSchematic(r);renderBalances(r);}
+
+/* ===== Balances y cálculos ===== */
+function renderBalances(r){
+  var H=u().lH,Q=u().lQ,M=u().lM;
+  var m=u().M(r.mdot),h1=u().H(r.estados[0].h),h2=u().H(r.estados[1].h),
+      h3=u().H(r.estados[2].h),h4=u().H(r.estados[3].h),
+      qe=u().H(r.qe),qc=u().H(r.qc),w=u().H(r.w),
+      Qe=u().Q(r.Qe),Qc=u().Q(r.Qc),W=u().Q(r.W);
+  function E(name,sym){return '<div class="eqblock"><div class="eqname">'+name+'</div><div class="eq">'+sym+'</div></div>';}
+  var b="";
+  b+=E("Conservación de masa","ṁ₁ = ṁ₂ = ṁ₃ = ṁ₄ = <span class='num'>"+nf(m,4)+"</span> "+M);
+  b+=E("Compresor (adiabático)","Ẇc = ṁ (h₂ − h₁)");
+  b+=E("Condensador","Q̇H = ṁ (h₂ − h₃)");
+  b+=E("Válvula (isentálpica)","h₃ = h₄ ⟹ estrangulamiento a h constante");
+  b+=E("Evaporador","Q̇L = ṁ (h₁ − h₄)");
+  b+=E("Coeficientes de desempeño","COP_R = q_L / w_c ; COP_HP = q_H / w_c");
+  el("balances").innerHTML=b;
+
+  var qutil=(MODO==="Refrigeración")?qe:qc;
+  var Qutil=(MODO==="Refrigeración")?Qe:Qc;
+  var c="";
+  c+=E("Calor específico de evaporación","q_L = h₁ − h₄ = "+nf(h1,2)+" − "+nf(h4,2)+" = <span class='num'>"+nf(qe,2)+"</span> "+H);
+  c+=E("Calor específico de condensación","q_H = h₂ − h₃ = "+nf(h2,2)+" − "+nf(h3,2)+" = <span class='num'>"+nf(qc,2)+"</span> "+H);
+  c+=E("Trabajo específico de compresión","w_c = h₂ − h₁ = "+nf(h2,2)+" − "+nf(h1,2)+" = <span class='num'>"+nf(w,2)+"</span> "+H);
+  c+=E("Flujo másico",(STATE.dimMode==="cap")
+      ?("ṁ = Q̇ / q = "+nf(Qutil,UN==="SI"?2:0)+" / "+nf(qutil,2)+" = <span class='num'>"+nf(m,4)+"</span> "+M)
+      :("ṁ = "+nf(m,4)+" "+M+" (dato de entrada)"));
+  c+=E("Potencia de refrigeración","Q̇L = ṁ·q_L = "+nf(m,4)+" × "+nf(qe,2)+" = <span class='num'>"+nf(Qe,UN==="SI"?2:0)+"</span> "+Q);
+  c+=E("Calor cedido en el condensador","Q̇H = ṁ·q_H = "+nf(m,4)+" × "+nf(qc,2)+" = <span class='num'>"+nf(Qc,UN==="SI"?2:0)+"</span> "+Q);
+  c+=E("Potencia del compresor","Ẇc = ṁ·w_c = "+nf(m,4)+" × "+nf(w,2)+" = <span class='num'>"+nf(W,UN==="SI"?2:0)+"</span> "+Q);
+  c+=E("COP refrigeración","COP_R = q_L / w_c = "+nf(qe,2)+" / "+nf(w,2)+" = <span class='num'>"+r.COPr.toFixed(3)+"</span>");
+  c+=E("COP bomba de calor","COP_HP = q_H / w_c = "+nf(qc,2)+" / "+nf(w,2)+" = <span class='num'>"+r.COPbc.toFixed(3)+"</span>");
+  c+='<div class="check-ok">✓ 1ª ley (balance global): Q̇H = Q̇L + Ẇc → '+nf(Qc,2)+' ≈ '+nf(Qe+W,2)+' '+Q+'</div>';
+  el("calculos").innerHTML=c;}
+
+/* ===== Diagramas ===== */
+function clearCanvas(id){var c=el(id),x=c.getContext("2d");x.clearRect(0,0,c.width,c.height);}
+function fitCanvas(c,ratio){var w=c.parentElement.clientWidth-2;if(w>40){c.width=w;c.height=Math.round(w*(ratio||0.55));}}
+function axes(ctx,W,H,m){ctx.clearRect(0,0,W,H);ctx.fillStyle="#fafcff";ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle="#94a3b8";ctx.lineWidth=1;ctx.beginPath();
+  ctx.moveTo(m.l,m.t);ctx.lineTo(m.l,H-m.b);ctx.lineTo(W-m.r,H-m.b);ctx.stroke();}
+function grid(ctx,xs,ys,m,W,H,fx,fy,xl,yl){ctx.strokeStyle="#e8eef6";ctx.fillStyle="#64748b";ctx.font="11px system-ui";
+  xs.forEach(function(v){var px=fx(v);ctx.beginPath();ctx.moveTo(px,m.t);ctx.lineTo(px,H-m.b);ctx.stroke();
+    ctx.textAlign="center";ctx.fillText(xl(v),px,H-m.b+15);});
+  ys.forEach(function(v){var py=fy(v);ctx.beginPath();ctx.moveTo(m.l,py);ctx.lineTo(W-m.r,py);ctx.stroke();
+    ctx.textAlign="right";ctx.fillText(yl(v),m.l-6,py+4);});}
+function title(ctx,W,t){ctx.fillStyle="#1d56d4";ctx.font="bold 13px system-ui";ctx.textAlign="center";ctx.fillText(t,W/2,18);}
+function drawCycle(ctx,pts){ctx.strokeStyle="#16a34a";ctx.lineWidth=3;ctx.beginPath();
+  pts.forEach(function(p,i){if(i===0)ctx.moveTo(p[0],p[1]);else ctx.lineTo(p[0],p[1]);});ctx.stroke();
+  for(var i=0;i<4;i++){var p=pts[i];ctx.fillStyle="#16a34a";ctx.beginPath();ctx.arc(p[0],p[1],5,0,2*Math.PI);ctx.fill();
+    ctx.fillStyle="#0f172a";ctx.font="bold 13px system-ui";ctx.textAlign="left";ctx.fillText((i+1),p[0]+8,p[1]-7);}}
+function poly(ctx,X,Y,fx,fy,color){ctx.strokeStyle=color;ctx.lineWidth=2;ctx.beginPath();
+  for(var i=0;i<X.length;i++){var px=fx(X[i]),py=fy(Y[i]);if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}ctx.stroke();}
+function drawDiagram(fluid,r){var c=el("diag");fitCanvas(c,0.56);
+  if(DIAG==="ph")drawPH(c,fluid,r);else drawTS(c,fluid,r);}
+
+function drawPH(c,fluid,r){
+  var ctx=c.getContext("2d"),W=c.width,H=c.height,m={l:60,r:22,t:30,b:38},d=REFDATA[fluid];
+  var liqH=[],liqP=[],vapH=[],vapP=[];
+  d.tab.forEach(function(row){liqH.push(u().H(row[2]));liqP.push(u().P(row[1]/100));
+    vapH.push(u().H(row[3]));vapP.push(u().P(row[1]/100));});
+  var Pc=u().P(d.Pcrit/100),Hc=u().H(d.hc);
+  liqH.push(Hc);liqP.push(Pc);vapH.push(Hc);vapP.push(Pc);
+  var estH=r.estados.map(function(e){return u().H(e.h);});
+  var estP=r.estados.map(function(e){return u().P(e.P/100);});
+  var hmin=Math.min.apply(null,liqH.concat(estH))-15,hmax=Math.max.apply(null,vapH.concat(estH))+25;
+  var allP=liqP.concat(estP);
+  var pmin=Math.max(Math.min.apply(null,allP)*0.7,0.01),pmax=Math.max.apply(null,allP)*1.4;
+  var lpmin=Math.log10(pmin),lpmax=Math.log10(pmax);
+  var fx=function(h){return m.l+(h-hmin)/(hmax-hmin)*(W-m.l-m.r);};
+  var fy=function(P){return H-m.b-(Math.log10(P)-lpmin)/(lpmax-lpmin)*(H-m.t-m.b);};
+  axes(ctx,W,H,m);
+  var ps=[];for(var e2=Math.ceil(lpmin);e2<=Math.floor(lpmax);e2++)ps.push(Math.pow(10,e2));
+  var hs=[],step=Math.max(10,Math.ceil((hmax-hmin)/6/10)*10);
+  for(var h=Math.ceil(hmin/step)*step;h<hmax;h+=step)hs.push(h);
+  grid(ctx,hs,ps,m,W,H,fx,fy,function(v){return v.toFixed(0);},function(v){return v>=10?v.toFixed(0):v.toFixed(1);});
+  ctx.fillStyle="#334155";ctx.font="12px system-ui";ctx.textAlign="center";
+  ctx.fillText("Entalpía h ["+u().lH+"]",(m.l+W-m.r)/2,H-6);
+  ctx.save();ctx.translate(13,(m.t+H-m.b)/2);ctx.rotate(-Math.PI/2);ctx.fillText("Presión P ["+u().lP+", log]",0,0);ctx.restore();
+  poly(ctx,liqH,liqP,fx,fy,"#1f77b4");poly(ctx,vapH,vapP,fx,fy,"#d62728");
+  var pts=r.estados.map(function(e){return[fx(u().H(e.h)),fy(u().P(e.P/100))];});pts.push(pts[0]);
+  drawCycle(ctx,pts);title(ctx,W,"Diagrama P–h · "+fluid);}
+
+function drawTS(c,fluid,r){
+  var ctx=c.getContext("2d"),W=c.width,H=c.height,m={l:56,r:22,t:30,b:38},d=REFDATA[fluid];
+  var liqS=[],liqT=[],vapS=[],vapT=[];
+  d.tab.forEach(function(row){liqS.push(u().S(row[4]));liqT.push(u().T(row[0]));
+    vapS.push(u().S(row[5]));vapT.push(u().T(row[0]));});
+  liqS.push(u().S(d.sc));liqT.push(u().T(d.Tcrit));vapS.push(u().S(d.sc));vapT.push(u().T(d.Tcrit));
+  var estS=r.estados.map(function(e){return u().S(e.s);});
+  var estT=r.estados.map(function(e){return u().T(e.T);});
+  var smin=Math.min.apply(null,liqS.concat(estS))-u().S(0.05);
+  var smax=Math.max.apply(null,vapS.concat(estS))+u().S(0.1);
+  var tmin=Math.min.apply(null,liqT.concat(estT))-8,tmax=Math.max.apply(null,estT.concat(liqT))+12;
+  var fx=function(s){return m.l+(s-smin)/(smax-smin)*(W-m.l-m.r);};
+  var fy=function(T){return H-m.b-(T-tmin)/(tmax-tmin)*(H-m.t-m.b);};
+  axes(ctx,W,H,m);
+  var ss=[],sstep=(smax-smin)/6;for(var i=0;i<=6;i++)ss.push(smin+sstep*i);
+  var ts=[],tstep=Math.max(5,Math.ceil((tmax-tmin)/6/5)*5);for(var t=Math.ceil(tmin/tstep)*tstep;t<tmax;t+=tstep)ts.push(t);
+  grid(ctx,ss,ts,m,W,H,fx,fy,function(v){return v.toFixed(2);},function(v){return v.toFixed(0);});
+  ctx.fillStyle="#334155";ctx.font="12px system-ui";ctx.textAlign="center";
+  ctx.fillText("Entropía s ["+u().lS+"]",(m.l+W-m.r)/2,H-6);
+  ctx.save();ctx.translate(13,(m.t+H-m.b)/2);ctx.rotate(-Math.PI/2);ctx.fillText("Temperatura T ["+u().lT+"]",0,0);ctx.restore();
+  poly(ctx,liqS,liqT,fx,fy,"#1f77b4");poly(ctx,vapS,vapT,fx,fy,"#d62728");
+  var pts=r.estados.map(function(e){return[fx(u().S(e.s)),fy(u().T(e.T))];});pts.push(pts[0]);
+  drawCycle(ctx,pts);title(ctx,W,"Diagrama T–s · "+fluid);}
+
+/* ===== Esquema del ciclo ===== */
+function arrow(ctx,x1,y1,x2,y2){var a=Math.atan2(y2-y1,x2-x1),L=8;
+  ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-L*Math.cos(a-0.4),y2-L*Math.sin(a-0.4));
+  ctx.lineTo(x2-L*Math.cos(a+0.4),y2-L*Math.sin(a+0.4));ctx.closePath();ctx.fill();}
+function drawSchematic(r){
+  var c=el("sch");var w=c.parentElement.clientWidth-2;if(w>40){c.width=w;c.height=300;}
+  var ctx=c.getContext("2d"),W=c.width,H=c.height;
+  ctx.clearRect(0,0,W,H);ctx.fillStyle="#fafcff";ctx.fillRect(0,0,W,H);
+  var L=58,R=W-58,T=62,B=232;
+  ctx.strokeStyle="#1d56d4";ctx.lineWidth=2.5;ctx.fillStyle="#1d56d4";
+  ctx.beginPath();ctx.moveTo(R,B);ctx.lineTo(R,T);ctx.lineTo(L,T);ctx.lineTo(L,B);ctx.lineTo(R,B);ctx.stroke();
+  arrow(ctx,R,B,R,(T+B)/2);arrow(ctx,R,T,(L+R)/2,T);arrow(ctx,L,T,L,(T+B)/2);arrow(ctx,L,B,(L+R)/2,B);
+  function box(x,y,w2,h2,txt,col){ctx.fillStyle=col;ctx.strokeStyle="#334155";ctx.lineWidth=1.5;
+    ctx.fillRect(x-w2/2,y-h2/2,w2,h2);ctx.strokeRect(x-w2/2,y-h2/2,w2,h2);
+    ctx.fillStyle="#0f172a";ctx.font="bold 12px system-ui";ctx.textAlign="center";ctx.fillText(txt,x,y+4);}
+  box((L+R)/2,T,150,26,"Condensador","#dbeafe");
+  box((L+R)/2,B,150,26,"Evaporador","#dcfce7");
+  ctx.fillStyle="#fde68a";ctx.strokeStyle="#334155";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.arc(R,(T+B)/2,20,0,2*Math.PI);ctx.fill();ctx.stroke();
+  ctx.fillStyle="#0f172a";ctx.font="bold 11px system-ui";ctx.textAlign="center";ctx.fillText("Comp",R,(T+B)/2+4);
+  var vx=L,vy=(T+B)/2;ctx.fillStyle="#fecaca";ctx.strokeStyle="#334155";
+  ctx.beginPath();ctx.moveTo(vx-9,vy-11);ctx.lineTo(vx+9,vy+11);ctx.lineTo(vx+9,vy-11);ctx.lineTo(vx-9,vy+11);ctx.closePath();ctx.fill();ctx.stroke();
+  function node(x,y,i,dx,dy){ctx.fillStyle="#16a34a";ctx.beginPath();ctx.arc(x,y,6,0,2*Math.PI);ctx.fill();
+    ctx.fillStyle="#0f172a";ctx.font="bold 13px system-ui";ctx.textAlign="center";ctx.fillText(i,x+dx,y+dy);
+    var e=r.estados[i-1];ctx.font="10px system-ui";ctx.fillStyle="#475569";
+    ctx.fillText(nf(u().T(e.T),0)+u().lT,x+dx,y+dy+13);
+    ctx.fillText(nf(u().P(e.P/100),1)+u().lP,x+dx,y+dy+24);}
+  node(R,B-1,1,-24,-4);node(R,T+1,2,-24,16);node(L,T+1,3,24,16);node(L,B-1,4,24,-4);
+  title(ctx,W,"Esquema · "+r.fluid);}
+
+/* ===== Sensibilidad ===== */
+function runSens(){
+  var v=el("svar").value,vmin=+el("smin").value,vmax=+el("smax").value;
+  if(vmax<=vmin){alert("El máximo debe ser mayor que el mínimo.");return;}
+  var toSI=function(x){return UN==="SI"?x:(x-32)/1.8;};
+  var N=50,xs=[],cr=[],cb=[];
+  for(var i=0;i<N;i++){
+    var disp=vmin+(vmax-vmin)*i/(N-1),val=toSI(disp);
+    var Te=(v==="Te")?val:STATE.Te,Tc=(v==="Tc")?val:STATE.Tc;
+    var r=calcular(STATE.fluid,Te,Tc,STATE.sh,STATE.sc,STATE.eta,MODO,STATE.dimMode,STATE.dimval);
+    xs.push(disp);
+    if(r.error){cr.push(null);cb.push(null);}else{cr.push(r.COPr);cb.push(r.COPbc);}}
+  drawSens(xs,cr,cb,v);}
+function drawSens(xs,cr,cb,v){
+  var c=el("senscv");fitCanvas(c,0.42);
+  var ctx=c.getContext("2d"),W=c.width,H=c.height,m={l:52,r:18,t:28,b:42};
+  var ally=cr.concat(cb).filter(function(y){return y!=null;});
+  if(!ally.length){clearCanvas("senscv");return;}
+  var ymin=Math.max(0,Math.min.apply(null,ally)-0.3),ymax=Math.max.apply(null,ally)+0.3;
+  var xmin=xs[0],xmax=xs[xs.length-1];
+  var fx=function(x){return m.l+(x-xmin)/(xmax-xmin)*(W-m.l-m.r);};
+  var fy=function(y){return H-m.b-(y-ymin)/(ymax-ymin)*(H-m.t-m.b);};
+  axes(ctx,W,H,m);
+  var xs2=[],step=(xmax-xmin)/6;for(var i=0;i<=6;i++)xs2.push(xmin+step*i);
+  var ys2=[],ystep=(ymax-ymin)/5;for(var j=0;j<=5;j++)ys2.push(ymin+ystep*j);
+  grid(ctx,xs2,ys2,m,W,H,fx,fy,function(x){return x.toFixed(0);},function(y){return y.toFixed(1);});
+  ctx.fillStyle="#334155";ctx.font="12px system-ui";ctx.textAlign="center";
+  ctx.fillText((v==="Te"?"Temperatura de evaporación ["+u().lT+"]":"Temperatura de condensación ["+u().lT+"]"),(m.l+W-m.r)/2,H-7);
+  ctx.save();ctx.translate(13,(m.t+H-m.b)/2);ctx.rotate(-Math.PI/2);ctx.fillText("COP",0,0);ctx.restore();
+  sline(ctx,xs,cr,fx,fy,"#1d56d4");sline(ctx,xs,cb,fx,fy,"#ea8a0e");
+  ctx.font="12px system-ui";ctx.textAlign="left";
+  ctx.fillStyle="#1d56d4";ctx.fillRect(m.l+10,m.t-2,14,4);ctx.fillStyle="#334155";ctx.fillText("COP refrigeración",m.l+30,m.t+3);
+  ctx.fillStyle="#ea8a0e";ctx.fillRect(m.l+180,m.t-2,14,4);ctx.fillStyle="#334155";ctx.fillText("COP bomba de calor",m.l+200,m.t+3);}
+function sline(ctx,xs,ys,fx,fy,color){ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.beginPath();var st=false;
+  for(var i=0;i<xs.length;i++){if(ys[i]==null){st=false;continue;}var px=fx(xs[i]),py=fy(ys[i]);
+    if(!st){ctx.moveTo(px,py);st=true;}else ctx.lineTo(px,py);}ctx.stroke();}
+
+/* ===== Guardar / Cargar / Nuevo / CSV ===== */
+function guardar(){
+  var data={app:"sim-ciclo-vc",ver:2,units:UN,modo:MODO,state:STATE};
+  var blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+  var a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="simulacion_ciclo.json";document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(a.href);}
+function cargarFile(input){
+  if(!input.files.length)return;
+  var fr=new FileReader();
+  fr.onload=function(){
+    try{var d=JSON.parse(fr.result);
+      if(d.state)STATE=Object.assign({},DEF,d.state);
+      if(d.units)UN=d.units;
+      if(d.modo)MODO=d.modo;
+      el("fluid").value=STATE.fluid;el("units").value=UN;
+      setModo(MODO);configInputs();run();
+    }catch(e){alert("Archivo no válido: "+e.message);}};
+  fr.readAsText(input.files[0]);input.value="";}
+function nuevo(){
+  if(!confirm("¿Iniciar una nueva simulación? Se restablecerán los parámetros."))return;
+  STATE=Object.assign({},DEF);UN="SI";MODO="Refrigeración";
+  el("fluid").value="R134a";el("units").value="SI";
+  setModo("Refrigeración");configInputs();run();}
+function exportCSV(){
+  if(!LASTR||LASTR.error){alert("No hay resultados válidos para exportar.");return;}
+  var r=LASTR,sep=",",nl="\r\n";
+  var s="Simulador de ciclo de compresion de vapor"+nl;
+  s+="Refrigerante"+sep+r.fluid+nl+"Modo"+sep+MODO+nl+"Unidades"+sep+UN+nl+nl;
+  s+=["Estado","P("+u().lP+")","T("+u().lT+")","h("+u().lH+")","s("+u().lS+")","x"].join(sep)+nl;
+  r.estados.forEach(function(e){
+    s+=[e.n,u().P(e.P/100).toFixed(3),u().T(e.T).toFixed(2),u().H(e.h).toFixed(2),
+        u().S(e.s).toFixed(4),(e.x<0?"-":e.x.toFixed(3))].join(sep)+nl;});
+  s+=nl+"Q_evaporador("+u().lQ+")"+sep+u().Q(r.Qe).toFixed(3)+nl;
+  s+="Q_condensador("+u().lQ+")"+sep+u().Q(r.Qc).toFixed(3)+nl;
+  s+="W_compresor("+u().lQ+")"+sep+u().Q(r.W).toFixed(3)+nl;
+  s+="Flujo_masico("+u().lM+")"+sep+u().M(r.mdot).toFixed(5)+nl;
+  s+="COP_refrigeracion"+sep+r.COPr.toFixed(4)+nl+"COP_bomba_calor"+sep+r.COPbc.toFixed(4)+nl;
+  var blob=new Blob([s],{type:"text/csv"});
+  var a=document.createElement("a");a.href=URL.createObjectURL(blob);
+  a.download="resultados_ciclo.csv";document.body.appendChild(a);a.click();
+  document.body.removeChild(a);URL.revokeObjectURL(a.href);}
+
+window.addEventListener("resize",function(){if(LASTR&&!LASTR.error)run();});
+window.addEventListener("load",function(){el("units").value=UN;configInputs();run();runSens();});
+</script>
+</body>
+</html>
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    

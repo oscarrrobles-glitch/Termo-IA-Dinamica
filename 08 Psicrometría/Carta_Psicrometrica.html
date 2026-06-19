@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>TermoIA · Carta Psicrométrica y Acondicionamiento de Aire</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f5f7fa;--surface:#fff;--border:#dde3ec;--text:#1a2233;--muted:#6b7a99;
+  --accent:#1976d2;--accent2:#1565c0;--dome:#7b1fa2;--hot:#ef6c00;--cold:#1565c0;
+  --good:#2e7d32;--warn:#f57c00;--bad:#c62828;
+  --hdr:linear-gradient(90deg,#1565c0 0%,#1976d2 60%,#1e88e5 100%)}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',Roboto,Arial,sans-serif;
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 0 40px}
+.topbar{width:100%;background:var(--hdr);display:flex;align-items:center;
+  justify-content:space-between;gap:14px;padding:0 28px;height:66px;
+  box-shadow:0 2px 8px rgba(21,101,192,.18);margin-bottom:18px;position:relative;overflow:hidden}
+.topbar-brand{display:flex;align-items:center;gap:10px;font-weight:700;
+  font-size:1.45rem;color:#fff;line-height:1;position:relative;z-index:2;flex-shrink:0}
+.topbar-logo{width:38px;height:38px;flex-shrink:0}
+.topbar-brand .t-sep{color:rgba(255,224,178,.85);font-weight:400;padding:0 2px}
+.topbar-brand .t-ia{background:linear-gradient(135deg,#ffeb3b 0%,#ffb300 45%,#ff5722 80%,#ef5350 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900}
+.topbar-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  display:flex;align-items:center;gap:12px;z-index:1}
+.topbar-text h1{font-size:1rem;font-weight:700;color:#fff;letter-spacing:.04em;
+  text-transform:uppercase;line-height:1.1}
+.topbar-text p{font-size:.72rem;color:rgba(255,255,255,.78);font-weight:300;margin-top:1px}
+.topbar-spacer{visibility:hidden;pointer-events:none}
+.main-wrapper{width:100%;max-width:1280px;padding:0 20px;display:flex;flex-direction:column}
+.subtitle-bar{display:flex;align-items:center;gap:10px;padding:10px 18px;background:#fff;
+  border:1px solid var(--border);border-radius:8px 8px 0 0;flex-wrap:wrap}
+.subtitle-bar .ct{font-size:.95rem;font-weight:600}
+.subtitle-bar .right{margin-left:auto;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.pres-ctl{display:flex;align-items:center;gap:6px;font-size:.8rem;color:var(--muted)}
+.pres-ctl input{width:84px;padding:4px 6px;border:1px solid var(--border);border-radius:6px;
+  font-family:Consolas,monospace;font-size:.85rem;color:var(--text)}
+.unit-toggle{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.unit-btn{padding:5px 14px;background:#fff;border:none;cursor:pointer;font-size:.8rem;color:var(--muted)}
+.unit-btn.active{background:var(--accent);color:#fff;font-weight:600}
+.tabbar{display:flex;background:#fff;border:1px solid var(--border);border-top:none}
+.tab-btn{flex:1;padding:11px 8px;background:#f0f4f8;border:none;border-right:1px solid var(--border);
+  cursor:pointer;font-size:.92rem;font-weight:600;color:var(--muted)}
+.tab-btn:last-child{border-right:none}
+.tab-btn.active{background:#fff;color:var(--accent2);box-shadow:inset 0 -3px 0 var(--accent)}
+.tab-pane{display:none;background:#fff;border:1px solid var(--border);border-top:none;
+  border-radius:0 0 8px 8px;padding:16px}
+.tab-pane.active{display:block}
+.concept{background:#e3f2fd;border-left:4px solid var(--accent);border-radius:6px;
+  padding:10px 14px;font-size:.86rem;margin-bottom:14px;color:#26354f;line-height:1.5}
+.concept b{color:var(--accent2)}
+.layout{display:grid;grid-template-columns:1fr 320px;gap:14px;align-items:start}
+@media(max-width:980px){.layout{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px}
+.panel h3{font-size:.82rem;text-transform:uppercase;letter-spacing:.05em;color:var(--accent2);
+  margin-bottom:10px;border-bottom:1px solid var(--border);padding-bottom:6px}
+.prow{display:flex;justify-content:space-between;padding:4px 0;font-size:.88rem;border-bottom:1px dashed #eef2f7}
+.prow .k{color:var(--muted)}
+.prow .v{font-family:Consolas,monospace;font-weight:600}
+.field{margin-bottom:10px}
+.field label{display:block;font-size:.78rem;color:var(--muted);margin-bottom:3px}
+.field input,.field select{width:100%;padding:7px 9px;border:1px solid var(--border);border-radius:6px;
+  font-family:Consolas,monospace;font-size:.9rem;color:var(--text);background:#fff}
+.field input:focus,.field select:focus{outline:none;border-color:var(--accent)}
+.btn{display:inline-block;padding:9px 18px;background:var(--accent);color:#fff;border:none;
+  border-radius:7px;cursor:pointer;font-weight:600;font-size:.9rem}
+.btn:hover{background:var(--accent2)}
+.btn.green{background:var(--good)}
+.btn.ghost{background:#fff;color:var(--accent2);border:1px solid var(--accent)}
+.steps{font-size:.84rem;line-height:1.65;font-family:Consolas,monospace;
+  background:#f7f9fc;border:1px solid var(--border);border-radius:6px;padding:10px 12px;
+  margin-top:10px;white-space:pre-wrap;color:#26354f}
+.msg{margin-top:8px;padding:8px 12px;border-radius:6px;font-size:.86rem;display:none}
+.msg.ok{display:block;background:#e8f5e9;color:var(--good);border:1px solid #c8e6c9}
+.msg.bad{display:block;background:#ffebee;color:var(--bad);border:1px solid #ffcdd2}
+.msg.warn{display:block;background:#fff3e0;color:#e65100;border:1px solid #ffe0b2}
+#chart svg,#chartProc svg{width:100%;height:auto;display:block;cursor:crosshair}
+#chartProc svg{cursor:default}
+.hoverinfo{font-family:Consolas,monospace;font-size:.82rem;color:var(--muted);
+  padding:6px 10px;background:#f7f9fc;border:1px solid var(--border);border-radius:6px;margin-top:6px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+.note{font-size:.75rem;color:var(--muted);margin-top:8px;line-height:1.5}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-brand">
+    <svg class="topbar-logo" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="tg" x1="0" y1="1" x2="1" y2="0">
+        <stop offset="0%" stop-color="#0d47a1"/><stop offset="35%" stop-color="#1976d2"/>
+        <stop offset="60%" stop-color="#7b1fa2"/><stop offset="85%" stop-color="#e65100"/>
+        <stop offset="100%" stop-color="#ffb300"/></linearGradient></defs>
+      <circle cx="32" cy="32" r="28" fill="none" stroke="url(#tg)" stroke-width="3"
+        stroke-linecap="round" stroke-dasharray="138 38"/>
+      <circle cx="32" cy="32" r="24" fill="#ffffff" opacity=".82"/>
+      <path d="M10 48 Q18 16 32 16 Q46 16 54 48" fill="none" stroke="#1976d2"
+        stroke-width="1.8" stroke-linecap="round"/>
+      <path d="M13 44 Q22 32 32 28 Q44 25 52 30" fill="none" stroke="#7b1fa2"
+        stroke-width="1.2" stroke-dasharray="3 2" opacity=".75"/>
+      <circle cx="32" cy="22" r="2.6" fill="#1976d2"/>
+      <circle cx="24" cy="34" r="2.2" fill="#7b1fa2"/>
+      <circle cx="40" cy="34" r="2.2" fill="#e65100"/>
+    </svg>
+    <div><span>Termo</span><span class="t-sep">·</span><span class="t-ia">IA</span><span class="t-sep">·</span><span>Dinámica</span></div>
+  </div>
+  <div class="topbar-center">
+    <div class="topbar-text">
+      <h1>Unidad 8 · Carta Psicrométrica</h1>
+      <p>Aire Húmedo y Acondicionamiento de Aire</p>
+    </div>
+  </div>
+  <div class="topbar-spacer topbar-brand">
+    <span style="display:inline-block;width:38px;height:38px"></span>
+    <div><span>Termo</span><span class="t-sep">·</span><span class="t-ia">IA</span><span class="t-sep">·</span><span>Dinámica</span></div>
+  </div>
+</div>
+
+<div class="main-wrapper">
+<div class="subtitle-bar">
+  <span>💧</span>
+  <span class="ct">Carta Psicrométrica · Calculadora · Procesos de Acondicionamiento</span>
+  <div class="right">
+    <span class="pres-ctl">P&nbsp;total
+      <input type="number" id="inP" value="101.325" min="80" max="110" step="0.5"
+        onchange="rebuildAll()"> kPa</span>
+    <div class="unit-toggle">
+      <button id="btn-si" class="unit-btn active" onclick="setUnits('SI')">SI</button>
+      <button id="btn-ing" class="unit-btn" onclick="setUnits('ING')">Inglés</button>
+    </div>
+    <span style="font-size:.7rem;color:#90a4ae;font-family:Consolas,monospace">v2.0 SVG</span>
+  </div>
+</div>
+<div class="tabbar">
+  <button class="tab-btn active" id="tb-carta" onclick="switchTab('carta')">📈 Carta psicrométrica</button>
+  <button class="tab-btn" id="tb-calc" onclick="switchTab('calc')">🧮 Calculadora de propiedades</button>
+  <button class="tab-btn" id="tb-proc" onclick="switchTab('proc')">🔄 Procesos de acondicionamiento</button>
+</div>
+
+<div class="tab-pane active" id="pane-carta">
+  <div class="concept"><b>Concepto (8.3).</b> La carta psicrométrica representa los estados del aire húmedo
+  a presión total constante: temperatura de bulbo seco <i>T</i> en abscisas y humedad específica
+  ω en ordenadas. Las familias de curvas son: humedad relativa φ constante (la curva φ = 100 %
+  es la <b>línea de saturación</b>), bulbo húmedo constante, entalpía constante y volumen
+  específico constante. Haga clic en cualquier punto de la región para leer el estado completo.</div>
+  <div class="layout">
+    <div>
+      <div id="chart"></div>
+      <div class="hoverinfo" id="hoverInfo">Mueva el cursor sobre la carta…</div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Estado seleccionado</h3>
+        <div class="prow"><span class="k">T bulbo seco</span><span class="v" id="st-T">—</span></div>
+        <div class="prow"><span class="k">ω humedad específica</span><span class="v" id="st-w">—</span></div>
+        <div class="prow"><span class="k">φ humedad relativa</span><span class="v" id="st-phi">—</span></div>
+        <div class="prow"><span class="k">T bulbo húmedo</span><span class="v" id="st-twb">—</span></div>
+        <div class="prow"><span class="k">T punto de rocío</span><span class="v" id="st-tdp">—</span></div>
+        <div class="prow"><span class="k">h entalpía</span><span class="v" id="st-h">—</span></div>
+        <div class="prow"><span class="k">v volumen específico</span><span class="v" id="st-v">—</span></div>
+        <div class="prow"><span class="k">Pv presión de vapor</span><span class="v" id="st-pv">—</span></div>
+        <p class="note">Clic sobre la carta para evaluar un estado. La carta se traza en SI;
+        el panel muestra valores en el sistema elegido.</p>
+      </div>
+      <div class="panel" style="margin-top:12px">
+        <h3>Leyenda de curvas</h3>
+        <div class="prow"><span class="k" style="color:#6a1b9a;font-weight:700">━━</span><span class="v">Saturación φ=100 %</span></div>
+        <div class="prow"><span class="k" style="color:#1b5e20">──</span><span class="v">φ constante [%]</span></div>
+        <div class="prow"><span class="k" style="color:#37474f">─ ·</span><span class="v">T bulbo húmedo [°C]</span></div>
+        <div class="prow"><span class="k" style="color:#455a64">- -</span><span class="v">h constante [kJ/kg a.s.]</span></div>
+        <div class="prow"><span class="k" style="color:#00695C">· ·</span><span class="v">v constante [m³/kg a.s.]</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tab-pane" id="pane-calc">
+  <div class="concept"><b>Concepto (8.1–8.2).</b> El aire húmedo es una mezcla de aire seco y vapor de agua.
+  La <b>humedad específica</b> ω = mv/ma = 0.622·Pv/(P−Pv); la <b>humedad relativa</b>
+  φ = Pv/Psat(T). La <b>temperatura de saturación adiabática</b> (≈ bulbo húmedo) se alcanza al
+  saturar el aire en flujo estacionario aislado; el <b>punto de rocío</b> es Tsat a la presión
+  parcial del vapor. Con dos propiedades independientes (más P) el estado queda determinado.</div>
+  <div class="layout">
+    <div class="panel">
+      <h3>Datos de entrada</h3>
+      <div class="grid2">
+        <div class="field"><label>Par de propiedades conocidas</label>
+          <select id="calcPair" onchange="calcPairChanged()">
+            <option value="phi">T bulbo seco y φ (humedad relativa)</option>
+            <option value="twb">T bulbo seco y T bulbo húmedo</option>
+            <option value="tdp">T bulbo seco y T punto de rocío</option>
+            <option value="w">T bulbo seco y ω (humedad específica)</option>
+          </select></div>
+        <div class="field"><label>T bulbo seco [°C]</label><input type="number" id="calcT" value="25" step="0.5"></div>
+        <div class="field" id="f-phi"><label>φ humedad relativa [%]</label><input type="number" id="calcPhi" value="60" min="1" max="100" step="1"></div>
+        <div class="field" id="f-twb" style="display:none"><label>T bulbo húmedo [°C]</label><input type="number" id="calcTwb" value="20" step="0.5"></div>
+        <div class="field" id="f-tdp" style="display:none"><label>T punto de rocío [°C]</label><input type="number" id="calcTdp" value="15" step="0.5"></div>
+        <div class="field" id="f-w" style="display:none"><label>ω [g vapor / kg aire seco]</label><input type="number" id="calcW" value="10" min="0.1" step="0.1"></div>
+      </div>
+      <button class="btn" onclick="runCalc()">Resolver estado</button>
+      <button class="btn ghost" onclick="newExerciseCalc()" style="margin-left:8px">🎲 Ejercicio</button>
+      <div class="msg" id="calcMsg"></div>
+      <div class="steps" id="calcSteps" style="display:none"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Estado resuelto</h3>
+        <div class="prow"><span class="k">T bulbo seco</span><span class="v" id="ca-T">—</span></div>
+        <div class="prow"><span class="k">ω</span><span class="v" id="ca-w">—</span></div>
+        <div class="prow"><span class="k">φ</span><span class="v" id="ca-phi">—</span></div>
+        <div class="prow"><span class="k">T bulbo húmedo</span><span class="v" id="ca-twb">—</span></div>
+        <div class="prow"><span class="k">T punto de rocío</span><span class="v" id="ca-tdp">—</span></div>
+        <div class="prow"><span class="k">h</span><span class="v" id="ca-h">—</span></div>
+        <div class="prow"><span class="k">v</span><span class="v" id="ca-v">—</span></div>
+        <div class="prow"><span class="k">Pv</span><span class="v" id="ca-pv">—</span></div>
+        <div class="prow"><span class="k">Psat(T)</span><span class="v" id="ca-psat">—</span></div>
+      </div>
+      <div class="panel" style="margin-top:12px" id="exPanel" hidden>
+        <h3>Ejercicio propuesto</h3>
+        <p id="exText" style="font-size:.87rem;line-height:1.55;margin-bottom:10px"></p>
+        <div class="field"><label>Su respuesta: ω [g/kg aire seco]</label>
+          <input type="number" id="exAns" step="0.1"></div>
+        <button class="btn green" onclick="checkExerciseCalc()">Verificar</button>
+        <div class="msg" id="exMsg"></div>
+        <div class="steps" id="exSteps" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tab-pane" id="pane-proc">
+  <div class="concept"><b>Concepto (8.4).</b> Los procesos de acondicionamiento se analizan con balances de
+  masa de aire seco (ṁa constante), de agua (ṁa·ω + ṁw) y de energía (ṁa·h ± Q̇). El
+  <b>calentamiento/enfriamiento simple</b> ocurre a ω constante; la <b>deshumidificación</b>
+  enfría por debajo del punto de rocío y condensa agua; el <b>enfriamiento evaporativo</b> sigue
+  una línea de bulbo húmedo casi constante; y el <b>mezclado adiabático</b> produce un estado
+  sobre la recta que une las dos corrientes.</div>
+  <div class="layout">
+    <div>
+      <div class="panel" style="margin-bottom:12px">
+        <h3>Definición del proceso</h3>
+        <div class="field"><label>Tipo de proceso</label>
+          <select id="procType" onchange="procTypeChanged()">
+            <option value="heat">Calentamiento simple (ω constante)</option>
+            <option value="cool">Enfriamiento simple (ω constante)</option>
+            <option value="heathum">Calentamiento con humidificación</option>
+            <option value="cooldeshum">Enfriamiento con deshumidificación</option>
+            <option value="evap">Enfriamiento evaporativo</option>
+            <option value="mix">Mezclado adiabático de dos corrientes</option>
+          </select></div>
+        <div class="grid2" id="procInputs"></div>
+        <button class="btn" onclick="runProc()">Calcular proceso</button>
+        <button class="btn ghost" onclick="newExerciseProc()" style="margin-left:8px">🎲 Ejercicio</button>
+        <div class="msg" id="procMsg"></div>
+      </div>
+      <div id="chartProc"></div>
+    </div>
+    <div>
+      <div class="panel">
+        <h3>Resultados</h3>
+        <div id="procResults" style="font-size:.88rem"><p class="note">Defina el proceso y pulse «Calcular proceso».</p></div>
+      </div>
+      <div class="panel" style="margin-top:12px" id="exPanelProc" hidden>
+        <h3>Ejercicio propuesto</h3>
+        <p id="exTextProc" style="font-size:.87rem;line-height:1.55;margin-bottom:10px"></p>
+        <div class="field"><label>Su respuesta: Q̇ [kW]</label>
+          <input type="number" id="exAnsProc" step="0.1"></div>
+        <button class="btn green" onclick="checkExerciseProc()">Verificar</button>
+        <div class="msg" id="exMsgProc"></div>
+        <div class="steps" id="exStepsProc" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="note" style="margin-top:14px;text-align:center">
+TermoIA · Termodinámica Química Aplicada · Unidad 8 (Potter y Scott cap. 8 · Cengel cap. 14 ·
+Moran y Shapiro cap. 12) · Psat: correlación Hyland–Wexler (ASHRAE) ·
+Gráficos SVG nativos, sin dependencias externas: funciona sin conexión a Internet.</p>
+</div>
+
+<script>
+/* ═══════ MOTOR PSICROMÉTRICO (validado contra Cengel tabla A-4 y ej. 14-7) ═══════ */
+var KC=273.15, RA=0.287, EPS=0.622, WMAX=0.030;
+function PSAT(t){var T=t+KC;
+  var ln=-5800.2206/T+1.3914993-0.048640239*T+4.1764768e-5*T*T-1.4452093e-8*T*T*T+6.5459673*Math.log(T);
+  return Math.exp(ln)/1000;}
+function TSAT(p){var lo=0.01,hi=99.9,m,i;
+  for(i=0;i<60;i++){m=.5*(lo+hi);if(PSAT(m)<p)lo=m;else hi=m;}return .5*(lo+hi);}
+function pvFromOmega(w,P){return w*P/(EPS+w);}
+function omegaFromPv(pv,P){return EPS*pv/(P-pv);}
+function omegaFromPhi(t,phi,P){return omegaFromPv(phi*PSAT(t),P);}
+function phiFromOmega(t,w,P){return pvFromOmega(w,P)/PSAT(t);}
+function omegaSat(t,P){return omegaFromPhi(t,1,P);}
+function enthalpy(t,w){return 1.005*t+w*(2501.3+1.82*t);}
+function specVol(t,w,P){return RA*(t+KC)/(P-pvFromOmega(w,P));}
+function hfLiq(t){return 4.186*t;}
+function omegaFromTwb(t,twb,P){var ws=omegaSat(twb,P);
+  return ((2501.3-2.326*twb)*ws-1.006*(t-twb))/(2501.3+1.86*t-4.186*twb);}
+function twbFrom(t,w,P){var lo=-20,hi=t,m,i;
+  for(i=0;i<60;i++){m=.5*(lo+hi);if(omegaFromTwb(t,m,P)<w)lo=m;else hi=m;}return .5*(lo+hi);}
+function tdpFrom(w,P){return TSAT(pvFromOmega(w,P));}
+function tFromHW(h,w){return (h-2501.3*w)/(1.005+1.82*w);}
+function state(t,w,P){var pv=pvFromOmega(w,P);
+  return {T:t,w:w,phi:phiFromOmega(t,w,P),twb:twbFrom(t,w,P),tdp:tdpFrom(w,P),
+          h:enthalpy(t,w),v:specVol(t,w,P),pv:pv,psat:PSAT(t)};}
+
+/* ═══════ UNIDADES ═══════ */
+var U='SI';
+function setUnits(u){U=u;
+  document.getElementById('btn-si').className='unit-btn'+(u==='SI'?' active':'');
+  document.getElementById('btn-ing').className='unit-btn'+(u==='ING'?' active':'');
+  if(selState)showState(selState);if(lastCalc)showCalc(lastCalc);
+  if(lastProcData)document.getElementById('procResults').innerHTML=lastProcData();}
+function fT(t){return U==='SI'?t.toFixed(2)+' °C':(t*1.8+32).toFixed(2)+' °F';}
+function fW(w){return U==='SI'?(w*1000).toFixed(2)+' g/kg a.s.':(w*7000).toFixed(1)+' gr/lb a.s.';}
+function fH(h){return U==='SI'?h.toFixed(2)+' kJ/kg a.s.':(h*0.42992).toFixed(2)+' Btu/lb a.s.';}
+function fV(v){return U==='SI'?v.toFixed(4)+' m³/kg a.s.':(v*16.0185).toFixed(3)+' ft³/lb a.s.';}
+function fP(p){return U==='SI'?p.toFixed(3)+' kPa':(p*0.145038).toFixed(3)+' psia';}
+function fPhi(x){return (x*100).toFixed(1)+' %';}
+function fQ(q){return U==='SI'?q.toFixed(2)+' kW':(q*3412.14/1000).toFixed(0)+' Btu/h';}
+function fM(m){return U==='SI'?m.toFixed(2)+' kg/min':(m*2.20462).toFixed(2)+' lb/min';}
+function Ptot(){var v=parseFloat(document.getElementById('inP').value);
+  return (isFinite(v)&&v>=80&&v<=110)?v:101.325;}
+
+/* ═══════ CARTA SVG (sin librerías) ═══════ */
+var CW=1000,CH=640,ML=16,MR=78,MT=24,MB=58;
+var PW=CW-ML-MR,PH=CH-MT-MB;
+function X(t){return ML+t/50*PW;}
+function Y(w){return MT+(1-w/WMAX)*PH;}
+function angScr(p,q){return Math.atan2(Y(q[1])-Y(p[1]),X(q[0])-X(p[0]))*180/Math.PI;}
+function pathD(pts){var s='',i;for(i=0;i<pts.length;i++)
+  s+=(i?'L':'M')+X(pts[i][0]).toFixed(1)+' '+Y(pts[i][1]).toFixed(1);return s;}
+function txt(p,q,t,c,o){o=o||{};
+  return '<text transform="translate('+(X(p[0])+(o.dx||0)).toFixed(1)+' '+(Y(p[1])+(o.dy||0)).toFixed(1)+
+    ') rotate('+(q?angScr(p,q).toFixed(1):0)+')" text-anchor="'+(o.anchor||'middle')+
+    '" font-size="'+(o.size||10.5)+'" fill="'+c+'" stroke="#fff" stroke-width="3" paint-order="stroke"'+
+    (o.bold?' font-weight="700"':' font-weight="600"')+'>'+t+'</text>';}
+function crv(pts,c,w,dash){return '<path d="'+pathD(pts)+'" fill="none" stroke="'+c+
+  '" stroke-width="'+w+'"'+(dash?' stroke-dasharray="'+dash+'"':'')+'/>';}
+
+function svgBase(P){
+  var s='',g='',i,t,w,pts,phi,twb,h,v,pa,pv,j;
+  /* rejilla */
+  for(t=0;t<=50;t++)g+='<line x1="'+X(t).toFixed(1)+'" y1="'+MT+'" x2="'+X(t).toFixed(1)+'" y2="'+(MT+PH)+
+    '" stroke="'+(t%5?'#eef2f7':'#d8dfe8')+'" stroke-width="'+(t%5?0.5:1)+'"/>';
+  for(w=0;w<=30;w++)g+='<line x1="'+ML+'" y1="'+Y(w/1000).toFixed(1)+'" x2="'+(ML+PW)+'" y2="'+Y(w/1000).toFixed(1)+
+    '" stroke="'+(w%2?'#eef2f7':'#d8dfe8')+'" stroke-width="'+(w%2?0.5:1)+'"/>';
+  s+=g;
+  /* marco */
+  s+='<rect x="'+ML+'" y="'+MT+'" width="'+PW+'" height="'+PH+'" fill="none" stroke="#b6c2d2" stroke-width="1"/>';
+  /* etiquetas de ejes */
+  for(t=0;t<=50;t+=5)s+='<text x="'+X(t).toFixed(1)+'" y="'+(MT+PH+18)+'" text-anchor="middle" font-size="11" fill="#5a7184">'+t+'</text>';
+  for(w=0;w<=30;w+=2)s+='<text x="'+(ML+PW+8)+'" y="'+(Y(w/1000)+4).toFixed(1)+'" font-size="11" fill="#5a7184">'+w+'</text>';
+  s+='<text x="'+(ML+PW/2)+'" y="'+(CH-14)+'" text-anchor="middle" font-size="13" fill="#1a2233" font-weight="600">Temperatura de bulbo seco, T [°C]</text>';
+  s+='<text transform="translate('+(CW-14)+' '+(MT+PH/2)+') rotate(-90)" text-anchor="middle" font-size="13" fill="#1a2233" font-weight="600">Humedad específica, ω [g vapor / kg aire seco]</text>';
+  /* h constante */
+  var lh='';
+  for(h=10;h<=120;h+=10){pts=[];
+    for(t=0;t<=50.001;t+=0.5){w=(h-1.005*t)/(2501.3+1.82*t);
+      if(w>=0&&w<=WMAX&&w<=omegaSat(t,P)+1e-9)pts.push([t,w]);}
+    if(pts.length>2){s+=crv(pts,'rgba(84,110,122,.55)',1,'5 4');
+      lh+=txt(pts[0],pts[2],String(h),'#455a64',{dx:-10,dy:-3,size:10});
+      if(h===90){j=Math.floor(pts.length*.18);
+        lh+=txt(pts[j],pts[j+2],'Entalpía, h [kJ/kg a.s.]','#455a64',{dy:-12});}}}
+  /* Twb constante */
+  var lt='';
+  for(twb=0;twb<=35;twb+=5){pts=[];
+    for(t=twb;t<=50.001;t+=0.5){w=omegaFromTwb(t,twb,P);
+      if(w>=0&&w<=WMAX&&w<=omegaSat(t,P)+1e-9)pts.push([t,w]);}
+    if(pts.length>2){s+=crv(pts,'rgba(55,71,79,.75)',1.1,'8 3 2 3');
+      lt+=txt(pts[0],pts[2],twb+'°','#37474f',{dx:5,dy:-7,size:10});
+      if(twb===20){j=Math.floor(pts.length*.42);
+        lt+=txt(pts[j],pts[j+2],'T bulbo húmedo, Twb [°C]','#37474f',{dy:-11});}}}
+  /* v constante */
+  var lv='';
+  for(v=0.80;v<=0.951;v+=0.025){pts=[];
+    for(t=0;t<=50.001;t+=0.5){pa=RA*(t+KC)/v;pv=P-pa;
+      if(pv<=0)continue;w=omegaFromPv(pv,P);
+      if(w>=0&&w<=WMAX&&w<=omegaSat(t,P)+1e-9)pts.push([t,w]);}
+    if(pts.length>2){s+=crv(pts,'rgba(0,105,92,.6)',1,'2 3');
+      j=pts.length-1;
+      lv+=txt(pts[j],pts[j-2],v.toFixed(3),'#00695C',{dx:4,dy:12,size:9.5});
+      if(Math.abs(v-0.875)<1e-6){j=Math.floor(pts.length*.5);
+        lv+=txt(pts[j],pts[Math.min(j+2,pts.length-1)],'v [m³/kg a.s.]','#00695C',{dx:-12});}}}
+  /* φ constante */
+  var lp='';
+  for(phi=10;phi<=100;phi+=10){pts=[];
+    for(t=0;t<=50.001;t+=0.5){w=omegaFromPhi(t,phi/100,P);
+      if(w<=WMAX)pts.push([t,w]);}
+    if(phi===100){s+=crv(pts,'#6a1b9a',3.2);
+      i=0;while(i<pts.length&&pts[i][1]<0.015)i++;
+      if(i>=pts.length-3)i=Math.floor(pts.length*.55);
+      lp+=txt(pts[i],pts[i+3],'Saturación · φ = 100 %','#6a1b9a',{dy:-10,bold:1,size:11});}
+    else{s+=crv(pts,'rgba(27,94,32,.78)',1.15);
+      i=0;while(i<pts.length&&pts[i][1]<0.0235)i++;
+      if(i>=pts.length-4)i=pts.length-8;
+      lp+=txt(pts[i],pts[Math.min(i+3,pts.length-1)],phi+' %','#1b5e20',{dy:-4});}}
+  return s+lh+lt+lv+lp;}
+
+var baseCache={P:0,svg:''};
+function getBase(P){if(baseCache.P!==P){baseCache.P=P;baseCache.svg=svgBase(P);}return baseCache.svg;}
+var DEFS='<defs>'+
+ '<marker id="arrH" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ef6c00"/></marker>'+
+ '<marker id="arrC" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#1565c0"/></marker>'+
+ '<marker id="arrG" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#2e7d32"/></marker></defs>';
+
+function renderChart(divId,P,extra){
+  document.getElementById(divId).innerHTML=
+    '<svg viewBox="0 0 '+CW+' '+CH+'" xmlns="http://www.w3.org/2000/svg">'+DEFS+
+    '<rect width="'+CW+'" height="'+CH+'" fill="#ffffff"/>'+getBase(P)+(extra||'')+'</svg>';}
+
+/* extras de proceso */
+function procLine(pts,color,arrow){
+  return '<path d="'+pathD(pts)+'" fill="none" stroke="'+color+'" stroke-width="3.5"'+
+    (arrow?' marker-end="url(#'+arrow+')"':'')+'/>';}
+function procPt(t,w,label,color){
+  return '<circle cx="'+X(t).toFixed(1)+'" cy="'+Y(w).toFixed(1)+'" r="7" fill="'+color+
+    '" stroke="#fff" stroke-width="2.2"/>'+
+    '<text x="'+X(t).toFixed(1)+'" y="'+(Y(w)-13).toFixed(1)+'" text-anchor="middle" font-size="13" '+
+    'font-weight="700" fill="#1a2233" stroke="#fff" stroke-width="3" paint-order="stroke">'+label+'</text>';}
+
+/* ═══════ CARTA: interacción ═══════ */
+var selState=null;
+function selExtra(){if(!selState)return '';
+  return procPt(selState.T,selState.w,'●','#c62828').replace('>●<','><');}
+function renderMain(){renderChart('chart',Ptot(),selState?
+  '<circle cx="'+X(selState.T).toFixed(1)+'" cy="'+Y(selState.w).toFixed(1)+
+  '" r="7.5" fill="#c62828" stroke="#fff" stroke-width="2.5"/>':'');
+  attachMainEvents();}
+function svgCoords(svg,ev){
+  var r=svg.getBoundingClientRect();
+  var x=(ev.clientX-r.left)*CW/r.width, y=(ev.clientY-r.top)*CH/r.height;
+  var t=(x-ML)/PW*50, w=(1-(y-MT)/PH)*WMAX;
+  return {t:t,w:w,inside:t>=0&&t<=50&&w>=0&&w<=WMAX};}
+function attachMainEvents(){
+  var svg=document.querySelector('#chart svg');if(!svg)return;
+  svg.addEventListener('click',function(ev){
+    var c=svgCoords(svg,ev),P=Ptot();
+    if(!c.inside)return;
+    var w=Math.min(c.w,omegaSat(c.t,P));
+    selState=state(c.t,w,P);showState(selState);renderMain();});
+  svg.addEventListener('mousemove',function(ev){
+    var c=svgCoords(svg,ev),P=Ptot(),el=document.getElementById('hoverInfo');
+    if(!c.inside){el.textContent='Fuera de la carta';return;}
+    var ws=omegaSat(c.t,P);
+    if(c.w>ws){el.textContent='T = '+c.t.toFixed(1)+' °C · región de niebla (sobre saturación)';return;}
+    el.textContent='T = '+c.t.toFixed(1)+' °C · ω = '+(c.w*1000).toFixed(1)+
+      ' g/kg · φ = '+(phiFromOmega(c.t,c.w,P)*100).toFixed(1)+' %  (clic para evaluar)';});}
+function showState(s){
+  function put(id,v){document.getElementById(id).textContent=v;}
+  put('st-T',fT(s.T));put('st-w',fW(s.w));put('st-phi',fPhi(s.phi));
+  put('st-twb',fT(s.twb));put('st-tdp',fT(s.tdp));put('st-h',fH(s.h));
+  put('st-v',fV(s.v));put('st-pv',fP(s.pv));}
+
+/* ═══════ PESTAÑAS ═══════ */
+function switchTab(id){
+  var ks=['carta','calc','proc'],i;
+  for(i=0;i<3;i++){
+    document.getElementById('tb-'+ks[i]).className='tab-btn'+(ks[i]===id?' active':'');
+    document.getElementById('pane-'+ks[i]).className='tab-pane'+(ks[i]===id?' active':'');}}
+
+/* ═══════ CALCULADORA ═══════ */
+var lastCalc=null;
+function calcPairChanged(){
+  var p=document.getElementById('calcPair').value,ks=['phi','twb','tdp','w'],i;
+  for(i=0;i<4;i++)document.getElementById('f-'+ks[i]).style.display=(ks[i]===p)?'':'none';}
+function runCalc(){
+  var P=Ptot(),pair=document.getElementById('calcPair').value;
+  var T=parseFloat(document.getElementById('calcT').value);
+  var msg=document.getElementById('calcMsg');msg.className='msg';
+  if(!isFinite(T)||T<0||T>60){msg.className='msg bad';msg.textContent='T debe estar entre 0 y 60 °C.';return;}
+  var w,steps='P total = '+P.toFixed(3)+' kPa\nPsat('+T.toFixed(1)+' °C) = '+PSAT(T).toFixed(4)+' kPa\n';
+  if(pair==='phi'){var phi=parseFloat(document.getElementById('calcPhi').value)/100;
+    if(!(phi>0&&phi<=1)){msg.className='msg bad';msg.textContent='φ debe estar entre 1 y 100 %.';return;}
+    var pv=phi*PSAT(T);w=omegaFromPv(pv,P);
+    steps+='Pv = φ·Psat = '+pv.toFixed(4)+' kPa\nω = 0.622·Pv/(P−Pv) = '+(w*1000).toFixed(3)+' g/kg';}
+  else if(pair==='twb'){var twb=parseFloat(document.getElementById('calcTwb').value);
+    if(!(twb<=T)){msg.className='msg bad';msg.textContent='Twb no puede exceder T de bulbo seco.';return;}
+    w=omegaFromTwb(T,twb,P);
+    if(w<0){msg.className='msg bad';msg.textContent='Combinación T/Twb fuera de la región física.';return;}
+    steps+='ωs(Twb) = '+(omegaSat(twb,P)*1000).toFixed(3)+' g/kg\n'+
+      'ω = [(2501.3−2.326·Twb)·ωs − 1.006·(T−Twb)] / [2501.3+1.86·T−4.186·Twb] = '+(w*1000).toFixed(3)+' g/kg';}
+  else if(pair==='tdp'){var tdp=parseFloat(document.getElementById('calcTdp').value);
+    if(!(tdp<=T)){msg.className='msg bad';msg.textContent='Tdp no puede exceder T de bulbo seco.';return;}
+    var pv2=PSAT(tdp);w=omegaFromPv(pv2,P);
+    steps+='Pv = Psat(Tdp) = '+pv2.toFixed(4)+' kPa\nω = 0.622·Pv/(P−Pv) = '+(w*1000).toFixed(3)+' g/kg';}
+  else{w=parseFloat(document.getElementById('calcW').value)/1000;
+    if(!(w>0)){msg.className='msg bad';msg.textContent='ω debe ser positiva.';return;}
+    steps+='Pv = ω·P/(0.622+ω) = '+pvFromOmega(w,P).toFixed(4)+' kPa';}
+  if(w>omegaSat(T,P)+1e-9){msg.className='msg warn';
+    msg.textContent='El estado queda sobre la línea de saturación (φ > 100 %): se ajustó a saturación.';
+    w=omegaSat(T,P);}
+  var s=state(T,w,P);lastCalc=s;showCalc(s);
+  steps+='\nφ = Pv/Psat = '+fPhi(s.phi)+'\nh = 1.005·T + ω·(2501.3+1.82·T) = '+s.h.toFixed(2)+' kJ/kg a.s.'+
+    '\nv = Ra·T/(P−Pv) = '+s.v.toFixed(4)+' m³/kg a.s.'+
+    '\nTwb = '+s.twb.toFixed(2)+' °C (inversión numérica de saturación adiabática)'+
+    '\nTdp = '+s.tdp.toFixed(2)+' °C (Tsat a Pv)';
+  var st=document.getElementById('calcSteps');st.style.display='block';st.textContent=steps;}
+function showCalc(s){
+  function put(id,v){document.getElementById(id).textContent=v;}
+  put('ca-T',fT(s.T));put('ca-w',fW(s.w));put('ca-phi',fPhi(s.phi));
+  put('ca-twb',fT(s.twb));put('ca-tdp',fT(s.tdp));put('ca-h',fH(s.h));
+  put('ca-v',fV(s.v));put('ca-pv',fP(s.pv));put('ca-psat',fP(s.psat));}
+
+var exSol=null;
+function newExerciseCalc(){
+  var T=15+Math.round(Math.random()*25),phi=20+Math.round(Math.random()*70),P=Ptot();
+  exSol={T:T,phi:phi,w:omegaFromPhi(T,phi/100,P)*1000,P:P};
+  document.getElementById('exPanel').hidden=false;
+  document.getElementById('exText').textContent=
+    'Aire húmedo a P = '+P.toFixed(2)+' kPa, T = '+T+' °C y φ = '+phi+
+    ' %. Determine la humedad específica ω en g de vapor por kg de aire seco (tolerancia ±0.3 g/kg).';
+  document.getElementById('exAns').value='';
+  document.getElementById('exMsg').className='msg';
+  document.getElementById('exSteps').style.display='none';}
+function checkExerciseCalc(){
+  if(!exSol)return;
+  var a=parseFloat(document.getElementById('exAns').value);
+  var m=document.getElementById('exMsg');
+  var ok=isFinite(a)&&Math.abs(a-exSol.w)<=0.3;
+  m.className='msg '+(ok?'ok':'bad');
+  m.textContent=ok?'✔ Correcto: ω = '+exSol.w.toFixed(2)+' g/kg a.s.':
+    '✘ Revise el procedimiento. Respuesta correcta: ω = '+exSol.w.toFixed(2)+' g/kg a.s.';
+  var pv=exSol.phi/100*PSAT(exSol.T);
+  document.getElementById('exSteps').style.display='block';
+  document.getElementById('exSteps').textContent=
+    'Solución:\nPsat('+exSol.T+' °C) = '+PSAT(exSol.T).toFixed(4)+' kPa'+
+    '\nPv = φ·Psat = '+pv.toFixed(4)+' kPa'+
+    '\nω = 0.622·Pv/(P−Pv) = '+(exSol.w/1000).toFixed(5)+' kg/kg = '+exSol.w.toFixed(2)+' g/kg a.s.';}
+
+/* ═══════ PROCESOS ═══════ */
+var lastProcData=null,lastProcExtra='';
+function FLD(id,lab,val){return '<div class="field"><label>'+lab+'</label>'+
+  '<input type="number" id="'+id+'" value="'+val+'" step="0.5"></div>';}
+function procTypeChanged(){
+  var t=document.getElementById('procType').value,d=document.getElementById('procInputs');
+  var h=FLD('p-T1','T₁ bulbo seco [°C]',(t==='cool'||t==='cooldeshum')?30:15)+
+        FLD('p-phi1','φ₁ [%]',t==='evap'?25:(t==='cooldeshum'?80:60))+
+        FLD('p-V1','Flujo volumétrico V̇₁ [m³/min]',50);
+  if(t==='heat')h+=FLD('p-T2','T₂ de salida [°C]',35);
+  if(t==='cool')h+=FLD('p-T2','T₂ de salida [°C]',18);
+  if(t==='heathum')h+=FLD('p-T2','T₂ de salida [°C]',30)+FLD('p-phi2','φ₂ de salida [%]',55);
+  if(t==='cooldeshum')h+=FLD('p-T2','T₂ de salida [°C]',14)+FLD('p-phi2','φ₂ de salida [%]',100);
+  if(t==='evap')h+=FLD('p-T2','T₂ de salida [°C]',22);
+  if(t==='mix')h=FLD('p-T1','Corriente 1 · T₁ [°C]',14)+FLD('p-phi1','Corriente 1 · φ₁ [%]',100)+
+    FLD('p-V1','Corriente 1 · V̇₁ [m³/min]',50)+FLD('p-T2','Corriente 2 · T₂ [°C]',32)+
+    FLD('p-phi2','Corriente 2 · φ₂ [%]',60)+FLD('p-V2','Corriente 2 · V̇₂ [m³/min]',20);
+  d.innerHTML=h;}
+function gv(id){return parseFloat(document.getElementById(id).value);}
+function ROW(k,v,c){return '<div class="prow"><span class="k">'+k+'</span><span class="v"'+
+  (c?' style="color:var(--'+c+')"':'')+'>'+v+'</span></div>';}
+function H4(t){return '<h4 style="font-size:.8rem;color:var(--muted);margin:8px 0 4px">'+t+'</h4>';}
+function stRows(tag,s){return ROW('T'+tag,fT(s.T))+ROW('ω'+tag,fW(s.w))+
+  ROW('φ'+tag,fPhi(s.phi))+ROW('h'+tag,fH(s.h))+ROW('v'+tag,fV(s.v));}
+function renderProc(){renderChart('chartProc',Ptot(),lastProcExtra);}
+
+function runProc(){
+  var P=Ptot(),t=document.getElementById('procType').value;
+  var msg=document.getElementById('procMsg');msg.className='msg';
+  var T1=gv('p-T1'),phi1=gv('p-phi1')/100,V1=gv('p-V1');
+  if(!isFinite(T1)||!isFinite(phi1)||!isFinite(V1)||phi1<=0||phi1>1||V1<=0){
+    msg.className='msg bad';msg.textContent='Revise los datos de entrada.';return;}
+  var w1=omegaFromPhi(T1,phi1,P),s1=state(T1,w1,P),ma=V1/s1.v;
+  var extra='',i,tt;
+  if(t==='heat'||t==='cool'){
+    var T2=gv('p-T2');
+    if(t==='heat'&&T2<=T1){msg.className='msg bad';msg.textContent='En calentamiento T₂ > T₁.';return;}
+    if(t==='cool'&&T2>=T1){msg.className='msg bad';msg.textContent='En enfriamiento T₂ < T₁.';return;}
+    if(t==='cool'&&T2<s1.tdp){msg.className='msg warn';
+      msg.textContent='T₂ < Tdp ('+s1.tdp.toFixed(1)+' °C): habría condensación; use «Enfriamiento con deshumidificación».';return;}
+    var s2=state(T2,w1,P),Q=ma*(s2.h-s1.h)/60;
+    lastProcData=function(){return H4('Estado 1 (entrada)')+stRows('₁',s1)+
+      H4('Estado 2 (salida)')+stRows('₂',s2)+H4('Balances')+
+      ROW('ṁ aire seco',fM(ma))+ROW('ω (sin cambio)',fW(w1))+
+      ROW(Q>=0?'Q̇ suministrado':'Q̇ retirado',fQ(Math.abs(Q)),Q>=0?'hot':'cold');};
+    var col=Q>=0?'#ef6c00':'#1565c0',ar=Q>=0?'arrH':'arrC';
+    extra=procLine([[T1,w1],[T2,w1]],col,ar)+procPt(T1,w1,'1',col)+procPt(T2,w1,'2',col);}
+  else if(t==='heathum'){
+    var T2b=gv('p-T2'),phi2=gv('p-phi2')/100;
+    var w2=omegaFromPhi(T2b,phi2,P),s2b=state(T2b,w2,P);
+    if(w2<w1){msg.className='msg warn';msg.textContent='El estado final tiene menos humedad que el inicial: no es humidificación.';return;}
+    var mw=ma*(w2-w1),Qb=(ma*(s2b.h-s1.h)-mw*hfLiq(25))/60;
+    lastProcData=function(){return H4('Estado 1')+stRows('₁',s1)+H4('Estado 2')+stRows('₂',s2b)+
+      H4('Balances')+ROW('ṁ aire seco',fM(ma))+ROW('Agua agregada',(mw*1000).toFixed(1)+' g/min')+
+      ROW('Q̇ neto (agua líq. 25 °C)',fQ(Qb),'hot');};
+    extra=procLine([[T1,w1],[T2b,w1]],'#ef6c00',null)+procLine([[T2b,w1],[T2b,w2]],'#ef6c00','arrH')+
+      procPt(T1,w1,'1','#ef6c00')+procPt(T2b,w2,'2','#ef6c00');}
+  else if(t==='cooldeshum'){
+    var T2c=gv('p-T2'),phi2c=gv('p-phi2')/100;
+    if(T2c>=s1.tdp){msg.className='msg warn';
+      msg.textContent='Para deshumidificar, T₂ debe ser menor que Tdp₁ = '+s1.tdp.toFixed(1)+' °C.';return;}
+    var w2c=omegaFromPhi(T2c,phi2c,P),s2c=state(T2c,w2c,P);
+    var mwc=ma*(w1-w2c),Qc=(ma*(s1.h-s2c.h)-mwc*hfLiq(T2c))/60;
+    lastProcData=function(){return H4('Estado 1')+stRows('₁',s1)+H4('Estado 2')+stRows('₂',s2c)+
+      H4('Balances')+ROW('ṁ aire seco',fM(ma))+ROW('Condensado retirado',(mwc*1000).toFixed(1)+' g/min')+
+      ROW('Q̇ retirado',fQ(Qc),'cold');};
+    var path=[[T1,w1],[s1.tdp,w1]];
+    for(tt=s1.tdp;tt>=T2c;tt-=0.5)path.push([tt,Math.min(w1,omegaSat(tt,P))]);
+    path.push([T2c,w2c]);
+    extra=procLine(path,'#1565c0','arrC')+procPt(T1,w1,'1','#1565c0')+procPt(T2c,w2c,'2','#1565c0');}
+  else if(t==='evap'){
+    var T2e=gv('p-T2');
+    if(T2e>=T1||T2e<s1.twb){msg.className='msg bad';
+      msg.textContent='T₂ debe estar entre Twb₁ = '+s1.twb.toFixed(1)+' °C y T₁.';return;}
+    var w2e=omegaFromTwb(T2e,s1.twb,P),s2e=state(T2e,w2e,P);
+    var mwe=ma*(w2e-w1);
+    lastProcData=function(){return H4('Estado 1')+stRows('₁',s1)+H4('Estado 2')+stRows('₂',s2e)+
+      H4('Balances')+ROW('ṁ aire seco',fM(ma))+ROW('Twb ≈ constante',fT(s1.twb))+
+      ROW('Agua evaporada',(mwe*1000).toFixed(1)+' g/min')+ROW('Q̇ externo','≈ 0 (adiabático)','good');};
+    var pth=[];for(tt=T1;tt>=T2e;tt-=0.5)pth.push([tt,omegaFromTwb(tt,s1.twb,P)]);
+    pth.push([T2e,w2e]);
+    extra=procLine(pth,'#2e7d32','arrG')+procPt(T1,w1,'1','#2e7d32')+procPt(T2e,w2e,'2','#2e7d32');}
+  else{
+    var T2m=gv('p-T2'),phi2m=gv('p-phi2')/100,V2=gv('p-V2');
+    if(!isFinite(T2m)||!isFinite(phi2m)||!isFinite(V2)||phi2m<=0||phi2m>1||V2<=0){
+      msg.className='msg bad';msg.textContent='Revise los datos de la corriente 2.';return;}
+    var w2m=omegaFromPhi(T2m,phi2m,P),s2m=state(T2m,w2m,P),ma2=V2/s2m.v;
+    var w3=(ma*w1+ma2*w2m)/(ma+ma2),h3=(ma*s1.h+ma2*s2m.h)/(ma+ma2);
+    var T3=tFromHW(h3,w3),s3=state(T3,Math.min(w3,omegaSat(T3,P)),P);
+    var fog=w3>omegaSat(T3,P);
+    lastProcData=function(){return H4('Corriente 1')+stRows('₁',s1)+ROW('ṁa₁',fM(ma))+
+      H4('Corriente 2')+stRows('₂',s2m)+ROW('ṁa₂',fM(ma2))+
+      H4('Mezcla (3)')+stRows('₃',s3)+ROW('ṁa₃',fM(ma+ma2))+
+      (fog?ROW('Aviso','mezcla sobresaturada (niebla)','warn'):'');};
+    extra=procLine([[T1,w1],[T2m,w2m]],'#9e9e9e',null)+
+      procPt(T1,w1,'1','#616161')+procPt(T2m,w2m,'2','#616161')+procPt(s3.T,s3.w,'3','#7b1fa2');}
+  document.getElementById('procResults').innerHTML=lastProcData();
+  lastProcExtra=extra;renderProc();}
+
+var exSolP=null;
+function newExerciseProc(){
+  var P=Ptot();
+  var T1=10+Math.round(Math.random()*10),phi1=30+Math.round(Math.random()*50);
+  var T2=30+Math.round(Math.random()*15),V=20+Math.round(Math.random()*60);
+  var w=omegaFromPhi(T1,phi1/100,P),s1=state(T1,w,P),s2=state(T2,w,P);
+  var ma=V/s1.v,Q=ma*(s2.h-s1.h)/60;
+  exSolP={T1:T1,phi1:phi1,T2:T2,V:V,Q:Q,ma:ma,h1:s1.h,h2:s2.h,v1:s1.v,w:w};
+  document.getElementById('exPanelProc').hidden=false;
+  document.getElementById('exTextProc').textContent=
+    'Se calientan '+V+' m³/min de aire húmedo a P = '+P.toFixed(2)+' kPa desde T₁ = '+T1+
+    ' °C y φ₁ = '+phi1+' % hasta T₂ = '+T2+' °C en un ducto (ω constante). '+
+    'Determine la potencia térmica Q̇ en kW (tolerancia ±5 %).';
+  document.getElementById('exAnsProc').value='';
+  document.getElementById('exMsgProc').className='msg';
+  document.getElementById('exStepsProc').style.display='none';}
+function checkExerciseProc(){
+  if(!exSolP)return;
+  var a=parseFloat(document.getElementById('exAnsProc').value);
+  var ok=isFinite(a)&&Math.abs(a-exSolP.Q)<=0.05*Math.abs(exSolP.Q);
+  var m=document.getElementById('exMsgProc');
+  m.className='msg '+(ok?'ok':'bad');
+  m.textContent=ok?'✔ Correcto: Q̇ = '+exSolP.Q.toFixed(2)+' kW':
+    '✘ Revise el balance de energía. Respuesta correcta: Q̇ = '+exSolP.Q.toFixed(2)+' kW';
+  document.getElementById('exStepsProc').style.display='block';
+  document.getElementById('exStepsProc').textContent=
+    'Solución:\nω = '+(exSolP.w*1000).toFixed(3)+' g/kg (constante)\n'+
+    'v₁ = '+exSolP.v1.toFixed(4)+' m³/kg a.s. → ṁa = V̇/v₁ = '+exSolP.ma.toFixed(2)+' kg/min\n'+
+    'h₁ = '+exSolP.h1.toFixed(2)+' kJ/kg a.s. · h₂ = '+exSolP.h2.toFixed(2)+' kJ/kg a.s.\n'+
+    'Q̇ = ṁa·(h₂−h₁)/60 = '+exSolP.Q.toFixed(2)+' kW';}
+
+/* ═══════ INICIO ═══════ */
+function rebuildAll(){baseCache.P=0;renderMain();renderProc();
+  if(selState){var P=Ptot();selState=state(selState.T,Math.min(selState.w,omegaSat(selState.T,P)),P);
+    showState(selState);renderMain();}}
+procTypeChanged();
+selState=state(25,omegaFromPhi(25,0.6,Ptot()),Ptot());
+showState(selState);
+renderMain();
+renderProc();
+</script>
+</body>
+</html>

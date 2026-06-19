@@ -1,0 +1,100 @@
+{
+  "app": "cyclepad",
+  "version": 1,
+  "title": "Ejemplo · Mezclador adiabático",
+  "cycleType": "open",
+  "substance": "water",
+  "unitSystem": "SI",
+  "nodes": [
+    {
+      "id": "n1",
+      "type": "SOURCE",
+      "name": "SRC1",
+      "params": {
+        "phase": "auto",
+        "T": 300,
+        "P": 200,
+        "m_dot": 0.4,
+        "x": ""
+      },
+      "x": 60,
+      "y": 70
+    },
+    {
+      "id": "n2",
+      "type": "SOURCE",
+      "name": "SRC2",
+      "params": {
+        "phase": "auto",
+        "T": 40,
+        "P": 200,
+        "m_dot": 0.6,
+        "x": ""
+      },
+      "x": 60,
+      "y": 300
+    },
+    {
+      "id": "n3",
+      "type": "MIXER",
+      "name": "MIX1",
+      "params": {
+        "nIn": 2
+      },
+      "x": 430,
+      "y": 170
+    },
+    {
+      "id": "n4",
+      "type": "SINK",
+      "name": "SNK1",
+      "params": {},
+      "x": 800,
+      "y": 170
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "fromNodeId": "n1",
+      "toNodeId": "n3",
+      "fromPort": 0,
+      "toPort": 0,
+      "cond": {
+        "phase": "auto",
+        "P": "",
+        "T": "",
+        "x": ""
+      },
+      "pts": []
+    },
+    {
+      "id": "e2",
+      "fromNodeId": "n2",
+      "toNodeId": "n3",
+      "fromPort": 0,
+      "toPort": 1,
+      "cond": {
+        "phase": "auto",
+        "P": "",
+        "T": "",
+        "x": ""
+      },
+      "pts": []
+    },
+    {
+      "id": "e3",
+      "fromNodeId": "n3",
+      "toNodeId": "n4",
+      "fromPort": 0,
+      "toPort": 0,
+      "cond": {
+        "phase": "auto",
+        "P": "",
+        "T": "",
+        "x": ""
+      },
+      "pts": []
+    }
+  ]
+}

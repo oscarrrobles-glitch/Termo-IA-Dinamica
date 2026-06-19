@@ -1,0 +1,16 @@
+{
+  "app": "sim-ciclo-vc",
+  "ver": 2,
+  "units": "SI",
+  "modo": "Refrigeración",
+  "state": {
+    "fluid": "R290",
+    "Te": -15,
+    "Tc": 45,
+    "sh": 10,
+    "sc": 8,
+    "eta": 0.75,
+    "dimMode": "cap",
+    "dimval": 5
+  }
+}

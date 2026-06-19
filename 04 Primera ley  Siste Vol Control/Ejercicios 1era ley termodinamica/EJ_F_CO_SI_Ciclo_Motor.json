@@ -1,0 +1,26 @@
+{
+  "app": "TermoIA-PrimeraLey",
+  "version": "1.1",
+  "savedAt": "2026-06-16T00:00:00.000Z",
+  "title": "EJ-F · Ciclo Motor — CO (Monóxido de Carbono, SI)",
+  "source": "Ejercicio original — Ciclo estándar para CO como gas de trabajo",
+  "description": "1 kg de CO (monóxido de carbono) realiza un ciclo motor de tres procesos. Estado 1: T₁=27 °C (300 K), P₁=100 kPa. Proceso 1→2: expansión isobárica (P=cte, P=100 kPa) hasta T₂=326.85 °C (600 K); el fluido absorbe calor. Proceso 2→3: enfriamiento isocórico (v=cte) hasta P₃=50 kPa; T₃=T₂·(P₃/P₂)=600·0.5=300 K=26.85 °C≈27 °C. Proceso 3→1: compresión isotérmica (T=cte, T≈27 °C) hasta P₁=100 kPa, restaurando el estado inicial. Determinar: W_neto del ciclo (área encerrada en diagrama P-v), Q_absorbido, Q_cedido y eficiencia térmica del ciclo. Observar que CO tiene propiedades similares a N₂ (M=28 g/mol) pero relevante en combustión.",
+  "config": {
+    "currentUnit": "SI",
+    "tempSubUnit": "C",
+    "pressSubUnit": "kPa",
+    "currentGas": "co",
+    "calcMode": "cycle",
+    "propMode": "integ"
+  },
+  "state1": {
+    "T0": 27.0,
+    "P0": 100.0,
+    "mass": 1.0
+  },
+  "processes": [
+    { "type": "isobaric",   "inp2a": 326.85, "inp2b": 1.3 },
+    { "type": "isochoric",  "inp2a": 26.85,  "inp2b": 1.3 },
+    { "type": "isothermal", "inp2a": 100.0,  "inp2b": 1.3 }
+  ]
+}

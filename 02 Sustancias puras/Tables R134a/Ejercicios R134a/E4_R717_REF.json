@@ -1,0 +1,16 @@
+{
+  "app": "sim-ciclo-vc",
+  "ver": 2,
+  "units": "SI",
+  "modo": "Refrigeración",
+  "state": {
+    "fluid": "R717",
+    "Te": -20,
+    "Tc": 35,
+    "sh": 5,
+    "sc": 5,
+    "eta": 0.72,
+    "dimMode": "cap",
+    "dimval": 20
+  }
+}

@@ -1,0 +1,2548 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Primera Ley · Sistemas Cerrados · TermoIA·Dinámica</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.27.0/plotly.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f7fa;--surface:#fff;--border:#dde3ec;--text:#1a2233;--muted:#6b7a99;
+  --accent:#1976d2;
+  --hdr:linear-gradient(90deg,#1565c0 0%,#1976d2 60%,#1e88e5 100%);
+  --cQ:#f57c00;--cdU:#1565c0;--cW:#2e7d32;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;
+  display:flex;flex-direction:column}
+
+/* ══ TOPBAR ══ */
+.topbar{background:var(--hdr);display:flex;align-items:center;
+  justify-content:space-between;padding:0 24px;height:60px;
+  box-shadow:0 2px 8px rgba(21,101,192,.22);flex-shrink:0;position:relative;overflow:hidden}
+.topbar::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 280px 90px at 50% 140%,rgba(255,179,0,.15),transparent 70%)}
+.tb-brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:1.25rem;
+  color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.18);z-index:1}
+.tb-logo{width:32px;height:32px;flex-shrink:0}
+.tb-logo .ring{transform-origin:center;animation:rotring 18s linear infinite}
+.tb-logo .spark{transform-origin:center;animation:spk 2.4s ease-in-out infinite}
+@keyframes rotring{to{transform:rotate(360deg)}}
+@keyframes spk{0%,100%{opacity:.5;transform:scale(.9)}50%{opacity:1;transform:scale(1.1)}}
+.tb-ia{background:linear-gradient(135deg,#ffeb3b,#ffb300,#ff5722);
+  -webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900}
+.tb-sep{color:rgba(255,220,160,.8);font-weight:400;padding:0 2px}
+.tb-center{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  text-align:center;z-index:1}
+.tb-title{font-size:.9rem;font-weight:800;color:#fff;letter-spacing:.06em;
+  text-transform:uppercase;line-height:1.1}
+.tb-sub{font-size:.68rem;color:rgba(255,255,255,.72);font-weight:300;margin-top:1px;
+  letter-spacing:.04em}
+.tb-badge{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);
+  color:#fff;font-size:.72rem;font-weight:800;padding:4px 13px;border-radius:16px;
+  letter-spacing:.05em;z-index:1;white-space:nowrap;font-family:'IBM Plex Mono',monospace}
+
+/* ══ SUBBAR gas/units ══ */
+.subbar{background:#fff;border-bottom:2px solid var(--border);
+  display:flex;flex-direction:column;flex-shrink:0}
+.subbar-row{display:flex;align-items:center;gap:10px;padding:5px 20px;
+  flex-wrap:wrap;border-bottom:1px solid #eef0f5}
+.subbar-row:last-child{border-bottom:none}
+.gas-pills{display:flex;gap:5px;flex-wrap:wrap}
+.gas-pill{padding:3px 11px;font-size:.74rem;font-weight:700;border:1.5px solid var(--border);
+  border-radius:20px;cursor:pointer;color:var(--muted);background:#fff;
+  transition:all .15s;white-space:nowrap}
+.gas-pill:hover{border-color:var(--accent);color:var(--accent)}
+.gas-pill.act{background:var(--accent);color:#fff;border-color:var(--accent)}
+.subbar-sep{width:1px;height:26px;background:var(--border);flex-shrink:0}
+.utog{display:flex;border:1.5px solid var(--accent);border-radius:6px;overflow:hidden;flex-shrink:0}
+.ubtn{padding:3px 12px;font-size:.74rem;font-weight:700;background:#fff;color:var(--accent);
+  border:none;cursor:pointer;transition:all .15s;letter-spacing:.04em}
+.ubtn.act{background:var(--accent);color:#fff}
+.ubtn:not(.act):hover{background:#e3edf9}
+.prop-mode-tog{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap}
+.pm-btn{padding:3px 11px;font-size:.72rem;font-weight:700;border:1.5px solid #7b1fa2;
+  border-radius:5px;cursor:pointer;background:#fff;color:#7b1fa2;transition:all .15s;
+  white-space:nowrap}
+.pm-btn.act{background:#7b1fa2;color:#fff}
+.pm-label{font-size:.72rem;font-weight:700;color:var(--muted);white-space:nowrap;flex-shrink:0}
+/* Toggles compactos dentro de campos del sidebar */
+.utog-sm{display:flex;border:1.5px solid var(--accent);border-radius:5px;overflow:hidden;flex-shrink:0}
+.ubtn-sm{padding:1px 8px;font-size:.68rem;font-weight:700;background:#fff;color:var(--accent);
+  border:none;cursor:pointer;transition:all .15s;letter-spacing:.03em;line-height:1.5}
+.ubtn-sm.act{background:var(--accent);color:#fff}
+.ubtn-sm:not(.act):hover{background:#e3edf9}
+
+/* ══ LAYOUT ══ */
+.layout{display:grid;grid-template-columns:370px 1fr;grid-template-rows:1fr;
+  flex:1;min-height:0;overflow:hidden}
+aside{background:var(--surface);border-right:1px solid var(--border);
+  display:flex;flex-direction:column;overflow-y:auto;min-height:0}
+main{padding:14px 18px;display:flex;flex-direction:column;gap:12px;
+  overflow-y:auto;background:var(--bg);min-height:0}
+
+/* ══ ASIDE SECTIONS ══ */
+.aside-section{padding:12px 14px;border-bottom:1px solid var(--border)}
+.aside-title{font-size:.70rem;font-weight:800;color:var(--accent);letter-spacing:.1em;
+  text-transform:uppercase;margin-bottom:9px;display:flex;align-items:center;gap:6px}
+
+/* ══ FIELDS ══ */
+.field{display:flex;flex-direction:column;gap:3px}
+.field-lbl{font-size:.82rem;font-weight:700;color:var(--text);
+  display:flex;align-items:center;justify-content:space-between;gap:4px}
+.var-lbl{display:inline-flex;align-items:flex-end;line-height:1;gap:0}
+.var-lbl sub,.var-lbl sup,.field-lbl sub,.field-lbl sup{
+  font-size:.68em;font-weight:800;line-height:1;
+  vertical-align:sub;position:static}
+.field-sub{font-size:.68rem;color:var(--muted)}
+.inp-row{display:flex;border:1.5px solid var(--border);border-radius:7px;overflow:hidden;
+  transition:border-color .15s,box-shadow .15s;background:#fff}
+.inp-row:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(25,118,210,.10)}
+.inp-row input{flex:1;border:none;padding:7px 10px;font-size:.9rem;
+  font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--text);
+  background:transparent;outline:none;min-width:0}
+.inp-unit{padding:7px 10px;font-size:.72rem;font-weight:700;color:var(--accent);
+  background:#e8edf5;border-left:1px solid var(--border);white-space:nowrap;
+  display:flex;align-items:center}
+.out-row{display:flex;align-items:center;justify-content:space-between;
+  padding:6px 10px;background:#f5f8fd;border:1px solid #d9e5f5;border-radius:6px}
+.out-lbl{font-size:.78rem;font-weight:600;color:var(--muted)}
+.out-lbl sub,.out-lbl sup{font-size:.75em;font-weight:700;vertical-align:sub;line-height:0}
+.out-val{font-size:.90rem;font-weight:700;font-family:'IBM Plex Mono',monospace;color:var(--accent)}
+.fields-grid{display:flex;flex-direction:column;gap:7px}
+/* Ocultar spin buttons del input number — más espacio para el valor */
+.inp-row input[type=number]::-webkit-inner-spin-button,
+.inp-row input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.inp-row input[type=number]{-moz-appearance:textfield}
+
+/* ══ PROCESS CHAIN ══ */
+.chain-list{display:flex;flex-direction:column;gap:6px;padding:0 14px 8px}
+.proc-card{border:1.5px solid var(--border);border-radius:8px;overflow:hidden;
+  background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.05);transition:border-color .15s}
+.pc-header{display:flex;align-items:center;gap:8px;padding:7px 10px;
+  cursor:pointer;user-select:none;border-bottom:1px solid var(--border)}
+.pc-num{width:22px;height:22px;border-radius:50%;color:#fff;font-size:.72rem;
+  font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pc-arrow{font-size:.8rem;color:var(--muted);font-weight:800}
+.pc-type-sel{flex:1;border:1px solid var(--border);border-radius:5px;padding:3px 6px;
+  font-size:.74rem;font-weight:700;color:var(--text);background:#fff;cursor:pointer;
+  font-family:'IBM Plex Sans',sans-serif;outline:none}
+.pc-del{border:none;background:none;color:#b0bec5;cursor:pointer;font-size:.95rem;
+  padding:2px 5px;transition:color .15s;line-height:1}
+.pc-del:hover{color:#e53935}
+.pc-body{padding:9px 10px;display:flex;flex-direction:column;gap:7px}
+.pc-result{display:flex;gap:5px;flex-wrap:wrap;padding:6px 8px;
+  background:#f9fafb;border-radius:5px;margin-top:2px}
+.pc-res-chip{font-size:.68rem;font-family:'IBM Plex Mono',monospace;
+  padding:2px 7px;border-radius:10px;font-weight:600}
+
+/* ══ CHAIN CONTROLS ══ */
+.chain-controls{display:flex;gap:7px;padding:8px 14px}
+.chain-btn{flex:1;padding:7px;font-size:.75rem;font-weight:700;border:none;
+  border-radius:7px;cursor:pointer;transition:all .15s;letter-spacing:.03em}
+.chain-btn.add{background:linear-gradient(90deg,#1565c0,#1e88e5);color:#fff;
+  box-shadow:0 2px 6px rgba(25,118,210,.25)}
+.chain-btn.add:hover{transform:translateY(-1px);box-shadow:0 3px 10px rgba(25,118,210,.35)}
+.chain-btn.cycle{background:#fff;color:#2e7d32;border:1.5px solid #2e7d32}
+.chain-btn.cycle:hover{background:#e8f5e9}
+.proc-type-add-sel{flex:1;min-width:0;padding:7px 10px;font-size:.76rem;font-weight:700;
+  color:var(--text);background:#fff;border:1.5px solid var(--accent);border-radius:7px;
+  cursor:pointer;font-family:'IBM Plex Sans',sans-serif;outline:none;
+  transition:border-color .15s,box-shadow .15s}
+.proc-type-add-sel:focus{box-shadow:0 0 0 3px rgba(25,118,210,.12)}
+
+/* ══ MODO TOGGLE ══ */
+.mode-toggle-wrap{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
+.mode-btn{display:flex;align-items:center;gap:8px;padding:9px 10px;border-radius:8px;
+  border:2px solid var(--border);background:#fff;cursor:pointer;text-align:left;
+  transition:all .18s;width:100%}
+.mode-btn:hover{border-color:var(--accent);background:#f0f6ff}
+.mode-btn.act{border-color:var(--accent);background:linear-gradient(135deg,#e3f2fd,#ede7f6);
+  box-shadow:0 2px 8px rgba(25,118,210,.15)}
+.mode-icon{font-size:1.3rem;flex-shrink:0;line-height:1}
+.mode-btn.act .mode-icon{color:var(--accent)}
+.mode-btn:not(.act) .mode-icon{color:var(--muted)}
+.mode-texts{display:flex;flex-direction:column;gap:1px;min-width:0}
+.mode-name{font-size:.74rem;font-weight:800;color:var(--text);line-height:1.2}
+.mode-btn.act .mode-name{color:var(--accent)}
+.mode-desc{font-size:.62rem;color:var(--muted);line-height:1.3}
+.mode-hint{font-size:.68rem;line-height:1.5;padding:6px 10px;border-radius:6px;margin-top:0}
+.mode-hint-proc{background:#e3f2fd;color:#1565c0;border:1px solid #90caf9}
+.mode-hint-cycle{background:#e8f5e9;color:#2e7d32;border:1px solid #a5d6a7}
+
+/* ══ CALC BTN ══ */
+.calc-btn{margin:8px 14px;padding:10px;font-size:.85rem;font-weight:800;letter-spacing:.05em;
+  color:#fff;border:none;border-radius:8px;cursor:pointer;
+  background:linear-gradient(90deg,#1565c0,#1e88e5);
+  box-shadow:0 2px 8px rgba(25,118,210,.30);transition:all .18s}
+.calc-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(25,118,210,.40)}
+.calc-btn:active{transform:none}
+/* ── Sesión ─────────────────────────────────────── */
+.session-bar{display:flex;gap:6px;align-items:center;padding:6px 14px 12px;flex-wrap:wrap}
+.sess-btn{display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border-radius:6px;
+  border:1.5px solid var(--border);background:#f8faff;color:var(--muted);
+  font-size:.74rem;font-weight:700;cursor:pointer;transition:all .15s;flex-shrink:0}
+.sess-btn.save{border-color:#2e7d32;color:#2e7d32}
+.sess-btn.save:hover{background:#2e7d32;color:#fff}
+.sess-btn.load{border-color:#1565c0;color:#1565c0}
+.sess-btn.load:hover{background:#1565c0;color:#fff}
+.sess-name{font-size:.65rem;color:var(--muted);font-style:italic;flex:1;min-width:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ══ PROPS REF ══ */
+.props-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.prop-chip{padding:7px 4px;background:#f5f8fd;border:1px solid #d9e5f5;
+  border-radius:6px;text-align:center}
+.prop-nm{font-size:.70rem;color:var(--muted);font-family:'IBM Plex Mono',monospace;
+  display:inline-flex;align-items:flex-end;gap:0;line-height:1}
+.prop-nm sub,.prop-nm sup{font-size:.72em;vertical-align:sub;position:static;line-height:1}
+.prop-vl{font-size:.88rem;font-weight:700;color:var(--text);
+  font-family:'IBM Plex Mono',monospace;margin-top:3px}
+.prop-un{font-size:.62rem;color:var(--muted)}
+
+/* ══ MAIN CARDS ══ */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  overflow:visible;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.card-hdr{border-radius:10px 10px 0 0}
+.card > *:last-child{border-radius:0 0 10px 10px}
+.card-hdr{background:#f5f7fa;border-bottom:1px solid var(--border);padding:8px 14px;
+  font-size:.70rem;font-weight:800;color:var(--accent);letter-spacing:.1em;
+  text-transform:uppercase;display:flex;align-items:center;gap:6px;justify-content:space-between}
+.card-body{padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.card-hdr-btns{display:flex;align-items:center;gap:3px;margin-left:auto;flex-shrink:0}
+.expand-btn{cursor:pointer;border:none;background:none;color:var(--accent);
+  font-size:1.05rem;padding:1px 6px;border-radius:4px;transition:background .15s;
+  flex-shrink:0;opacity:.60;line-height:1}
+.expand-btn:hover{background:rgba(25,118,210,.12);opacity:1}
+#expandModal{display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(0,0,0,.65);align-items:center;justify-content:center}
+#expandModal.open{display:flex}
+.modal-box{background:#fff;border-radius:12px;
+  width:94vw;max-width:1440px;height:90vh;display:flex;flex-direction:column;
+  box-shadow:0 20px 60px rgba(0,0,0,.4);overflow:hidden}
+.modal-hdr{background:var(--hdr);color:#fff;
+  padding:11px 18px;display:flex;align-items:center;justify-content:space-between;
+  font-weight:800;font-size:.80rem;letter-spacing:.08em;text-transform:uppercase;flex-shrink:0}
+.modal-body{flex:1;overflow:auto;padding:16px;min-height:0}
+.modal-close{cursor:pointer;border:none;background:rgba(255,255,255,.15);
+  color:#fff;font-size:1.1rem;width:30px;height:30px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0}
+.modal-close:hover{background:rgba(255,255,255,.35)}
+
+/* ══ FIRST LAW BANNER ══ */
+.law-banner{background:linear-gradient(135deg,#e3f2fd,#ede7f6);
+  border:1.5px solid #90caf9;border-radius:10px;padding:13px 18px;
+  display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.law-eq{font-size:1.30rem;font-family:'IBM Plex Mono',monospace;font-weight:800;
+  color:#0d47a1;letter-spacing:.04em;flex-shrink:0}
+.law-desc{font-size:.76rem;color:var(--muted);line-height:1.55;flex:1;min-width:180px}
+.law-leg{display:flex;flex-direction:column;gap:3px;flex-shrink:0}
+.ll-item{display:flex;align-items:center;gap:5px;font-size:.72rem;font-weight:700}
+.ll-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+
+/* ══ PV CHART ══ */
+#pvChart{width:100%;height:430px;background:#fff;
+  border:1px solid var(--border);border-radius:8px;
+  box-shadow:0 2px 8px rgba(25,118,210,.06)}
+
+/* ══ STATE + PROCESS TABLE ══ */
+.data-table{width:100%;border-collapse:collapse;font-size:.78rem}
+.data-table th{padding:6px 9px;background:#f5f7fa;border:1px solid var(--border);
+  font-size:.68rem;font-weight:800;color:var(--muted);text-align:center;
+  letter-spacing:.03em;white-space:nowrap}
+.data-table td{padding:7px 9px;border:1px solid var(--border);
+  font-family:'IBM Plex Mono',monospace;text-align:center;font-size:.78rem;white-space:nowrap}
+.data-table .row-lbl{font-family:'IBM Plex Sans',sans-serif;font-weight:700;
+  text-align:left;font-size:.78rem}
+.data-table .st0{color:#1565c0}
+.data-table .st1{color:#d32f2f}
+.data-table .st2{color:#7b1fa2}
+.data-table .st3{color:#e65100}
+.data-table .st4{color:#2e7d32}
+.data-table .st5{color:#00838f}
+.data-table .stN{color:#6d4c41}
+.data-table .neg{color:#c62828}
+.data-table .pos{color:#2e7d32}
+.data-table .proc-row td{background:#fafbff}
+
+/* ══ BALANCE BARS ══ */
+.bal-wrap{display:flex;flex-direction:column;gap:6px}
+.bal-row-wrap{display:flex;align-items:center;gap:8px}
+.bal-sym{font-size:.85rem;font-weight:800;font-family:'IBM Plex Mono',monospace;
+  width:36px;text-align:center;flex-shrink:0}
+.bal-track{flex:1;height:26px;background:#eef2f7;border-radius:4px;
+  overflow:hidden;border:1px solid #dde3ec}
+.bal-fill{height:100%;border-radius:3px;transition:width .45s cubic-bezier(.4,0,.2,1);
+  display:flex;align-items:center;padding:0 7px;min-width:0}
+.bal-num{font-size:.72rem;font-weight:700;font-family:'IBM Plex Mono',monospace;
+  color:#fff;white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.25)}
+.bal-val{font-size:.78rem;font-weight:700;font-family:'IBM Plex Mono',monospace;
+  width:115px;text-align:right;flex-shrink:0}
+.bal-Q{} .bal-Q .bal-sym,.bal-Q .bal-val{color:var(--cQ)}
+.bal-Q .bal-fill{background:var(--cQ)}
+.bal-dU .bal-sym,.bal-dU .bal-val{color:var(--cdU)}
+.bal-dU .bal-fill{background:var(--cdU)}
+.bal-W .bal-sym,.bal-W .bal-val{color:var(--cW)}
+.bal-W .bal-fill{background:var(--cW)}
+.bal-neg .bal-fill{background:#b71c1c!important}
+.bal-neg .bal-sym,.bal-neg .bal-val{color:#b71c1c!important}
+.bal-check{font-size:.74rem;font-weight:700;padding:5px 12px;border-radius:6px;
+  text-align:center;margin-top:2px}
+.bal-ok{background:#e8f5e9;color:#1b5e20;border:1px solid #a5d6a7}
+.bal-err{background:#ffebee;color:#b71c1c;border:1px solid #ef9a9a}
+
+/* ══ CYCLE CARD ══ */
+.cycle-banner{border-radius:10px;padding:14px 18px;display:flex;
+  flex-wrap:wrap;gap:14px;align-items:center}
+.cycle-banner.engine{background:linear-gradient(135deg,#e8f5e9,#f1f8e9);
+  border:2px solid #66bb6a}
+.cycle-banner.refrig{background:linear-gradient(135deg,#e3f2fd,#f3e5f5);
+  border:2px solid #90caf9}
+.cy-kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;flex:1}
+.cy-kpi{padding:9px 10px;border-radius:8px;text-align:center}
+.cy-kpi.k-W{background:#fff;border:1.5px solid #a5d6a7}
+.cy-kpi.k-Qin{background:#fff;border:1.5px solid #ffe082}
+.cy-kpi.k-eta{background:#fff;border:1.5px solid #ce93d8}
+.cy-kpi.k-Wn{background:#fff;border:1.5px solid #ef9a9a}
+.cy-kpi-lbl{font-size:.68rem;color:var(--muted);font-weight:700;letter-spacing:.04em;
+  text-transform:uppercase}
+.cy-kpi-val{font-size:1.1rem;font-weight:800;font-family:'IBM Plex Mono',monospace;
+  margin-top:3px}
+.k-W .cy-kpi-val{color:var(--cW)}
+.k-Qin .cy-kpi-val{color:var(--cQ)}
+.k-eta .cy-kpi-val{color:#7b1fa2}
+.k-Wn .cy-kpi-val{color:#c62828}
+.cy-title{font-size:.95rem;font-weight:800;margin-bottom:5px}
+
+/* ══ STATE PROPERTY CARDS ══ */
+#statePropsPanel{display:none;flex-wrap:wrap;gap:8px;padding:6px 10px 12px}
+.state-prop-card{background:#fff;border:2px solid #90caf9;border-radius:12px;
+  padding:11px 14px;min-width:165px;flex:1 1 165px;max-width:215px}
+.spc-title{display:flex;align-items:center;gap:6px;font-weight:800;font-size:.82rem;margin-bottom:7px}
+.spc-num{display:inline-flex;align-items:center;justify-content:center;
+  width:20px;height:20px;border-radius:50%;color:#fff;font-size:.72rem;font-weight:800;flex-shrink:0}
+.spc-sep{font-size:.60rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:#90a4ae;border-bottom:1px solid #e8ecf4;padding-bottom:3px;margin:6px 0 3px}
+.spc-row{display:flex;align-items:baseline;gap:2px;font-size:.74rem;line-height:1.72}
+.spc-sym{font-family:'IBM Plex Mono',monospace;font-weight:700;width:36px;
+  flex-shrink:0;color:#1565c0;font-size:.73rem}
+.spc-val{font-family:'IBM Plex Mono',monospace;font-weight:600;color:#1a2233;
+  text-align:right;flex:1;font-size:.74rem}
+.spc-unit{font-size:.60rem;color:#90a4ae;width:70px;flex-shrink:0;
+  text-align:right;padding-left:2px;font-family:'IBM Plex Mono',monospace}
+.spc-divider{height:1px;background:#e8ecf4;margin:5px 0}
+
+/* ══ STEPS ACCORDION ══ */
+.steps-group{display:flex;flex-direction:column;gap:6px}
+.step-acc{border:1px solid var(--border);border-radius:8px;overflow:hidden;background:#fff}
+.step-acc-hdr{padding:9px 14px;display:flex;align-items:center;gap:8px;cursor:pointer;
+  user-select:none;transition:background .15s;background:#f9fafb}
+.step-acc-hdr:hover{background:#f0f4ff}
+.step-acc-num{font-size:.78rem;font-weight:800;font-family:'IBM Plex Mono',monospace;
+  padding:2px 9px;border-radius:10px;color:#fff;flex-shrink:0}
+.step-acc-name{font-size:.82rem;font-weight:700;flex:1}
+.step-acc-qwu{font-size:.72rem;font-family:'IBM Plex Mono',monospace;color:var(--muted)}
+.step-acc-icon{font-size:.8rem;color:var(--muted);transition:transform .25s;flex-shrink:0}
+.step-acc.open .step-acc-icon{transform:rotate(180deg)}
+.step-acc-body{display:none;padding:12px 14px;flex-direction:column;gap:5px;
+  background:#fff;border-top:1px solid var(--border)}
+.step-acc.open .step-acc-body{display:flex}
+.step{padding:8px 12px;border-radius:6px;font-size:.77rem;line-height:1.6}
+.step.note{background:#f5f8fd;border:1px solid #d9e5f5;color:var(--muted)}
+.step.formula{background:linear-gradient(135deg,#e8f0fe,#f3e5f5);
+  border:1px solid #90b8e0;font-family:'IBM Plex Mono',monospace;
+  color:#1a237e;font-size:.76rem}
+.step.result{background:linear-gradient(135deg,#e8f5e9,#f1f8e9);
+  border:1.5px solid #a5d6a7;font-weight:700;color:#1b5e20;
+  font-family:'IBM Plex Mono',monospace}
+.step.warn{background:#fff8e1;border:1px solid #ffe082;color:#6d4c00}
+.step.section{background:none;border:none;padding:2px 0;
+  font-size:.70rem;font-weight:800;color:var(--muted);letter-spacing:.1em;
+  text-transform:uppercase;border-bottom:1px solid var(--border);margin-bottom:1px}
+.step.var-prop{background:linear-gradient(135deg,#f3e5f5,#ede7f6);
+  border:1px solid #ce93d8;font-family:'IBM Plex Mono',monospace;
+  color:#4a148c;font-size:.76rem}
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr;overflow:visible}
+  aside{border-right:none;border-bottom:1px solid var(--border)}
+  .tb-center{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ════ TOPBAR ════ -->
+<div class="topbar">
+  <div class="tb-brand">
+    <svg class="tb-logo" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="tg" x1="0" y1="1" x2="1" y2="0">
+          <stop offset="0%" stop-color="#0d47a1"/><stop offset="35%" stop-color="#1976d2"/>
+          <stop offset="60%" stop-color="#7b1fa2"/><stop offset="85%" stop-color="#e65100"/>
+          <stop offset="100%" stop-color="#ffb300"/></linearGradient>
+        <radialGradient id="sg" cx=".5" cy=".5" r=".5">
+          <stop offset="0%" stop-color="#fff8e1"/><stop offset="60%" stop-color="#ffb300"/>
+          <stop offset="100%" stop-color="#e65100" stop-opacity="0"/></radialGradient>
+      </defs>
+      <g class="ring"><circle cx="32" cy="32" r="28" fill="none" stroke="url(#tg)" stroke-width="3" stroke-linecap="round" stroke-dasharray="138 38"/></g>
+      <circle cx="32" cy="32" r="24" fill="#ffffff" opacity=".82"/>
+      <path d="M10 48 Q18 16 32 16 Q46 16 54 48 Z" fill="#1976d2" opacity=".09"/>
+      <path d="M10 48 Q18 16 32 16 Q46 16 54 48" fill="none" stroke="#1976d2" stroke-width="1.8" stroke-linecap="round"/>
+      <g stroke="#0d47a1" stroke-width=".9" fill="#fff">
+        <circle cx="32" cy="22" r="2.6" fill="#1976d2"/>
+        <circle cx="24" cy="34" r="2.2" fill="#7b1fa2"/>
+        <circle cx="40" cy="34" r="2.2" fill="#e65100"/>
+        <line x1="24" y1="34" x2="40" y2="34" stroke-opacity=".5"/>
+        <line x1="24" y1="34" x2="32" y2="22" stroke-opacity=".5"/>
+        <line x1="40" y1="34" x2="32" y2="22" stroke-opacity=".5"/>
+      </g>
+      <circle class="spark" cx="32" cy="40" r="3.2" fill="url(#sg)"/>
+    </svg>
+    <span>Termo</span><span class="tb-sep">·</span><span class="tb-ia">IA</span><span class="tb-sep">·</span><span>Dinámica</span>
+  </div>
+  <div class="tb-center">
+    <div class="tb-title">Primera Ley de la Termodinámica</div>
+    <div class="tb-sub">Sistemas Cerrados · Procesos en Serie · Ciclos · Propiedades Variables</div>
+  </div>
+  <div class="tb-badge">ΔU = Q − W</div>
+</div>
+
+<!-- ════ GAS / UNITS / PROP-MODE BAR ════ -->
+<div class="subbar">
+  <div class="subbar-row">
+    <div class="gas-pills" id="gasPills">
+      <div class="gas-pill act" data-gas="air"  onclick="setGas('air',this)">Aire</div>
+      <div class="gas-pill"     data-gas="n2"   onclick="setGas('n2',this)">N₂</div>
+      <div class="gas-pill"     data-gas="o2"   onclick="setGas('o2',this)">O₂</div>
+      <div class="gas-pill"     data-gas="co2"  onclick="setGas('co2',this)">CO₂</div>
+      <div class="gas-pill"     data-gas="co"   onclick="setGas('co',this)">CO</div>
+      <div class="gas-pill"     data-gas="h2"   onclick="setGas('h2',this)">H₂</div>
+    </div>
+    <div class="subbar-sep"></div>
+    <span class="pm-label">Sistema:</span>
+    <div class="utog">
+      <button class="ubtn act" id="btnSI"  onclick="setUnit('SI')">SI</button>
+      <button class="ubtn"     id="btnENG" onclick="setUnit('ENG')">Inglés</button>
+    </div>
+    <div class="subbar-sep"></div>
+    <span class="pm-label">c<sub>p</sub>, c<sub>v</sub>:</span>
+    <div class="prop-mode-tog">
+      <button class="pm-btn act" id="pmConstant" onclick="setPropMode('constant')">Cte. T₁</button>
+      <button class="pm-btn"     id="pmAvg"      onclick="setPropMode('avg')">T<sub>avg</sub></button>
+      <button class="pm-btn"     id="pmInteg"    onclick="setPropMode('integ')">∫c<sub>v</sub>dT</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ MAIN LAYOUT ════ -->
+<div class="layout">
+
+<!-- ══════ SIDEBAR ══════ -->
+<aside>
+
+  <!-- ESTADO INICIAL -->
+  <div class="aside-section">
+    <div class="aside-title">① Estado inicial — Estado 1</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;gap:8px">
+        <div class="field" style="flex:1;min-width:0">
+          <div class="field-lbl">
+            <span class="var-lbl">T<sub>1</sub></span>
+            <div class="utog-sm" id="tempToggle">
+              <button class="ubtn-sm"     onclick="setTempUnit('K')">K</button>
+              <button class="ubtn-sm act" onclick="setTempUnit('C')">°C</button>
+            </div>
+          </div>
+          <div class="inp-row">
+            <input type="number" id="T0" value="20" min="-273" max="5000" step="5" oninput="onStateInput()">
+            <div class="inp-unit" id="u-T0">°C</div>
+          </div>
+        </div>
+        <div class="field" style="flex:1;min-width:0">
+          <div class="field-lbl">
+            <span class="var-lbl">P<sub>1</sub></span>
+            <div class="utog-sm" id="pressToggle">
+              <button class="ubtn-sm act" onclick="setPressUnit('kPa')">kPa</button>
+              <button class="ubtn-sm"     onclick="setPressUnit('bar')">bar</button>
+            </div>
+          </div>
+          <div class="inp-row">
+            <input type="number" id="P0" value="100" min="0.001" step="10" oninput="onStateInput()">
+            <div class="inp-unit" id="u-P0">kPa</div>
+          </div>
+        </div>
+      </div>
+      <div class="field">
+        <div class="field-lbl">Masa del sistema</div>
+        <div class="inp-row">
+          <input type="number" id="mass" value="1" min="0.001" step="0.1" oninput="onStateInput()">
+          <div class="inp-unit" id="u-mass">kg</div>
+        </div>
+      </div>
+      <div class="out-row">
+        <span class="out-lbl"><span class="var-lbl">v<sub>1</sub></span> (volumen específico)</span>
+        <span class="out-val" id="out-v0">— m³/kg</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROPIEDADES DEL GAS EN T₁ -->
+  <div class="aside-section">
+    <div class="aside-title" style="margin-bottom:7px" id="propsTableTitle">📊 Tabla A-20 — Propiedades en T₁
+      <span style="font-size:.62rem;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:400;margin-left:4px">(Moran &amp; Shapiro 7e)</span>
+    </div>
+    <div class="props-grid">
+      <div class="prop-chip"><div class="prop-nm">c<sub>p</sub>(T₁)</div>
+        <div class="prop-vl" id="pc-cp">—</div><div class="prop-un" id="pc-cpU">kJ/(kg·K)</div></div>
+      <div class="prop-chip"><div class="prop-nm">c<sub>v</sub>(T₁)</div>
+        <div class="prop-vl" id="pc-cv">—</div><div class="prop-un" id="pc-cvU">kJ/(kg·K)</div></div>
+      <div class="prop-chip"><div class="prop-nm">k(T₁)</div>
+        <div class="prop-vl" id="pc-k">—</div><div class="prop-un">adim.</div></div>
+      <div class="prop-chip"><div class="prop-nm">R</div>
+        <div class="prop-vl" id="pc-R">—</div><div class="prop-un" id="pc-RU">kJ/(kg·K)</div></div>
+    </div>
+    <div id="propsTblNote" style="font-size:.64rem;color:var(--muted);margin-top:5px;line-height:1.4">
+      Rango tabla: 250–1000 K · Extrapolación cte. fuera del rango · R = 8.314/M
+    </div>
+  </div>
+
+  <!-- MODO CÁLCULO -->
+  <div class="aside-section" style="padding:10px 14px">
+    <div class="aside-title" style="margin-bottom:8px">② Modo de cálculo</div>
+    <div class="mode-toggle-wrap">
+      <button class="mode-btn act" id="modeProc" onclick="setCalcMode('process')">
+        <span class="mode-icon">⇉</span>
+        <span class="mode-texts">
+          <span class="mode-name">Proceso en serie</span>
+          <span class="mode-desc">Estado 1 → Estado N sin cerrar</span>
+        </span>
+      </button>
+      <button class="mode-btn" id="modeCycle" onclick="setCalcMode('cycle')">
+        <span class="mode-icon">↺</span>
+        <span class="mode-texts">
+          <span class="mode-name">Ciclo termodinámico</span>
+          <span class="mode-desc">Estado N regresa a Estado 1</span>
+        </span>
+      </button>
+    </div>
+    <div id="modeHint" class="mode-hint mode-hint-proc">
+      Agrega procesos conectados en serie. El estado final de cada proceso es el estado inicial del siguiente.
+    </div>
+  </div>
+
+  <!-- CADENA DE PROCESOS -->
+  <div class="aside-section" style="padding-bottom:4px">
+    <div class="aside-title">③ Cadena de procesos</div>
+  </div>
+  <div class="chain-list" id="chainList"></div>
+  <div class="chain-controls" style="flex-direction:column;gap:7px">
+    <div style="display:flex;gap:7px;align-items:center">
+      <select id="newProcType" class="proc-type-add-sel">
+        <option value="isochoric">Isocórico  (v = cte)</option>
+        <option value="isobaric">Isobárico  (P = cte)</option>
+        <option value="isothermal">Isotérmico (T = cte)</option>
+        <option value="adiabatic">Adiabático (Q = 0)</option>
+        <option value="polytropic">Politrópico (Pv^n)</option>
+      </select>
+      <button class="chain-btn add" style="flex-shrink:0;white-space:nowrap"
+        onclick="addProcess()">＋ Agregar</button>
+    </div>
+    <button class="chain-btn cycle" id="btnCloseCycle" onclick="addClosingProcess()"
+      style="width:100%;display:none">↺ Sugerir proceso de cierre</button>
+  </div>
+  <button class="calc-btn" onclick="computeAll()">⚡ CALCULAR PRIMERA LEY</button>
+
+  <!-- GUARDAR / CARGAR SESIÓN -->
+  <input type="file" id="sessionFileInput" accept=".json" style="display:none"
+    onchange="loadSessionFile(this)">
+  <div class="session-bar">
+    <button class="sess-btn save" onclick="saveSession()" title="Descargar sesión como archivo .json">
+      💾 Guardar
+    </button>
+    <button class="sess-btn load"
+      onclick="document.getElementById('sessionFileInput').click()"
+      title="Cargar sesión desde archivo .json guardado anteriormente">
+      📂 Cargar
+    </button>
+    <span class="sess-name" id="sessNameLbl">—</span>
+  </div>
+
+</aside>
+
+<!-- ══════ MAIN CONTENT ══════ -->
+<main>
+
+  <!-- PRIMERA LEY BANNER -->
+  <div class="law-banner">
+    <div>
+      <div class="law-eq">ΔU = Q − W</div>
+      <div style="font-size:.74rem;font-family:'IBM Plex Mono',monospace;color:#1565c0;
+           opacity:.85;margin-top:4px">Q = ΔU + W &nbsp;·&nbsp; Gas ideal: PV = mRT</div>
+    </div>
+    <div class="law-desc">
+      <strong>Primera Ley (sistema cerrado):</strong> El calor neto <em>Q</em>
+      transferido al sistema iguala al cambio de energía interna <em>ΔU</em> más
+      el trabajo de frontera <em>W</em>.<br>
+      <span style="color:#7b1fa2;font-weight:700;font-size:.74rem">
+        Modo activo: <span id="propModeLabel">Constantes en T₁</span>
+      </span>
+    </div>
+    <div class="law-leg">
+      <div class="ll-item"><div class="ll-dot" style="background:var(--cQ)"></div>
+        <span style="color:var(--cQ)">Q — Calor</span></div>
+      <div class="ll-item"><div class="ll-dot" style="background:var(--cdU)"></div>
+        <span style="color:var(--cdU)">ΔU — En. Interna</span></div>
+      <div class="ll-item"><div class="ll-dot" style="background:var(--cW)"></div>
+        <span style="color:var(--cW)">W — Trabajo</span></div>
+    </div>
+  </div>
+
+  <!-- PV DIAGRAM -->
+  <div class="card">
+    <div class="card-hdr" id="pvHdr">📈 Diagrama P-v — <span id="pvModeLabel">Procesos en serie</span>
+      <div class="card-hdr-btns">
+        <button class="expand-btn" onclick="toggleCard(this)" title="Contraer">▼</button>
+        <button class="expand-btn" onclick="openModal('pvChart','📈 Diagrama P-v')" title="Ampliar">⛶</button>
+      </div>
+    </div>
+    <div style="padding:10px"><div id="pvChart"></div></div>
+    <!-- State property cards (shown as soon as T₁/P₁ entered) -->
+    <div id="statePropsPanel"></div>
+  </div>
+
+  <!-- BALANCE + SUMMARY (shown after compute) -->
+  <div id="resultsSection" style="display:none;flex-direction:column;gap:12px">
+
+    <!-- STATE + PROCESS SUMMARY TABLE -->
+    <div class="card">
+      <div class="card-hdr">📋 Tabla de estados y energía
+        <div class="card-hdr-btns">
+          <button class="expand-btn" onclick="toggleCard(this)" title="Contraer">▼</button>
+          <button class="expand-btn" onclick="openModal('summaryTableWrap','📋 Tabla de estados y energía')" title="Ampliar">⛶</button>
+        </div>
+      </div>
+      <div id="summaryTableWrap" style="padding:0;overflow-x:auto">
+        <table class="data-table" id="summaryTable"></table>
+      </div>
+    </div>
+
+    <!-- ENERGY BALANCE CUMULATIVE -->
+    <div class="card" style="grid-column:span 2">
+      <div class="card-hdr">⚖ Balance energético acumulado — Primera Ley
+        <div class="card-hdr-btns">
+          <button class="expand-btn" onclick="toggleCard(this)" title="Contraer">▼</button>
+          <button class="expand-btn" onclick="openModal('balWrap','⚖ Balance energético acumulado')" title="Ampliar">⛶</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="bal-wrap" id="balWrap">
+          <div class="bal-row-wrap bal-Q">
+            <div class="bal-sym">ΣQ</div>
+            <div class="bal-track"><div class="bal-fill" id="bfQ" style="width:0%">
+              <span class="bal-num" id="bnQ"></span></div></div>
+            <div class="bal-val" id="bvQ">—</div>
+          </div>
+          <div class="bal-row-wrap bal-dU">
+            <div class="bal-sym">ΣΔU</div>
+            <div class="bal-track"><div class="bal-fill" id="bfdU" style="width:0%">
+              <span class="bal-num" id="bndU"></span></div></div>
+            <div class="bal-val" id="bvdU">—</div>
+          </div>
+          <div class="bal-row-wrap bal-W">
+            <div class="bal-sym">ΣW</div>
+            <div class="bal-track"><div class="bal-fill" id="bfW" style="width:0%">
+              <span class="bal-num" id="bnW"></span></div></div>
+            <div class="bal-val" id="bvW">—</div>
+          </div>
+          <div class="bal-check" id="balCheck">— Calcule para ver el balance —</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CYCLE CARD (conditional) -->
+    <div id="cycleCard" style="display:none"></div>
+
+    <!-- STEP BY STEP PER PROCESS -->
+    <div class="card">
+      <div class="card-hdr">🔬 Derivación analítica por proceso
+        <div class="card-hdr-btns">
+          <button class="expand-btn" onclick="toggleCard(this)" title="Contraer">▼</button>
+          <button class="expand-btn" onclick="openModal('stepsGroup','🔬 Derivación analítica por proceso')" title="Ampliar">⛶</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="steps-group" id="stepsGroup"></div>
+      </div>
+    </div>
+
+  </div><!-- /resultsSection -->
+
+</main>
+</div>
+
+<!-- ══ MODAL DE AMPLIACIÓN ══ -->
+<div id="expandModal">
+  <div class="modal-box">
+    <div class="modal-hdr">
+      <span id="modalTitle"></span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════════
+// TABLA A-20 — Moran & Shapiro 7e  (idéntica a Diagrama_cp-cv-k.html)
+// T (K),  cp (kJ/kg·K),  cv (kJ/kg·K),  k (adim.)
+// ════════════════════════════════════════════════════════════════════
+const A20 = {
+  air:{ label:'Aire',     formula:'Air',  M:28.97,  color:'#1976d2',
+    T: [250,  300,  350,  400,  450,  500,  550,  600,  650,  700,  750,  800,  900, 1000],
+    cp:[1.003,1.005,1.008,1.013,1.020,1.029,1.040,1.051,1.063,1.075,1.087,1.099,1.121,1.142],
+    cv:[0.716,0.718,0.721,0.726,0.733,0.742,0.753,0.764,0.776,0.788,0.800,0.812,0.834,0.855],
+    k: [1.401,1.400,1.398,1.395,1.391,1.387,1.381,1.376,1.370,1.364,1.359,1.354,1.344,1.336]},
+  n2:{ label:'Nitrógeno', formula:'N₂',   M:28.014, color:'#2e7d32',
+    T: [250,  300,  350,  400,  450,  500,  550,  600,  650,  700,  750,  800,  900, 1000],
+    cp:[1.039,1.039,1.041,1.044,1.049,1.056,1.065,1.075,1.086,1.098,1.110,1.121,1.145,1.167],
+    cv:[0.742,0.743,0.744,0.747,0.752,0.759,0.768,0.778,0.789,0.801,0.813,0.825,0.849,0.870],
+    k: [1.400,1.400,1.399,1.397,1.395,1.391,1.387,1.382,1.376,1.371,1.365,1.360,1.349,1.341]},
+  o2:{ label:'Oxígeno',   formula:'O₂',   M:31.999, color:'#c62828',
+    T: [250,  300,  350,  400,  450,  500,  550,  600,  650,  700,  750,  800,  900, 1000],
+    cp:[0.913,0.918,0.928,0.941,0.956,0.972,0.988,1.003,1.017,1.031,1.043,1.054,1.074,1.090],
+    cv:[0.653,0.658,0.668,0.681,0.696,0.712,0.728,0.743,0.758,0.771,0.783,0.794,0.814,0.830],
+    k: [1.398,1.395,1.389,1.382,1.373,1.365,1.358,1.350,1.343,1.337,1.332,1.327,1.319,1.313]},
+  co2:{label:'CO₂',       formula:'CO₂',  M:44.01,  color:'#6a1b9a',
+    T: [250,  300,  350,  400,  450,  500,  550,  600,  650,  700,  750,  800,  900, 1000],
+    cp:[0.791,0.846,0.895,0.939,0.978,1.014,1.046,1.075,1.102,1.126,1.148,1.169,1.204,1.234],
+    cv:[0.602,0.657,0.706,0.750,0.790,0.825,0.857,0.886,0.913,0.937,0.959,0.980,1.015,1.045],
+    k: [1.314,1.288,1.268,1.252,1.239,1.229,1.220,1.213,1.207,1.202,1.197,1.193,1.186,1.181]},
+  co:{ label:'CO',         formula:'CO',   M:28.011, color:'#ef6c00',
+    T: [250,  300,  350,  400,  450,  500,  550,  600,  650,  700,  750,  800,  900, 1000],
+    cp:[1.039,1.040,1.043,1.047,1.054,1.063,1.075,1.087,1.100,1.113,1.126,1.139,1.163,1.185],
+    cv:[0.743,0.744,0.746,0.751,0.757,0.767,0.778,0.790,0.803,0.816,0.829,0.842,0.866,0.888],
+    k: [1.400,1.399,1.398,1.395,1.392,1.387,1.382,1.376,1.370,1.364,1.358,1.353,1.343,1.335]},
+  h2:{ label:'H₂',         formula:'H₂',   M:2.016,  color:'#00838f',
+    T: [250,    300,    350,    400,    450,    500,    550,    600,    650,    700,    750,    800,    900,   1000],
+    cp:[14.051,14.307,14.427,14.476,14.501,14.513,14.530,14.546,14.571,14.604,14.645,14.695,14.822,14.983],
+    cv:[ 9.927,10.183,10.302,10.352,10.377,10.389,10.405,10.422,10.447,10.480,10.521,10.570,10.698,10.859],
+    k: [ 1.416, 1.405, 1.400, 1.398, 1.398, 1.397, 1.396, 1.396, 1.395, 1.394, 1.392, 1.390, 1.385, 1.380]}
+};
+const R_BAR = 8.314; // kJ/(kmol·K)
+
+// ════════════════════════════════════════════════════════════════════
+// ESTADO GLOBAL
+// ════════════════════════════════════════════════════════════════════
+let currentGas  = 'air';
+let currentUnit = 'SI';
+let tempSubUnit = 'C';        // 'K' | 'C' (SI)  o  'R' | 'F' (Inglés)
+let pressSubUnit = 'kPa';    // 'kPa' | 'bar' (SI) — ENG siempre psia
+let propMode    = 'constant'; // 'constant' | 'avg' | 'integ'
+let calcMode    = 'process';  // 'process' | 'cycle'
+let processChain = [];        // [{id,type,inp2a,inp2b}]
+let nextId = 0;
+let lastStates   = null;
+let lastResults  = null;
+let lastPVTraces = null;
+let lastPVLayout = null;
+
+const PROC_COLORS = {
+  isochoric:'#d32f2f', isobaric:'#1565c0',
+  isothermal:'#6a1b9a', adiabatic:'#e65100', polytropic:'#2e7d32'
+};
+const PROC_NAMES = {
+  isochoric:'Isocórico (v=cte)', isobaric:'Isobárico (P=cte)',
+  isothermal:'Isotérmico (T=cte)', adiabatic:'Adiabático (Q=0)', polytropic:'Politrópico (Pv^n=C)'
+};
+const STATE_COLORS = ['#1565c0','#d32f2f','#7b1fa2','#e65100','#2e7d32','#00838f','#6d4c41','#546e7a'];
+
+// ════════════════════════════════════════════════════════════════════
+// UNIT HELPERS
+// ════════════════════════════════════════════════════════════════════
+// ── Unidades de temperatura (soporta K, °C, °R, °F) ──
+function uT() {
+  if (currentUnit==='ENG') return tempSubUnit==='F' ? '°F' : '°R';
+  return tempSubUnit==='C' ? '°C' : 'K';
+}
+// T_K → display
+function Td(T_K) {
+  if (currentUnit==='ENG') return tempSubUnit==='F' ? T_K*9/5 - 459.67 : T_K*9/5;
+  return tempSubUnit==='C' ? T_K - 273.15 : T_K;
+}
+// display → T_K
+function TfromD(Tdisp) {
+  if (currentUnit==='ENG') return tempSubUnit==='F' ? (Tdisp+459.67)*5/9 : Tdisp*5/9;
+  return tempSubUnit==='C' ? Tdisp + 273.15 : Tdisp;
+}
+
+// Presión: kPa→unidad display (ENG soporta psia | atm | lbpsf)
+function uP() {
+  if (currentUnit==='ENG') {
+    if (pressSubUnit==='atm')   return 'atm';
+    if (pressSubUnit==='lbpsf') return 'lbf/ft²';
+    return 'psia';
+  }
+  return pressSubUnit==='bar' ? 'bar' : 'kPa';
+}
+const uV  = ()=> currentUnit==='SI' ? 'm³/kg'  : 'ft³/lb';
+const uVt = ()=> currentUnit==='SI' ? 'm³'     : 'ft³';
+const uE  = ()=> currentUnit==='SI' ? 'kJ'     : 'BTU';
+const uEs = ()=> currentUnit==='SI' ? 'kJ/kg'  : 'BTU/lb';
+const uM  = ()=> currentUnit==='SI' ? 'kg'     : 'lb';
+// kPa → unidad display
+function Pd(P) {
+  if (currentUnit==='ENG') {
+    if (pressSubUnit==='atm')   return P * 0.0098692;   // 1 kPa = 0.0098692 atm
+    if (pressSubUnit==='lbpsf') return P * 20.8854;     // 1 kPa = 20.8854 lbf/ft²
+    return P * 0.14504;                                  // psia por defecto
+  }
+  return pressSubUnit==='bar' ? P/100 : P;
+}
+function vd(v){ return currentUnit==='SI' ? v : v*16.018; }
+function Ed(E){ return currentUnit==='SI' ? E : E*0.94782; }
+function Esd(Es){ return currentUnit==='SI' ? Es : Es*0.42992; }
+// unidad display → kPa
+function PfromD(Pdisp) {
+  if (currentUnit==='ENG') {
+    if (pressSubUnit==='atm')   return Pdisp / 0.0098692;
+    if (pressSubUnit==='lbpsf') return Pdisp / 20.8854;
+    return Pdisp / 0.14504;                              // psia
+  }
+  return pressSubUnit==='bar' ? Pdisp*100 : Pdisp;
+}
+
+// ════════════════════════════════════════════════════════════════════
+// INTERPOLACIÓN TABLA A-20
+// ════════════════════════════════════════════════════════════════════
+function interpA20(T_K, gasKey) {
+  const g = A20[gasKey];
+  const Ts = g.T, N = Ts.length;
+  const Tc = Math.min(Math.max(T_K, Ts[0]), Ts[N-1]);
+  if (Tc <= Ts[0])   return { cp:g.cp[0],   cv:g.cv[0],   k:g.k[0]   };
+  if (Tc >= Ts[N-1]) return { cp:g.cp[N-1], cv:g.cv[N-1], k:g.k[N-1] };
+  for (let i=0; i<N-1; i++) {
+    if (Tc >= Ts[i] && Tc < Ts[i+1]) {
+      const t = (Tc-Ts[i])/(Ts[i+1]-Ts[i]);
+      return {
+        cp: g.cp[i]+t*(g.cp[i+1]-g.cp[i]),
+        cv: g.cv[i]+t*(g.cv[i+1]-g.cv[i]),
+        k:  g.k[i] +t*(g.k[i+1] -g.k[i])
+      };
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// INTEGRACIÓN NUMÉRICA ΔU = m·∫cv(T)dT  (trapezoidal, N=200)
+// ════════════════════════════════════════════════════════════════════
+function integrateCv(T1, T2, gasKey, mass) {
+  if (Math.abs(T2-T1) < 1e-6) return 0;
+  const N  = 200;
+  const dT = (T2-T1)/N;
+  let sum = 0;
+  for (let i=0; i<N; i++) {
+    const Ta = T1 + i*dT, Tb = T1 + (i+1)*dT;
+    const cva = interpA20(Ta, gasKey).cv;
+    const cvb = interpA20(Tb, gasKey).cv;
+    sum += (cva+cvb)/2*dT;
+  }
+  return mass*sum;
+}
+
+// c_v media sobre [T1,T2] — usada en modo 'avg'
+function meanCv(T1, T2, gasKey) {
+  if (Math.abs(T2-T1) < 1e-6) return interpA20(T1, gasKey).cv;
+  const Tavg = (T1+T2)/2;
+  return interpA20(Tavg, gasKey).cv;
+}
+function meanCp(T1, T2, gasKey) {
+  const R = R_BAR/A20[gasKey].M;
+  return meanCv(T1,T2,gasKey) + R;
+}
+function meanK(T1, T2, gasKey) {
+  const cp = meanCp(T1,T2,gasKey), cv = meanCv(T1,T2,gasKey);
+  return cp/cv;
+}
+
+// ΔU según el modo seleccionado
+function calcDU(T1, T2, gasKey, mass) {
+  const R = R_BAR/A20[gasKey].M;
+  switch(propMode) {
+    case 'integ': return integrateCv(T1, T2, gasKey, mass);
+    case 'avg':   return mass * meanCv(T1,T2,gasKey) * (T2-T1);
+    default:      return mass * interpA20(T1, gasKey).cv * (T2-T1);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SOLVER ADIABÁTICO ITERATIVO con k(T_avg)
+// ════════════════════════════════════════════════════════════════════
+function solveAdiabaticT2(T1, P1, P2, gasKey) {
+  let T2 = T1;
+  for (let iter=0; iter<80; iter++) {
+    const Tavg = (T1+T2)/2;
+    const { k } = interpA20(Tavg, gasKey);
+    const T2new = T1 * Math.pow(P2/P1, (k-1)/k);
+    if (Math.abs(T2new-T2) < 0.001) { T2=T2new; break; }
+    T2 = 0.4*T2 + 0.6*T2new;
+  }
+  return T2;
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SOLVER DE PROCESO — siempre trabaja en SI internamente
+// s1 = {T,P,v,V}  (SI)  →  {s2,W,dU,Q,info}
+// ════════════════════════════════════════════════════════════════════
+function solveProcess(proc, s1, inp2a, inp2b, gasKey, mass) {
+  const { T:T1, P:P1, v:v1, V:V1 } = s1;
+  const Rg   = R_BAR / A20[gasKey].M;
+  const p1at = interpA20(T1, gasKey);
+
+  let T2, P2, v2, V2, W, dU, Q, info;
+
+  try {
+    switch(proc) {
+
+      // ── ISOCÓRICO ──────────────────────────────────────────────
+      case 'isochoric': {
+        T2 = TfromD(inp2a);
+        if (T2<=0) throw 'T₂ debe ser > 0';
+        P2 = P1*(T2/T1); v2 = v1; V2 = V1;
+        W  = 0;
+        dU = calcDU(T1,T2,gasKey,mass);
+        Q  = dU;
+        info = { constraint:'v₂ = v₁', formula_W:'W = 0  (dV=0)',
+          cv_used: propMode==='constant' ? p1at.cv : meanCv(T1,T2,gasKey) };
+        break;
+      }
+
+      // ── ISOBÁRICO ──────────────────────────────────────────────
+      case 'isobaric': {
+        T2 = TfromD(inp2a);
+        if (T2<=0) throw 'T₂ debe ser > 0';
+        P2 = P1; v2 = Rg*T2/P2; V2 = mass*v2;
+        W  = mass * Rg * (T2-T1);    // exact: P*ΔV = mRΔT
+        dU = calcDU(T1,T2,gasKey,mass);
+        Q  = dU + W;
+        const cp_used = propMode==='constant' ? p1at.cp : meanCp(T1,T2,gasKey);
+        info = { constraint:'P₂ = P₁', formula_W:'W = m·R·ΔT = P·ΔV',
+          cv_used: propMode==='constant' ? p1at.cv : meanCv(T1,T2,gasKey),
+          cp_used, Q_cp: mass*cp_used*(T2-T1) };
+        break;
+      }
+
+      // ── ISOTÉRMICO ─────────────────────────────────────────────
+      case 'isothermal': {
+        P2 = PfromD(inp2a);
+        if (P2<=0) throw 'P₂ debe ser > 0';
+        T2 = T1; v2 = Rg*T2/P2; V2 = mass*v2;
+        dU = 0;   // gas ideal, ΔT=0
+        W  = mass * Rg * T1 * Math.log(v2/v1);
+        Q  = W;
+        info = { constraint:'T₂ = T₁  →  ΔU=0',
+          formula_W:'W = m·R·T·ln(v₂/v₁) = m·R·T·ln(P₁/P₂)',
+          cv_used: p1at.cv };
+        break;
+      }
+
+      // ── ADIABÁTICO (solver iterativo k(T_avg)) ─────────────────
+      case 'adiabatic': {
+        P2 = PfromD(inp2a);
+        if (P2<=0) throw 'P₂ debe ser > 0';
+        T2 = propMode === 'constant'
+          ? T1 * Math.pow(P2 / P1, (p1at.k - 1) / p1at.k)
+          : solveAdiabaticT2(T1, P1, P2, gasKey);
+        v2 = Rg*T2/P2; V2 = mass*v2;
+        Q  = 0;
+        dU = calcDU(T1,T2,gasKey,mass);
+        W  = -dU;
+        const kused = propMode === 'constant' ? p1at.k : meanK(T1,T2,gasKey);
+        info = { constraint:'Q = 0  ·  Pv^k = cte',
+          formula_W:'W = −ΔU  (Primera Ley, Q=0)',
+          k_iter: kused, cv_used: meanCv(T1,T2,gasKey),
+          W_alt: (P1*V1-P2*V2)/(kused-1) };
+        break;
+      }
+
+      // ── POLITRÓPICO ────────────────────────────────────────────
+      case 'polytropic': {
+        P2 = PfromD(inp2a);
+        const n = parseFloat(inp2b)||1.3;
+        if (P2<=0) throw 'P₂ debe ser > 0';
+        if (Math.abs(n-1)<1e-5) {
+          // n=1 → isotérmico
+          T2=T1; v2=Rg*T2/P2; V2=mass*v2;
+          dU=0; W=mass*Rg*T1*Math.log(v2/v1); Q=W;
+          info = { constraint:'Pv^n=C, n→1 (isotérmico)', formula_W:'W=m·R·T·ln(v₂/v₁)',
+            cv_used:p1at.cv, n };
+        } else {
+          v2 = v1*Math.pow(P1/P2, 1/n);
+          T2 = P2*v2/Rg; V2 = mass*v2;
+          W  = mass*(P2*v2-P1*v1)/(1-n);
+          dU = calcDU(T1,T2,gasKey,mass);
+          Q  = dU+W;
+          const Q_cvn = mass * (propMode==='constant'?p1at.cv:meanCv(T1,T2,gasKey))
+                        * ((n - (propMode==='constant'?p1at.k:meanK(T1,T2,gasKey)))/(n-1)) * (T2-T1);
+          info = { constraint:`Pv^n=C, n=${n}`, formula_W:'W=(P₂V₂−P₁V₁)/(1−n)',
+            cv_used: propMode==='constant'?p1at.cv:meanCv(T1,T2,gasKey), n, Q_cvn };
+        }
+        break;
+      }
+      default: throw 'Tipo de proceso desconocido: '+proc;
+    }
+  } catch(e) { throw e; }
+
+  return {
+    s2:{ T:T2, P:P2, v:v2, V:V2 },
+    W, dU, Q, info,
+    props_at_T1: p1at,
+    Rg
+  };
+}
+
+// ════════════════════════════════════════════════════════════════════
+// COMPUTE ALL — resuelve la cadena completa
+// ════════════════════════════════════════════════════════════════════
+function computeAll() {
+  const T0 = TfromD(parseFloat(document.getElementById('T0').value)||300);
+  const P0 = PfromD(parseFloat(document.getElementById('P0').value)||100);
+  const m  = parseFloat(document.getElementById('mass').value)||1;
+  if (T0<=0||P0<=0||m<=0) { alert('Estado inicial inválido.'); return; }
+  if (processChain.length===0) { alert('Añade al menos un proceso.'); return; }
+
+  const Rg = R_BAR / A20[currentGas].M;
+  const s0 = { T:T0, P:P0, v:Rg*T0/P0, V:m*Rg*T0/P0 };
+
+  const states  = [s0];
+  const results = [];
+
+  for (let i=0; i<processChain.length; i++) {
+    const { type, inp2a, inp2b } = processChain[i];
+    try {
+      const r = solveProcess(type, states[states.length-1], inp2a, inp2b, currentGas, m);
+      states.push(r.s2);
+      results.push({ ...r, proc:type, procIdx:i });
+    } catch(e) {
+      alert(`Error en proceso ${i+1} (${PROC_NAMES[type]}): ${e}`);
+      return;
+    }
+  }
+
+  // Enriquecer cada estado con u, h, s (s₁=0 referencia)
+  const enriched = enrichStates(states, currentGas);
+  enriched.forEach((e, i) => { states[i] = e; });
+
+  lastStates  = states;
+  lastResults = results;
+
+  // Actualizar etiqueta del diagrama según modo
+  const pvLbl = document.getElementById('pvModeLabel');
+  if (pvLbl) pvLbl.textContent = calcMode==='cycle' ? 'Ciclo termodinámico' : 'Procesos en serie';
+
+  renderResults(states, results, m, Rg);
+}
+
+// ════════════════════════════════════════════════════════════════════
+// RENDER RESULTS
+// ════════════════════════════════════════════════════════════════════
+function renderResults(states, results, mass, Rg) {
+  document.getElementById('resultsSection').style.display = 'flex';
+
+  // ── Cumulative balance ──
+  const sumQ  = results.reduce((a,r)=>a+r.Q,  0);
+  const sumdU = results.reduce((a,r)=>a+r.dU, 0);
+  const sumW  = results.reduce((a,r)=>a+r.W,  0);
+  const vals  = [Math.abs(Ed(sumQ)), Math.abs(Ed(sumdU)), Math.abs(Ed(sumW))];
+  const maxV  = Math.max(...vals, 1e-9);
+  const eu = uE();
+  const f  = (v,d=3)=>isFinite(v)?v.toFixed(d):'—';
+  const fd = (v,d=3)=>f(Ed(v),d);
+
+  setBar('Q',  sumQ,  maxV);
+  setBar('dU', sumdU, maxV);
+  setBar('W',  sumW,  maxV);
+
+  const err = Math.abs(sumQ-sumdU-sumW);
+  const chk = document.getElementById('balCheck');
+  if (err < 0.01*Math.max(Math.abs(sumQ),1)) {
+    chk.className = 'bal-check bal-ok';
+    chk.textContent = `✓ Q = ΔU + W verificado  |  error = ${err.toFixed(6)} ${eu}`;
+  } else {
+    chk.className = 'bal-check bal-err';
+    chk.textContent = `⚠ Error balance = ${f(sumQ-sumdU-sumW,5)} ${eu}`;
+  }
+
+  // ── Summary table ──
+  buildSummaryTable(states, results, mass);
+
+  // ── Cycle detection ──
+  buildCycleCard(states, results, mass);
+
+  // ── PV chart ──
+  buildPVChart(states, results, currentGas, Rg, mass);
+
+  // ── Step-by-step ──
+  buildSteps(states, results, mass, Rg);
+
+  // update per-card results in sidebar
+  updateChainCardResults(results);
+
+  // ── State property cards (always visible after compute) ──
+  buildStateCards(states, mass);
+}
+
+function setBar(sym, val, maxV) {
+  const vd = Ed(val);
+  const w = (Math.abs(vd)/maxV*100).toFixed(1);
+  const fill = document.getElementById('bf'+sym);
+  const num  = document.getElementById('bn'+sym);
+  const disp = document.getElementById('bv'+sym);
+  if (!fill) return;
+  fill.style.width = w+'%';
+  num.textContent  = vd>=0 ? `+${Ed(val).toFixed(2)}` : Ed(val).toFixed(2);
+  disp.textContent = `${isFinite(Ed(val)) ? Ed(val).toFixed(3) : '—'} ${uE()}`;
+  const row = fill.closest('.bal-row-wrap');
+  if (row) row.classList.toggle('bal-neg', val<0);
+}
+
+// ════════════════════════════════════════════════════════════════════
+// SUMMARY TABLE
+// ════════════════════════════════════════════════════════════════════
+function buildSummaryTable(states, results, mass) {
+  const eu=uE(), ev=uV(), eVt=uVt(), eTu=uT(), ePu=uP(), eMu=uM();
+  const f=(v,d=4)=>isFinite(v)?v.toFixed(d):'—';
+  const fd=(v,d=3)=>isFinite(v)?f(Ed(v),d):'—';
+  const fvd=(v,d=4)=>isFinite(v)?f(vd(v),d):'—';
+
+  let html = `<thead><tr>
+    <th>Estado/Proc.</th>
+    <th>T (${eTu})</th><th>P (${ePu})</th>
+    <th>v (${ev})</th><th>V (${eVt})</th>
+    <th>Q (${eu})</th><th>ΔU (${eu})</th><th>W (${eu})</th>
+  </tr></thead><tbody>`;
+
+  states.forEach((s, i) => {
+    const cls = STATE_COLORS[i]?`color:${STATE_COLORS[i]}`:'';
+    html += `<tr>
+      <td class="row-lbl" style="${cls}">Estado ${i}</td>
+      <td>${f(Td(s.T),2)}</td><td>${f(Pd(s.P),3)}</td>
+      <td>${fvd(s.v)}</td><td>${fvd(s.V)}</td>
+      <td>—</td><td>—</td><td>—</td>
+    </tr>`;
+    if (i < results.length) {
+      const r = results[i];
+      const col = PROC_COLORS[r.proc];
+      html += `<tr class="proc-row">
+        <td class="row-lbl" style="color:${col}">
+          ${i}→${i+1} · ${PROC_NAMES[r.proc].split(' ')[0]}</td>
+        <td>ΔT=${f(Td(s.T)-Td(results[i].s2.T)*0+Td(results[i].s2.T-s.T+s.T)-Td(s.T+results[i].s2.T-results[i].s2.T),1)}</td>
+        <td>—</td><td>—</td><td>—</td>
+        <td class="${r.Q>=0?'pos':'neg'}">${fd(r.Q)}</td>
+        <td class="${r.dU>=0?'pos':'neg'}">${fd(r.dU)}</td>
+        <td class="${r.W>=0?'pos':'neg'}">${fd(r.W)}</td>
+      </tr>`;
+    }
+  });
+
+  // Totals row
+  const sumQ=results.reduce((a,r)=>a+r.Q,0);
+  const sumdU=results.reduce((a,r)=>a+r.dU,0);
+  const sumW=results.reduce((a,r)=>a+r.W,0);
+  html += `<tr style="background:#f0f4ff;font-weight:800">
+    <td class="row-lbl" style="color:#0d47a1">TOTAL</td>
+    <td colspan="4" style="font-family:'IBM Plex Sans',sans-serif;font-size:.72rem;color:var(--muted)">
+      ΔT total = ${f(Td(states[states.length-1].T)-Td(states[0].T),2)} ${uT()}</td>
+    <td class="${sumQ>=0?'pos':'neg'}">${fd(sumQ)}</td>
+    <td class="${sumdU>=0?'pos':'neg'}">${fd(sumdU)}</td>
+    <td class="${sumW>=0?'pos':'neg'}">${fd(sumW)}</td>
+  </tr>`;
+  html += '</tbody>';
+
+  // Fix ΔT column — rebuild cleanly
+  // (Fix the messy ΔT expression above)
+  document.getElementById('summaryTable').innerHTML = buildSummaryTableClean(states, results);
+}
+
+function buildSummaryTableClean(states, results) {
+  const eu=uE(), ev=uV(), eTu=uT(), ePu=uP();
+  const f  = (v,d=4) => isFinite(v)?v.toFixed(d):'—';
+  const fd = (v,d=3) => isFinite(v)?f(Ed(v),d):'—';
+  const fes= (v,d=3) => isFinite(v)?f(Esd(v),d):'—';
+  const fss= (v,d=4) => isFinite(v)?f(Ssd(v),d):'—';
+
+  // Check if states have u/h/s (after computeAll enrichment)
+  const hasProps = states.length > 0 && states[0].u !== undefined;
+  const isCycle  = detectCycle(states);
+
+  let html = `<thead><tr>
+    <th>Estado / Proceso</th>
+    <th>T (${eTu})</th><th>P (${ePu})</th>
+    <th>v (${ev})</th>
+    ${hasProps ? `<th>u (${uEs()})</th><th>h (${uEs()})</th><th>s (${uSs()})</th>` : ''}
+    <th>Q (${eu})</th><th>ΔU (${eu})</th><th>W (${eu})</th>
+  </tr></thead><tbody>`;
+
+  states.forEach((s, i) => {
+    // En ciclo cerrado: el último estado es duplicado de Estado 1 — omitir fila
+    if (isCycle && i === states.length - 1) return;
+    const col = STATE_COLORS[Math.min(i,STATE_COLORS.length-1)];
+    const se  = (hasProps && i > 0) ? 'Δs' : (hasProps ? 's' : '');
+    html += `<tr>
+      <td class="row-lbl" style="color:${col};font-weight:800">⦿ Estado ${i+1}</td>
+      <td>${f(Td(s.T),2)}</td><td>${f(Pd(s.P),4)}</td>
+      <td>${f(vd(s.v),5)}</td>
+      ${hasProps ? `<td>${fes(s.u)}</td><td>${fes(s.h)}</td><td>${fss(s.s)}</td>` : ''}
+      <td>—</td><td>—</td><td>—</td>
+    </tr>`;
+    if (i < results.length) {
+      const r  = results[i];
+      const sN = states[i+1];
+      const pc = PROC_COLORS[r.proc];
+      const dTstr = `ΔT=${f(Td(sN.T)-Td(s.T),2)} ${uT()}`;
+      // Último proceso de ciclo: el destino es Estado 1, no un estado nuevo
+      const destLbl = (isCycle && i === results.length - 1) ? 1 : i+2;
+      const propCols = hasProps
+        ? `<td colspan="3" style="font-size:.68rem;color:var(--muted)">
+             u₂=${fes(sN.u)} · h₂=${fes(sN.h)} · s₂=${fss(sN.s)}</td>`
+        : '';
+      const qwuCols = hasProps ? 3 : 3;
+      html += `<tr class="proc-row">
+        <td class="row-lbl" style="color:${pc}">
+          → ${i+1}→${destLbl} ${PROC_NAMES[r.proc]}<br>
+          <span style="font-size:.64rem;font-weight:400;color:var(--muted)">${dTstr}</span>
+        </td>
+        <td colspan="3" style="font-size:.68rem;color:var(--muted);text-align:left">
+          T₂=${f(Td(sN.T),2)} ${uT()} · P₂=${f(Pd(sN.P),3)} ${uP()} · v₂=${f(vd(sN.v),4)} ${ev}</td>
+        ${hasProps ? `<td colspan="3" style="font-size:.68rem;color:var(--muted)">
+           u₂=${fes(sN.u,2)} · h₂=${fes(sN.h,2)} · s₂=${fss(sN.s,4)}</td>` : ''}
+        <td class="${r.Q>=0?'pos':'neg'}">${fd(r.Q)}</td>
+        <td class="${r.dU>=0?'pos':'neg'}">${fd(r.dU)}</td>
+        <td class="${r.W>=0?'pos':'neg'}">${fd(r.W)}</td>
+      </tr>`;
+    }
+  });
+
+  const sumQ=results.reduce((a,r)=>a+r.Q,0);
+  const sumdU=results.reduce((a,r)=>a+r.dU,0);
+  const sumW=results.reduce((a,r)=>a+r.W,0);
+  const propTotal = hasProps
+    ? `<td colspan="3" style="font-size:.68rem;color:var(--muted)">
+         s (Estado ${isCycle ? 1 : states.length})=${fss(states[states.length-1].s)} ${uSs()}</td>` : '';
+  html += `<tr style="background:#e8f0fe;font-weight:800">
+    <td class="row-lbl" style="color:#0d47a1">ΣTOTAL</td>
+    <td colspan="3" style="font-family:'IBM Plex Sans',sans-serif;font-size:.70rem;color:var(--muted)">
+      ${results.length} proceso(s) · modo: ${propMode}</td>
+    ${propTotal}
+    <td class="${sumQ>=0?'pos':'neg'}">${fd(sumQ)}</td>
+    <td class="${sumdU>=0?'pos':'neg'}">${fd(sumdU)}</td>
+    <td class="${sumW>=0?'pos':'neg'}">${fd(sumW)}</td>
+  </tr>`;
+  return html+'</tbody>';
+}
+
+// ════════════════════════════════════════════════════════════════════
+// CICLO
+// ════════════════════════════════════════════════════════════════════
+function detectCycle(states) {
+  const s0 = states[0], sN = states[states.length-1];
+  const dT  = Math.abs(sN.T - s0.T);
+  const dP  = Math.abs(sN.P - s0.P) / s0.P;
+  return dT < 0.5 && dP < 0.005;  // tolerancia
+}
+
+function buildCycleCard(states, results, mass) {
+  const card = document.getElementById('cycleCard');
+  const isCycle = detectCycle(states);
+
+  // En modo proceso: ocultar tarjeta de ciclo aunque los estados cierren
+  if (calcMode === 'process') {
+    if (isCycle) {
+      card.style.display = '';
+      card.innerHTML = `<div style="background:#fff8e1;border:1.5px solid #ffe082;border-radius:10px;
+        padding:11px 16px;font-size:.78rem;color:#6d4c00;display:flex;align-items:center;gap:10px">
+        <span style="font-size:1.2rem">ℹ</span>
+        <span>Los estados forman un <b>ciclo cerrado</b>, pero el modo activo es <b>Proceso en serie</b>.
+        Cambia a <b>Ciclo termodinámico</b> para ver eficiencia y W<sub>neto</sub>.</span>
+      </div>`;
+    } else {
+      card.style.display = 'none';
+    }
+    return;
+  }
+
+  // Modo ciclo
+  if (!isCycle || results.length < 2) {
+    // Calcular sugerencia concreta para cerrar el ciclo
+    const s1  = states[0];
+    const sN  = states[states.length - 1];
+    const sN1 = states.length >= 2 ? states[states.length - 2] : s1; // estado ANTES del último proceso
+    const lastProc = processChain[processChain.length - 1];
+    let hint = '';
+    if (lastProc) {
+      const ltype = lastProc.type;
+      const SUB9c = ['₀','₁','₂','₃','₄','₅','₆','₇','₈','₉'];
+      const nN = states.length;
+      const subN = nN < 10 ? SUB9c[nN] : nN;
+      if (ltype === 'isobaric') {
+        // P fija = P del estado previo. Para cerrar: T_N = T₁
+        hint = `Proceso ${nN-1}→${nN} es <b>Isobárico</b>: ingresa <b>T${subN} = ${Td(s1.T).toFixed(1)} ${uT()}</b> para cerrar el ciclo.`;
+      } else if (ltype === 'isochoric') {
+        // v fija. Para cerrar: P_N = P₁
+        hint = `Proceso ${nN-1}→${nN} es <b>Isocórico</b>: ingresa <b>P${subN} = ${Pd(s1.P).toFixed(4)} ${uP()}</b> para cerrar el ciclo.`;
+      } else if (ltype === 'isothermal') {
+        // T fija = T del estado previo. Para cerrar necesitamos T_previo=T₁ Y P_N=P₁.
+        if (Math.abs(sN1.T - s1.T) < 1) {
+          hint = `Proceso ${nN-1}→${nN} es <b>Isotérmico</b>: ingresa <b>P${subN} = ${Pd(s1.P).toFixed(4)} ${uP()}</b> para cerrar el ciclo.`;
+        } else {
+          hint = `Proceso ${nN-1}→${nN} es <b>Isotérmico</b> pero T${nN-1} ≠ T₁; el ciclo no puede cerrarse solo ajustando P${subN}. Revisa los procesos anteriores.`;
+        }
+      } else {
+        hint = `Ajusta las condiciones del proceso ${nN-1}→${nN} para que Estado ${nN} = Estado 1.`;
+      }
+    }
+    card.style.display = '';
+    card.innerHTML = `<div style="background:#ffebee;border:1.5px solid #ef9a9a;border-radius:10px;
+      padding:11px 16px;font-size:.78rem;color:#b71c1c">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+        <span style="font-size:1.2rem">⚠</span>
+        <b>Ciclo no cerrado</b> — Estado ${states.length} ≠ Estado 1
+      </div>
+      <div style="margin-bottom:4px;line-height:1.6">
+        ΔT = ${Math.abs(sN.T - s1.T).toFixed(2)} K · ΔP/P₁ = ${(Math.abs(sN.P - s1.P)/s1.P*100).toFixed(3)} %
+      </div>
+      ${hint ? `<div style="background:#fff3f3;border-radius:6px;padding:5px 9px;margin-top:4px;line-height:1.6">🔧 ${hint}</div>` : ''}
+    </div>`;
+    return;
+  }
+
+  card.style.display = '';
+  const sumW  = results.reduce((a,r)=>a+r.W,  0);
+  const sumQ  = results.reduce((a,r)=>a+r.Q,  0);
+  const Qin   = results.filter(r=>r.Q>0).reduce((a,r)=>a+r.Q, 0);
+  const Qout  = results.filter(r=>r.Q<0).reduce((a,r)=>a+r.Q, 0);
+  const eta   = Qin>0 ? sumW/Qin*100 : 0;
+  const isEng = sumW>0;
+  const eu    = uE();
+  const fd    = (v,d=2)=>Ed(v).toFixed(d);
+
+  card.innerHTML = `
+    <div class="cycle-banner ${isEng?'engine':'refrig'}">
+      <div style="flex-shrink:0">
+        <div class="cy-title" style="color:${isEng?'#2e7d32':'#1565c0'}">
+          ${isEng?'⚙ Ciclo Motor (termodinámico)':'❄ Ciclo Inverso (refrigeración/BC)'}
+        </div>
+        <div style="font-size:.74rem;color:var(--muted);line-height:1.5">
+          ${results.length} procesos · Estado ${states.length} ≈ Estado 1 ✓<br>
+          ${isEng?`W_neto > 0 · η = W_neto/Q_in × 100`:`W_neto < 0 · COP = Q_out/|W_neto|`}
+        </div>
+      </div>
+      <div class="cy-kpi-grid">
+        <div class="cy-kpi k-W">
+          <div class="cy-kpi-lbl">W neto</div>
+          <div class="cy-kpi-val">${fd(sumW)} ${eu}</div>
+        </div>
+        <div class="cy-kpi k-Qin">
+          <div class="cy-kpi-lbl">${isEng?'Q_entrada':'Q_salida'}</div>
+          <div class="cy-kpi-val">${fd(isEng?Qin:Math.abs(Qout))} ${eu}</div>
+        </div>
+        <div class="cy-kpi k-eta">
+          <div class="cy-kpi-lbl">${isEng?'η térmica':'COP'}</div>
+          <div class="cy-kpi-val">
+            ${isEng ? eta.toFixed(2)+'%' : (Qin>0?(Math.abs(Qout)/Math.abs(sumW)).toFixed(3):'—')}
+          </div>
+        </div>
+        <div class="cy-kpi k-Wn" style="border-color:${isEng?'#a5d6a7':'#ef9a9a'}">
+          <div class="cy-kpi-lbl">ΣQ</div>
+          <div class="cy-kpi-val" style="color:${Math.abs(Ed(sumQ))<0.1?'#2e7d32':'#c62828'}">
+            ${fd(sumQ)} ${eu}</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ════════════════════════════════════════════════════════════════════
+// PV CHART
+// ════════════════════════════════════════════════════════════════════
+function buildPVChart(states, results, gasKey, Rg, mass) {
+  if (mass === undefined) mass = parseFloat(document.getElementById('mass').value)||1;
+  const traces      = [];
+  const annotations = [];
+  const N           = 120;
+  const isCycle     = detectCycle(states);
+
+  // ── Proceso curves ─────────────────────────────────────────────
+  results.forEach((r, idx) => {
+    const s1 = states[idx], s2 = states[idx+1];
+    const { proc } = r;
+    const col = PROC_COLORS[proc];
+    const v1=s1.v, P1=s1.P, v2=s2.v, P2=s2.P;
+    const nPoly = proc==='polytropic' ? (r.info.n||1.3) : 1.3;
+    const kAd   = r.info.k_iter || interpA20(Math.min(Math.max((s1.T+s2.T)/2,250),1000), gasKey).k;
+    const xs=[], ys=[];
+
+    for (let i=0; i<=N; i++) {
+      const t = i/N;
+      let vi, Pi;
+      switch(proc) {
+        case 'isochoric':
+          vi = v1; Pi = P1 + t*(P2-P1); break;
+        case 'isobaric':
+          vi = v1 + t*(v2-v1); Pi = P1; break;
+        case 'isothermal': {
+          const ratio = v2/v1 > 0 ? v2/v1 : 1e-10;
+          vi = v1 * Math.exp(t * Math.log(ratio));
+          Pi = P1*v1/vi; break;
+        }
+        case 'adiabatic': {
+          const ratio = v2/v1 > 0 ? v2/v1 : 1e-10;
+          vi = v1 * Math.exp(t * Math.log(ratio));
+          Pi = P1 * Math.pow(v1/vi, kAd); break;
+        }
+        case 'polytropic': {
+          const ratio = v2/v1 > 0 ? v2/v1 : 1e-10;
+          vi = v1 * Math.exp(t * Math.log(ratio));
+          Pi = P1 * Math.pow(v1/vi, nPoly); break;
+        }
+        default: vi=v1; Pi=P1;
+      }
+      if (isFinite(vi) && isFinite(Pi) && vi>0 && Pi>0) {
+        xs.push(cvd(vi)); ys.push(Pd(Pi));
+      }
+    }
+
+    if (xs.length < 2) return;
+
+    // Work shading (fill to y=0 creates area under curve)
+    const xFill = [...xs, cvd(v2), cvd(v1), xs[0]];
+    const yFill = [...ys, 0, 0, ys[0]];
+    traces.push({ x:xFill, y:yFill, type:'scatter', mode:'none',
+      fill:'toself', fillcolor:col+'18', line:{width:0},
+      showlegend:false, hoverinfo:'none' });
+
+    // Process curve
+    traces.push({ x:xs, y:ys, type:'scatter', mode:'lines',
+      line:{ color:col, width:3, shape:'linear' },
+      name:`${idx+1}→${(isCycle && idx===results.length-1) ? 1 : idx+2} · ${PROC_NAMES[proc].split('(')[0].trim()}`,
+      hovertemplate:`<b>Proceso ${idx+1}→${(isCycle && idx===results.length-1) ? 1 : idx+2}</b><br>v = %{x:.5f} ${uV()}<br>P = %{y:.4f} ${uP()}<extra>${PROC_NAMES[proc]}</extra>`
+    });
+
+    // Arrow at midpoint (direction indicator)
+    // Nota: Plotly aplica ángulo en sentido horario (SVG), opuesto al convenio matemático CCW.
+    // Se niega el ángulo para que el triángulo apunte en el sentido real del proceso.
+    if (xs.length > 4) {
+      const mi = Math.floor(xs.length * 0.55);
+      const mi2 = Math.max(0, mi-1);
+      const dx = xs[mi]-xs[mi2], dy = ys[mi]-ys[mi2];
+      const angleDeg = -Math.atan2(dy, dx)*180/Math.PI;
+      traces.push({ x:[xs[mi]], y:[ys[mi]], type:'scatter', mode:'markers',
+        marker:{ size:8, color:col, symbol:'triangle-right', angle: angleDeg },
+        showlegend:false, hoverinfo:'none' });
+    }
+  });
+
+  // ── Reference isotherms ────────────────────────────────────────
+  const allV = states.map(s=>s.v).filter(v=>v>0);
+  if (allV.length > 0) {
+    const vmin = Math.min(...allV)*0.40, vmax = Math.max(...allV)*2.2;
+    const vRef = Array.from({length:60},(_,i)=>vmin+i*(vmax-vmin)/59).filter(v=>v>0);
+    const refStates = isCycle ? [states[0]] : [states[0], states[states.length-1]];
+    refStates.forEach((s,ri)=>{
+      const col = STATE_COLORS[ri===0 ? 0 : states.length-1];
+      const lbl = ri===0 ? 'T₁' : `T${states.length}`;
+      traces.push({ x:vRef.map(v=>cvd(v)), y:vRef.map(v=>Pd(Rg*s.T/v)),
+        type:'scatter', mode:'lines',
+        line:{ color:col, width:1.2, dash:'dot' },
+        name:`Isoterma ${lbl} = ${Td(s.T).toFixed(1)} ${uT()}`,
+        opacity:0.55, hoverinfo:'none' });
+    });
+  }
+
+  // ── State point MARKERS (circles) ─────────────────────────────
+  // Rendered as individual traces so each gets its own color reliably
+  states.forEach((s, i) => {
+    if (isCycle && i === states.length - 1) return; // cierre de ciclo → regresa a Estado 1
+    const col = STATE_COLORS[Math.min(i, STATE_COLORS.length-1)];
+    const xv  = cvd(s.v), yv = Pd(s.P);
+    if (!isFinite(xv) || !isFinite(yv)) return;
+
+    // Halo blanco para contraste
+    traces.push({ x:[xv], y:[yv], type:'scatter', mode:'markers',
+      marker:{ size:22, color:'white', line:{color:col, width:2} },
+      showlegend:false, hoverinfo:'none' });
+
+    // Círculo sólido coloreado
+    traces.push({ x:[xv], y:[yv], type:'scatter', mode:'markers',
+      marker:{ size:18, color:col, symbol:'circle',
+        line:{color:'white', width:1.5} },
+      showlegend: i===0,
+      name: i===0 ? 'Estados' : undefined,
+      hovertemplate: buildStateHover(s, i+1, mass)
+    });
+
+    // Número blanco centrado
+    annotations.push({
+      x: xv, y: yv,
+      xref:'x', yref:'y',
+      text: `<b>${i+1}</b>`,
+      showarrow: false,
+      xanchor: 'center', yanchor: 'middle',
+      font: { size:11, color:'white', family:"'IBM Plex Mono',monospace" }
+    });
+  });
+
+  // ── Layout ─────────────────────────────────────────────────────
+  const layout = {
+    paper_bgcolor:'#fff', plot_bgcolor:'#fafcff',
+    font:{ family:"'IBM Plex Sans',sans-serif", color:'#1a2233', size:11 },
+    margin:{ l:76, r:28, t:44, b:65 },
+    annotations,
+    xaxis:{
+      title:{ text:`<b>Volumen específico v (${uV()})</b>`, font:{size:12.5} },
+      showgrid:true, gridcolor:'#e3edf9', zeroline:false,
+      showline:true, linecolor:'#1976d2', linewidth:2,
+      autorange:true
+    },
+    yaxis:{
+      title:{ text:`<b>Presión P (${uP()})</b>`, font:{size:12.5} },
+      showgrid:true, gridcolor:'#e3edf9', zeroline:false,
+      showline:true, linecolor:'#0d47a1', linewidth:2,
+      autorange:true
+    },
+    legend:{ orientation:'h', y:1.08, x:0.5, xanchor:'center',
+      font:{size:10.5}, bgcolor:'rgba(255,255,255,.9)',
+      bordercolor:'#dde3ec', borderwidth:1 },
+    hovermode:'closest', dragmode:'pan',
+    hoverlabel:{ bgcolor:'#fff', bordercolor:'#1976d2',
+      font:{family:"'IBM Plex Mono',monospace", size:11} }
+  };
+
+  // Altura explícita para que Plotly no dependa de medir el contenedor
+  layout.height = 430;
+  layout.autosize = true;
+
+  // Guardar para re-renderizar en modal
+  lastPVTraces = traces;
+  lastPVLayout = layout;
+
+  Plotly.purge('pvChart');
+  setTimeout(() => {
+    Plotly.newPlot('pvChart', traces, layout, {
+      responsive:true, displayModeBar:true, scrollZoom:true,
+      modeBarButtonsToRemove:['lasso2d','select2d'], displaylogo:false
+    });
+    // Forzar re-medición tras el reflow del layout flex/grid
+    requestAnimationFrame(() => requestAnimationFrame(() => Plotly.Plots.resize('pvChart')));
+    setTimeout(() => Plotly.Plots.resize('pvChart'), 300);
+  }, 60);
+}
+
+// Alias para evitar colisión con la variable local 'vd' en setBar
+function cvd(v){ return vd(v); }
+
+// ════════════════════════════════════════════════════════════════════
+// STEP BY STEP (accordion per process)
+// ════════════════════════════════════════════════════════════════════
+function buildSteps(states, results, mass, Rg) {
+  const sg = document.getElementById('stepsGroup');
+  sg.innerHTML = '';
+
+  results.forEach((r, idx) => {
+    const s1 = states[idx], s2 = r.s2;
+    const col = PROC_COLORS[r.proc];
+    const { W,dU,Q, proc, info, props_at_T1, Rg:Rgas } = r;
+    const eu=uE(), eTu=uT(), ePu=uP(), eVu=uV();
+    const f=(v,d=4)=>isFinite(v)?v.toFixed(d):'—';
+    const fd=(v,d=3)=>f(Ed(v),d);
+    const fds=(v,d=3)=>f(Esd(v),d);
+    const g = A20[currentGas];
+    const steps = [];
+
+    const add  = (cls,txt)=> steps.push(`<div class="step ${cls}">${txt}</div>`);
+
+    const propModeStr = propMode==='constant'
+      ? `Constantes en T₁ = ${f(Td(s1.T),2)} ${eTu}`
+      : propMode==='avg'
+        ? `Promedio en T_avg = ${f(Td((s1.T+s2.T)/2),2)} ${eTu}`
+        : `Integración numérica ∫c_v(T)dT`;
+
+    add('section','1 · Gas y modo de propiedades');
+    add('note', `Gas: ${g.label} (${g.formula}) · M = ${g.M} kg/kmol · R = ${R_BAR}/${g.M} = ${Rgas.toFixed(5)} kJ/(kg·K)`);
+    add('note', `Modo propiedades: <b>${propModeStr}</b>`);
+
+    const cv_used = info.cv_used || props_at_T1.cv;
+    const cp_used = info.cp_used || (cv_used + Rgas);
+    const k_used  = info.k_iter  || props_at_T1.k;
+    add('formula', `c_v = ${f(cv_used)}  ·  c_p = ${f(cp_used)}  ·  k = ${f(k_used)}  (kJ/kg·K)`);
+
+    add('section', '2 · Estados inicial y final');
+    add('note', `Estado ${idx+1}: T=${f(Td(s1.T),2)} ${eTu}  P=${f(Pd(s1.P),4)} ${ePu}  v=${f(vd(s1.v),6)} ${eVu}`);
+    add('formula', `Gas ideal: v = R·T/P = ${Rgas.toFixed(5)} × ${f(s1.T,2)} / ${f(s1.P,4)} = ${f(s1.v,6)} m³/kg`);
+
+    switch(proc) {
+      case 'isochoric':
+        add('section','3 · Proceso isocórico (v = const)');
+        add('note','Restricción: v₂ = v₁ → el volumen no cambia. P₂ = P₁·(T₂/T₁)');
+        add('formula',`P₂ = ${f(s1.P,4)} × (${f(s2.T,2)}/${f(s1.T,2)}) = ${f(s2.P,4)} kPa  →  ${f(Pd(s2.P),4)} ${ePu}`);
+        add('formula',`v₂ = v₁ = ${f(vd(s1.v),6)} ${eVu}`);
+        break;
+      case 'isobaric':
+        add('section','3 · Proceso isobárico (P = const)');
+        add('note','Restricción: P₂ = P₁. v₂ = R·T₂/P₂');
+        add('formula',`v₂ = ${Rgas.toFixed(5)} × ${f(s2.T,2)} / ${f(s2.P,4)} = ${f(s2.v,6)} m³/kg  →  ${f(vd(s2.v),6)} ${eVu}`);
+        break;
+      case 'isothermal':
+        add('section','3 · Proceso isotérmico (T = const)');
+        add('note','Restricción: T₂ = T₁  → para gas ideal ΔU = 0');
+        add('formula',`v₂ = R·T₁/P₂ = ${Rgas.toFixed(5)} × ${f(s1.T,2)} / ${f(s2.P,4)} = ${f(s2.v,6)} m³/kg`);
+        break;
+      case 'adiabatic':
+        add('section','3 · Proceso adiabático (Q=0, Pv^k = cte) — solver iterativo k(T_avg)');
+        add('note',`k promedio usado: ${f(k_used)}  ·  Relación isentrópica: T₂ = T₁·(P₂/P₁)^((k−1)/k)`);
+        add('formula',`T₂ = ${f(s1.T,2)} × (${f(s2.P,4)}/${f(s1.P,4)})^(${f((k_used-1)/k_used,5)}) = ${f(s2.T,4)} K`);
+        add('formula',`v₂ = R·T₂/P₂ = ${f(s2.v,6)} m³/kg`);
+        if (info.W_alt !== undefined) {
+          add('var-prop',`Verificación: W = (P₁V₁−P₂V₂)/(k−1) = (${f(s1.P*s1.V,4)}−${f(s2.P*s2.V,4)})/${f(k_used-1,4)} = ${f(info.W_alt,4)} kJ vs W=−ΔU=${fd(W)} ${eu}`);
+        }
+        break;
+      case 'polytropic':
+        add('section',`3 · Proceso politrópico (Pv^n = C,  n = ${f(info.n,4)})`);
+        add('formula',`Pv^n = cte → v₂ = v₁·(P₁/P₂)^(1/n) = ${f(s1.v,6)}·(${f(s1.P,4)}/${f(s2.P,4)})^(1/${f(info.n,4)}) = ${f(s2.v,6)} m³/kg`);
+        add('formula',`T₂ = P₂·v₂/R = ${f(s2.P,4)} × ${f(s2.v,6)} / ${Rgas.toFixed(5)} = ${f(s2.T,4)} K`);
+        if (info.Q_cvn !== undefined) {
+          // q = Q/m (específica, minúscula)  Q = total (mayúscula)
+          add('var-prop',`q = c_v·((n−k)/(n−1))·ΔT = ${fds(info.Q_cvn/mass)} ${uEs()} (aprox.)`);
+        }
+        break;
+    }
+    add('note', `Estado ${idx+2}: T=${f(Td(s2.T),2)} ${eTu}  P=${f(Pd(s2.P),4)} ${ePu}  v=${f(vd(s2.v),6)} ${eVu}   ΔT=${f(Td(s2.T)-Td(s1.T),2)} ${eTu}`);
+
+    // ── Sección 4: energía interna ─────────────────────────────────
+    // Convención: Δu (específica, minúscula) | ΔU (total sistema, mayúscula)
+    add('section','4 · Energía interna  [Δu específica | ΔU total]');
+    if (proc==='isothermal') {
+      add('formula','Gas ideal + T=cte: Δu = 0  →  ΔU = 0 (exacto)');
+    } else {
+      if (propMode==='integ') {
+        add('var-prop',`ΔU = m·∫c_v(T)dT  [integración trapezoidal N=200 de ${f(s1.T,2)} a ${f(s2.T,2)} K]`);
+        add('var-prop',`c̄_v efectiva = ΔU/(m·ΔT) = ${f(dU/(mass*(s2.T-s1.T)||1),5)} kJ/(kg·K)  (variable con T)`);
+      } else if (propMode==='avg') {
+        add('var-prop',`c_v media en T_avg=(${f(s1.T,2)}+${f(s2.T,2)})/2=${f((s1.T+s2.T)/2,2)} K → c_v=${f(cv_used,5)} kJ/(kg·K)`);
+      } else {
+        add('note',`c_v constante evaluada en T₁=${f(Td(s1.T),2)} ${eTu}: c_v=${f(cv_used,5)} kJ/(kg·K)`);
+      }
+      add('formula',`Δu = c_v·ΔT = ${f(cv_used,5)} × ${f(s2.T-s1.T,4)} = ${f(dU/mass,5)} kJ/kg`);
+    }
+    add('result',`Δu = ${fds(dU/mass)} ${uEs()}  →  ΔU = m·Δu = ${fd(dU)} ${eu}`);
+
+    // ── Sección 5: trabajo de frontera ─────────────────────────────
+    // Convención: w (específico, minúscula) | W (total sistema, mayúscula)
+    add('section','5 · Trabajo de frontera  [w específico | W total]');
+    add('formula', info.formula_W || '—');
+    if (proc==='isochoric') {
+      add('result','w = 0  →  W = 0  (v = cte → dV = 0)');
+    } else if (proc==='isobaric') {
+      add('formula',`w = R·ΔT = ${Rgas.toFixed(5)} × ${f(s2.T-s1.T,4)} = ${f(W/mass,5)} kJ/kg`);
+      if (info.Q_cp) add('var-prop',`Verif.: Q ≈ m·c_p·ΔT = ${f(mass,4)} × ${f(cp_used,5)} × ${f(s2.T-s1.T,4)} = ${f(info.Q_cp,4)} kJ`);
+      add('result',`w = ${fds(W/mass)} ${uEs()}  →  W = m·w = ${fd(W)} ${eu}`);
+    } else if (proc==='isothermal') {
+      add('formula',`w = R·T₁·ln(v₂/v₁) = ${Rgas.toFixed(5)} × ${f(s1.T,2)} × ln(${f(s2.v/s1.v,6)}) = ${f(W/mass,5)} kJ/kg`);
+      add('note',`Alt: w = R·T·ln(P₁/P₂) = ${f(Rgas*s1.T*Math.log(s1.P/s2.P),4)} kJ/kg ✓`);
+      add('result',`w = ${fds(W/mass)} ${uEs()}  →  W = m·w = ${fd(W)} ${eu}`);
+    } else if (proc==='adiabatic') {
+      add('formula',`Q=0 → W = −ΔU  (Primera Ley)  →  W = −(${fd(dU)}) = ${fd(W)} ${eu}`);
+      add('result',`w = ${fds(W/mass)} ${uEs()}  →  W = m·w = ${fd(W)} ${eu}`);
+    } else if (proc==='polytropic') {
+      add('formula',`w = (P₂v₂−P₁v₁)/(1−n) = (${f(s2.P*s2.v,4)}−${f(s1.P*s1.v,4)})/(1−${f(info.n,4)}) = ${f(W/mass,5)} kJ/kg`);
+      add('result',`w = ${fds(W/mass)} ${uEs()}  →  W = m·w = ${fd(W)} ${eu}`);
+    }
+
+    // ── Sección 6: Primera Ley ─────────────────────────────────────
+    // Convención: q, Δu, w (específicos) | Q, ΔU, W (totales)
+    add('section','6 · Primera Ley  [minúscula = específico | mayúscula = total]');
+    add('formula',`Específica:  q = Δu + w  →  ${fds(Q/mass)} = ${fds(dU/mass)} + ${fds(W/mass)} ${uEs()}`);
+    add('formula',`Total:       Q = ΔU + W  →  ${fd(Q)} = ${fd(dU)} + ${fd(W)} ${eu}`);
+    add('result',`q = ${fds(Q/mass)} ${uEs()}  →  Q = m·q = ${fd(Q)} ${eu}`);
+    const err2 = Math.abs(Q-dU-W);
+    add(err2<0.001?'result':'warn',
+      `Verificación: Q − ΔU − W = ${err2.toFixed(7)} ${eu}  ${err2<0.001?'✓':'⚠'}`);
+    if (Q>0)  add('note','Q > 0: sistema recibe calor del entorno (proceso endotérmico)');
+    if (Q<0)  add('note','Q < 0: sistema cede calor al entorno (proceso exotérmico)');
+    if (Q===0) add('note','Q = 0: proceso adiabático — sin intercambio de calor');
+    if (W>0)  add('note','W > 0: sistema se expande, realiza trabajo sobre los alrededores');
+    if (W<0)  add('note','W < 0: sistema comprimido, los alrededores realizan trabajo sobre él');
+
+    // Build accordion card
+    const div = document.createElement('div');
+    div.className = 'step-acc';
+    div.id = `acc-${idx}`;
+    div.innerHTML = `
+      <div class="step-acc-hdr" onclick="toggleAcc(${idx})">
+        <div class="step-acc-num" style="background:${col}">${idx+1}→${idx+2}</div>
+        <div class="step-acc-name" style="color:${col}">${PROC_NAMES[proc]}</div>
+        <div class="step-acc-qwu">
+          Q=${fd(Q,2)} · ΔU=${fd(dU,2)} · W=${fd(W,2)} ${eu}
+        </div>
+        <div class="step-acc-icon">▼</div>
+      </div>
+      <div class="step-acc-body">${steps.join('')}</div>`;
+    sg.appendChild(div);
+  });
+}
+
+function toggleAcc(idx) {
+  const el = document.getElementById('acc-'+idx);
+  if (el) el.classList.toggle('open');
+}
+
+// ════════════════════════════════════════════════════════════════════
+// CHAIN UI
+// ════════════════════════════════════════════════════════════════════
+function renderChainUI() {
+  const cl = document.getElementById('chainList');
+  cl.innerHTML = '';
+  processChain.forEach((p, i) => {
+    const col = PROC_COLORS[p.type];
+    const div = document.createElement('div');
+    div.className = 'proc-card';
+    div.id = `pcard-${p.id}`;
+    div.style.borderLeftColor = col;
+    div.style.borderLeftWidth = '3px';
+
+    const needsT2 = p.type==='isochoric'||p.type==='isobaric';
+    const stateN = i + 2;   // número del estado DESTINO de este proceso
+    const SUB9 = ['₀','₁','₂','₃','₄','₅','₆','₇','₈','₉'];
+    const sub = stateN < 10 ? SUB9[stateN] : String(stateN);
+    const inp2aLabel = needsT2 ? `T${sub} (${uT()})` : `P${sub} (${uP()})`;
+    const inp2aPlaceholder = (p.inp2a !== undefined && p.inp2a !== null)
+      ? parseFloat(p.inp2a).toFixed(needsT2 ? 1 : 2)
+      : (needsT2 ? Td(500).toFixed(1) : Pd(200).toFixed(2));
+
+    div.innerHTML = `
+      <div class="pc-header">
+        <div class="pc-num" style="background:${col}">${i+1}</div>
+        <span class="pc-arrow">→</span>
+        <div class="pc-num" style="background:${STATE_COLORS[Math.min(i+1,STATE_COLORS.length-1)]}">${i+2}</div>
+        <select class="pc-type-sel" onchange="onProcTypeChange(${p.id},this.value)">
+          <option value="isochoric"  ${p.type==='isochoric' ?'selected':''}>Isocórico (v=cte)</option>
+          <option value="isobaric"   ${p.type==='isobaric'  ?'selected':''}>Isobárico (P=cte)</option>
+          <option value="isothermal" ${p.type==='isothermal'?'selected':''}>Isotérmico (T=cte)</option>
+          <option value="adiabatic"  ${p.type==='adiabatic' ?'selected':''}>Adiabático (Q=0)</option>
+          <option value="polytropic" ${p.type==='polytropic'?'selected':''}>Politrópico (Pv^n)</option>
+        </select>
+        <button class="pc-del" onclick="removeProcess(${p.id})">✕</button>
+      </div>
+      <div class="pc-body">
+        <div class="field">
+          <div class="field-lbl" id="lbl2a-${p.id}">${inp2aLabel}</div>
+          <div class="inp-row">
+            <input type="number" id="inp2a-${p.id}"
+              value="${inp2aPlaceholder}"
+              min="0.001" step="${needsT2?10:10}"
+              oninput="onProcInput(${p.id},'inp2a',this.value)">
+            <div class="inp-unit" id="unit2a-${p.id}">${needsT2?uT():uP()}</div>
+          </div>
+          <div class="field-sub">${needsT2?'Temperatura':'Presión'} destino — <b>Estado ${stateN}</b></div>
+        </div>
+        ${p.type==='polytropic' ? `
+        <div class="field">
+          <div class="field-lbl">Exponente n</div>
+          <div class="inp-row">
+            <input type="number" id="inp2b-${p.id}" value="${p.inp2b||1.3}"
+              min="0" max="20" step="0.05"
+              oninput="onProcInput(${p.id},'inp2b',this.value)">
+            <div class="inp-unit">—</div>
+          </div>
+          <div class="field-sub">0=isob · 1=isot · k=adiab · ∞=isoc</div>
+        </div>` : ''}
+        <div class="pc-result" id="pres-${p.id}" style="display:none"></div>
+      </div>`;
+    cl.appendChild(div);
+  });
+}
+
+function onProcTypeChange(id, newType) {
+  const p = processChain.find(p=>p.id===id);
+  if (!p) return;
+  p.type = newType;
+  // Reset inp2a to sensible defaults per type
+  const needsT2 = newType==='isochoric'||newType==='isobaric';
+  if (needsT2) { p.inp2a = Td(600); }
+  else { p.inp2a = Pd(200); }
+  renderChainUI();
+}
+
+function onProcInput(id, field, val) {
+  const p = processChain.find(p=>p.id===id);
+  if (p) p[field] = parseFloat(val)||0;
+}
+
+function updateChainCardResults(results) {
+  results.forEach((r, idx) => {
+    const id  = processChain[idx]?.id;
+    const el  = document.getElementById(`pres-${id}`);
+    if (!el) return;
+    const eu = uE();
+    const fd = v=>Ed(v).toFixed(2);
+    el.style.display = 'flex';
+    el.innerHTML = `
+      <span class="pc-res-chip" style="background:#e8f5e9;color:#1b5e20">W=${fd(r.W)} ${eu}</span>
+      <span class="pc-res-chip" style="background:#e3f2fd;color:#1565c0">ΔU=${fd(r.dU)} ${eu}</span>
+      <span class="pc-res-chip" style="background:#fff8e1;color:#e65100">Q=${fd(r.Q)} ${eu}</span>`;
+  });
+}
+
+function addProcess() {
+  const T0   = TfromD(parseFloat(document.getElementById('T0').value) || TfromD(20));
+  const P0   = PfromD(parseFloat(document.getElementById('P0').value) || 100);
+  const type = document.getElementById('newProcType').value || 'isochoric';
+  const needsT = type==='isochoric' || type==='isobaric';
+  // Sugerir T₂ = T₁ + 200°C equivalente, o P₂ = P₁ * 2
+  const defaultInp2a = needsT ? Td(T0 + 200) : Pd(P0*2);
+  processChain.push({ id:nextId++, type, inp2a: defaultInp2a, inp2b: 1.3 });
+  renderChainUI();
+}
+
+function removeProcess(id) {
+  const idx = processChain.findIndex(p=>p.id===id);
+  if (idx>=0) processChain.splice(idx,1);
+  renderChainUI();
+}
+
+function addClosingProcess() {
+  // ── Estado 1 (condiciones de entrada) ───────────────────────────
+  const T1_K = TfromD(parseFloat(document.getElementById('T0').value) || 300);
+  const P1_kPa = PfromD(parseFloat(document.getElementById('P0').value) || 101.325);
+  const Rg = R_BAR / A20[currentGas].M;
+  const v1 = Rg * T1_K / P1_kPa;           // m³/kg
+
+  // ── Estado N (último estado calculado) ──────────────────────────
+  let procType = 'isobaric';                 // fallback
+  let inp2a    = Td(T1_K);                   // valor por defecto: T destino en display
+  let detMsg   = '';
+
+  if (lastStates && lastStates.length >= 2) {
+    const sN = lastStates[lastStates.length - 1];
+    const TN = sN.T, PN = sN.P, vN = sN.v;
+
+    const tolP  = Math.abs(PN - P1_kPa) / P1_kPa;   // relativa presión
+    const tolV  = Math.abs(vN - v1)     / v1;         // relativa volumen
+    const tolT  = Math.abs(TN - T1_K)  / T1_K;       // relativa temperatura
+
+    if (tolP < 0.008) {
+      // P_N ≈ P_1 → proceso isobárico de cierre
+      procType = 'isobaric';
+      inp2a    = Td(T1_K);
+      detMsg   = `P${lastStates.length}≈P₁ (${(tolP*100).toFixed(3)}%) → Isobárico detectado · T destino: ${Td(T1_K).toFixed(2)} ${uT()}`;
+    } else if (tolV < 0.008) {
+      // v_N ≈ v_1 → proceso isocórico de cierre
+      procType = 'isochoric';
+      inp2a    = Pd(P1_kPa);
+      detMsg   = `v${lastStates.length}≈v₁ (${(tolV*100).toFixed(3)}%) → Isocórico detectado · P destino: ${Pd(P1_kPa).toFixed(3)} ${uP()}`;
+    } else if (tolT < 0.008) {
+      // T_N ≈ T_1 → proceso isotérmico de cierre
+      procType = 'isothermal';
+      inp2a    = Pd(P1_kPa);
+      detMsg   = `T${lastStates.length}≈T₁ (${(tolT*100).toFixed(3)}%) → Isotérmico detectado · P destino: ${Pd(P1_kPa).toFixed(3)} ${uP()}`;
+    } else {
+      // Ninguna propiedad coincide → sugerir isobárico por defecto
+      procType = 'isobaric';
+      inp2a    = Td(T1_K);
+      detMsg   = `Sin coincidencia clara (ΔP/P=${(tolP*100).toFixed(1)}%, Δv/v=${(tolV*100).toFixed(1)}%, ΔT/T=${(tolT*100).toFixed(1)}%) → Isobárico por defecto. Ajusta manualmente.`;
+    }
+  } else {
+    detMsg = 'Calcula al menos un proceso antes de sugerir cierre automático. Se agrega isobárico por defecto.';
+  }
+
+  processChain.push({ id:nextId++, type:procType, inp2a, inp2b:1.3 });
+  renderChainUI();
+
+  // Mostrar resultado de detección (no alert — mensaje inline corto)
+  const closeBtn = document.getElementById('btnCloseCycle');
+  if (closeBtn) {
+    const msg = document.createElement('div');
+    msg.style.cssText = 'font-size:.65rem;color:#1565c0;margin-top:4px;padding:4px 8px;background:#e3f2fd;border-radius:5px;line-height:1.4';
+    msg.textContent = '⚙ ' + detMsg;
+    closeBtn.insertAdjacentElement('afterend', msg);
+    setTimeout(()=>msg.remove(), 8000);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// PROPIEDADES TERMODINÁMICAS ESPECÍFICAS
+// Referencia: u=0 y h=0 en T→0K (con cv constante = cv[250K] para T<250K)
+// s₁=0 por definición; los demás estados muestran Δs acumulado desde Estado 1
+// ════════════════════════════════════════════════════════════════════
+
+// u(T): integral de cv desde 0K  (kJ/kg)
+function calcSpecificU(T_K, gasKey) {
+  if (T_K <= 0) return 0;
+  const g   = A20[gasKey];
+  const T0  = g.T[0];   // 250 K — primer punto de A-20
+  const cv0 = g.cv[0];
+  // Segmento 0→T0: cv constante = cv(250K)
+  const u_base = cv0 * Math.min(T_K, T0);
+  if (T_K <= T0) return u_base;
+  // Segmento T0→T: integración trapezoidal con A-20
+  const N  = 100;
+  const dT = (T_K - T0) / N;
+  let sum = 0;
+  for (let i = 0; i < N; i++) {
+    const Ta = T0 + i*dT, Tb = T0 + (i+1)*dT;
+    sum += (interpA20(Ta, gasKey).cv + interpA20(Tb, gasKey).cv) / 2 * dT;
+  }
+  return u_base + sum;
+}
+
+// h(T) = u(T) + R·T  (gas ideal: Pv = RT)
+function calcSpecificH(T_K, gasKey) {
+  const Rg = R_BAR / A20[gasKey].M;
+  return calcSpecificU(T_K, gasKey) + Rg * T_K;
+}
+
+// Δs entre dos estados (kJ/kg·K): ∫cp/T dT − R·ln(P₂/P₁)
+// (usado internamente en verificación de balance)
+function calcDeltaS(T1, P1, T2, P2, gasKey) {
+  const Rg = R_BAR / A20[gasKey].M;
+  const lnP = Math.log(P2 / P1);
+  if (Math.abs(T2 - T1) < 1e-8) return -Rg * lnP;
+  const N  = 100;
+  const dT = (T2 - T1) / N;
+  let intCpT = 0;
+  for (let i = 0; i < N; i++) {
+    const Ta = T1 + i*dT, Tb = T1 + (i+1)*dT;
+    const cpA = interpA20(Math.max(Ta, 1e-6), gasKey).cp;
+    const cpB = interpA20(Math.max(Tb, 1e-6), gasKey).cp;
+    intCpT += (cpA / Ta + cpB / Tb) / 2 * dT;
+  }
+  return intCpT - Rg * lnP;
+}
+
+// s(T, P) absoluta  [kJ/(kg·K)]
+// Fórmula: s = s°(T) − R·ln(P_Pa)
+// donde  s°(T) = ∫₁ᵀ cp(T')/T' dT'  (referencia T₀=1K, cp=cte hasta 250K)
+// Equivalente al software: s = Cp·ln(T) − R·ln(P[Pa])
+function calcSpecificS(T_K, P_kPa, gasKey) {
+  const g   = A20[gasKey];
+  const T0  = g.T[0];     // 250 K — primer dato de A-20
+  const cp0 = g.cp[0];    // cp en 250 K (constante para T < 250 K)
+  const Rg  = R_BAR / g.M;
+  // s°(T): desde 1K hasta T (cp constante = cp0 de 1K a 250K, A-20 arriba de 250K)
+  const sO_1_to_T0 = cp0 * Math.log(T0);   // cp0 × ln(250)
+  let sO;
+  if (T_K <= T0) {
+    sO = cp0 * Math.log(Math.max(T_K, 0.1));
+  } else {
+    const N = 100, dT = (T_K - T0) / N;
+    let intCpT = 0;
+    for (let i = 0; i < N; i++) {
+      const Ta = T0 + i*dT,  Tb = T0 + (i+1)*dT;
+      intCpT += (interpA20(Ta,gasKey).cp/Ta + interpA20(Tb,gasKey).cp/Tb) / 2 * dT;
+    }
+    sO = sO_1_to_T0 + intCpT;
+  }
+  return sO - Rg * Math.log(P_kPa * 1000);   // P convertida a Pa
+}
+
+// Enriquece cada estado con {u, h, s} absolutas
+// Para propMode='constant': u₂ = u₁ + cv(T₁)·ΔT  (consistente con calcDU)
+// Para 'avg'/'integ': integración completa desde referencia 0 K
+function enrichStates(states, gasKey) {
+  const Rg = R_BAR / A20[gasKey].M;
+  return states.map((st, i) => {
+    let u, h;
+    if (i === 0 || propMode !== 'constant') {
+      u = calcSpecificU(st.T, gasKey);
+      h = u + Rg * st.T;
+    } else {
+      // propMode='constant': propiedades evaluadas en el estado anterior
+      const prev = states[i - 1];
+      const u_prev = calcSpecificU(prev.T, gasKey);
+      const { cv, cp } = interpA20(prev.T, gasKey);
+      u = u_prev + cv * (st.T - prev.T);
+      h = u + Rg * st.T;
+    }
+    const s = calcSpecificS(st.T, st.P, gasKey);
+    return { ...st, u, h, s };
+  });
+}
+
+// ── Helpers de unidades para entropía ──────────────────────────────
+const uSs = () => currentUnit==='SI' ? 'kJ/(kg·K)' : 'BTU/(lb·°R)';
+const uSt = () => currentUnit==='SI' ? 'kJ/K' : 'BTU/°R';
+// kJ/(kg·K) → BTU/(lb·°R): 1 kJ/(kg·K) = 0.23885 BTU/(lb·°R)
+function Ssd(s) { return currentUnit==='SI' ? s : s * 0.23885; }
+// kJ/K → BTU/°R: 1 kJ/K = 0.52657 BTU/°R
+function Std(S) { return currentUnit==='SI' ? S : S * 0.52657; }
+
+// ── Texto de hover para Plotly ──────────────────────────────────────
+function buildStateHover(s, stateNum, mass) {
+  const f = (v, d) => isFinite(v) ? v.toFixed(d) : '—';
+  const V = mass * s.v;
+  const U = mass * s.u;
+  const H = mass * s.h;
+  const S = mass * s.s;
+  return [
+    `<b>Estado ${stateNum}</b>`,
+    `T = ${f(Td(s.T),2)} ${uT()}`,
+    `P = ${f(Pd(s.P),4)} ${uP()}`,
+    `v = ${f(cvd(s.v),5)} ${uV()}`,
+    `u = ${f(Esd(s.u),2)} ${uEs()}`,
+    `h = ${f(Esd(s.h),2)} ${uEs()}`,
+    `s = ${f(Ssd(s.s),4)} ${uSs()}`,
+    `── totales (m=${f(mass,3)} ${uM()}) ──`,
+    `V = ${f(cvd(V),4)} ${uVt()}`,
+    `U = ${f(Ed(U),2)} ${uE()}`,
+    `H = ${f(Ed(H),2)} ${uE()}`,
+    `S = ${f(Std(S),4)} ${uSt()}`,
+    `<extra></extra>`
+  ].join('<br>');
+}
+
+// ── Panel de tarjetas de propiedades de estados ─────────────────────
+function buildStateCards(states, mass) {
+  const panel = document.getElementById('statePropsPanel');
+  if (!panel) return;
+  if (!states || states.length === 0) { panel.style.display = 'none'; return; }
+
+  const f   = (v, d) => isFinite(v) ? v.toFixed(d) : '—';
+  const fv  = v => f(vd(v), 5);
+  const fe  = v => f(Ed(v), 3);
+  const fes = v => f(Esd(v), 4);
+  const fss = v => f(Ssd(v), 5);
+  const fst = v => f(Std(v), 4);
+
+  const isCycle = detectCycle(states);
+  let html = '';
+  states.forEach((s, i) => {
+    if (isCycle && i === states.length - 1) return; // ciclo cerrado: no duplicar Estado 1
+    const col = STATE_COLORS[Math.min(i, STATE_COLORS.length-1)];
+    const V   = mass * s.v;
+    const U   = mass * s.u;
+    const H   = mass * s.h;
+    const S   = mass * s.s;
+
+    html += `
+    <div class="state-prop-card" style="border-color:${col}">
+      <div class="spc-title" style="color:${col}">
+        <span class="spc-num" style="background:${col}">${i+1}</span>
+        Estado ${i+1}
+      </div>
+      <div class="spc-sep">Propiedades específicas</div>
+      <div class="spc-row"><span class="spc-sym">T</span><span class="spc-val">${f(Td(s.T),2)}</span><span class="spc-unit">${uT()}</span></div>
+      <div class="spc-row"><span class="spc-sym">P</span><span class="spc-val">${f(Pd(s.P),4)}</span><span class="spc-unit">${uP()}</span></div>
+      <div class="spc-row"><span class="spc-sym">v</span><span class="spc-val">${fv(s.v)}</span><span class="spc-unit">${uV()}</span></div>
+      <div class="spc-row"><span class="spc-sym">u</span><span class="spc-val">${fes(s.u)}</span><span class="spc-unit">${uEs()}</span></div>
+      <div class="spc-row"><span class="spc-sym">h</span><span class="spc-val">${fes(s.h)}</span><span class="spc-unit">${uEs()}</span></div>
+      <div class="spc-row"><span class="spc-sym">s</span><span class="spc-val">${fss(s.s)}</span><span class="spc-unit">${uSs()}</span></div>
+      <div class="spc-sep">Propiedades totales · m=${f(mass,3)} ${uM()}</div>
+      <div class="spc-row"><span class="spc-sym">V</span><span class="spc-val">${fv(V)}</span><span class="spc-unit">${uVt()}</span></div>
+      <div class="spc-row"><span class="spc-sym">U</span><span class="spc-val">${fe(U)}</span><span class="spc-unit">${uE()}</span></div>
+      <div class="spc-row"><span class="spc-sym">H</span><span class="spc-val">${fe(H)}</span><span class="spc-unit">${uE()}</span></div>
+      <div class="spc-row"><span class="spc-sym">S</span><span class="spc-val">${fst(S)}</span><span class="spc-unit">${uSt()}</span></div>
+    </div>`;
+  });
+  panel.innerHTML = html;
+  panel.style.display = 'flex';
+}
+
+// ── Vista previa del Estado 1 en el diagrama P-v ───────────────────
+function showState1Preview(s1, mass) {
+  if (!s1 || s1.v <= 0 || s1.P <= 0 || !isFinite(s1.v) || !isFinite(s1.P)) return;
+  const col = STATE_COLORS[0];
+  const Rg  = R_BAR / A20[currentGas].M;
+  const xv  = cvd(s1.v), yv = Pd(s1.P);
+
+  // Isoterma de referencia
+  const vMin = s1.v * 0.25, vMax = s1.v * 3.5;
+  const vRef = Array.from({length:60}, (_, i) => vMin + i*(vMax-vMin)/59).filter(v=>v>0);
+
+  const traces = [
+    { x:vRef.map(v=>cvd(v)), y:vRef.map(v=>Pd(Rg*s1.T/v)),
+      type:'scatter', mode:'lines', line:{color:col, width:1.5, dash:'dot'},
+      name:`Isoterma T₁=${Td(s1.T).toFixed(1)} ${uT()}`,
+      opacity:0.50, hoverinfo:'none' },
+    // halo blanco
+    { x:[xv], y:[yv], type:'scatter', mode:'markers',
+      marker:{size:22, color:'white', line:{color:col, width:2}},
+      showlegend:false, hoverinfo:'none' },
+    // círculo sólido numerado
+    { x:[xv], y:[yv], type:'scatter', mode:'markers',
+      marker:{size:18, color:col, symbol:'circle', line:{color:'white', width:1.5}},
+      name:'Estado 1',
+      hovertemplate: buildStateHover(s1, 1, mass) }
+  ];
+
+  const layout = {
+    paper_bgcolor:'#fff', plot_bgcolor:'#fafcff',
+    font:{family:"'IBM Plex Sans',sans-serif", color:'#1a2233', size:11},
+    margin:{l:76, r:28, t:44, b:65},
+    annotations:[{
+      x:xv, y:yv, xref:'x', yref:'y',
+      text:'<b>1</b>', showarrow:false,
+      xanchor:'center', yanchor:'middle',
+      font:{size:10, color:'white', family:"'IBM Plex Mono',monospace"}
+    }],
+    xaxis:{title:{text:`<b>Volumen específico v (${uV()})</b>`, font:{size:12.5}},
+      showgrid:true, gridcolor:'#e3edf9', zeroline:false,
+      showline:true, linecolor:'#1976d2', linewidth:2, autorange:true},
+    yaxis:{title:{text:`<b>Presión P (${uP()})</b>`, font:{size:12.5}},
+      showgrid:true, gridcolor:'#e3edf9', zeroline:false,
+      showline:true, linecolor:'#0d47a1', linewidth:2, autorange:true},
+    legend:{orientation:'h', y:1.08, x:0.5, xanchor:'center',
+      font:{size:10.5}, bgcolor:'rgba(255,255,255,.9)',
+      bordercolor:'#dde3ec', borderwidth:1},
+    hovermode:'closest', dragmode:'pan',
+    hoverlabel:{bgcolor:'#fff', bordercolor:'#1976d2',
+      font:{family:"'IBM Plex Mono',monospace", size:11}}
+  };
+
+  layout.height = 430;
+  layout.autosize = true;
+
+  Plotly.purge('pvChart');
+  setTimeout(() => {
+    Plotly.newPlot('pvChart', traces, layout, {
+      responsive:true, displayModeBar:true, scrollZoom:true,
+      modeBarButtonsToRemove:['lasso2d','select2d'], displaylogo:false
+    });
+    requestAnimationFrame(() => requestAnimationFrame(() => Plotly.Plots.resize('pvChart')));
+    setTimeout(() => Plotly.Plots.resize('pvChart'), 300);
+  }, 60);
+}
+
+// ════════════════════════════════════════════════════════════════════
+// STATE INPUT HANDLER
+// ════════════════════════════════════════════════════════════════════
+function onStateInput() {
+  const T0raw = parseFloat(document.getElementById('T0').value);
+  const T0d   = isNaN(T0raw) ? Td(293.15) : T0raw;
+  const P0d   = parseFloat(document.getElementById('P0').value)||100;
+  const T0    = TfromD(T0d);
+  const P0    = PfromD(P0d);
+  const Rg    = R_BAR / A20[currentGas].M;
+  const v0    = Rg*T0/P0;
+  const mass  = parseFloat(document.getElementById('mass').value)||1;
+
+  document.getElementById('out-v0').textContent = `${vd(v0).toFixed(5)} ${uV()}`;
+
+  const props = interpA20(T0, currentGas);
+  // En ENG: convertir kJ/(kg·K) → BTU/(lb·°R) × 0.23885
+  const propFmt = currentUnit==='ENG'
+    ? v => (v * 0.23885).toFixed(5)
+    : v => v.toFixed(4);
+  const RgFmt = currentUnit==='ENG'
+    ? (Rg * 0.23885).toFixed(6)   // BTU/(lb·°R)
+    : Rg.toFixed(5);               // kJ/(kg·K)
+  document.getElementById('pc-cp').textContent = propFmt(props.cp);
+  document.getElementById('pc-cv').textContent = propFmt(props.cv);
+  document.getElementById('pc-k').textContent  = props.k.toFixed(4);
+  document.getElementById('pc-R').textContent  = RgFmt;
+
+  // Calcular propiedades completas del Estado 1 y mostrarlo en el diagrama
+  if (T0 > 0 && P0 > 0 && isFinite(v0)) {
+    const u0 = calcSpecificU(T0, currentGas);
+    const h0 = u0 + Rg * T0;
+    const s1 = { T:T0, P:P0, v:v0, V:mass*v0, u:u0, h:h0, s:calcSpecificS(T0, P0, currentGas) };
+    showState1Preview(s1, mass);
+    buildStateCards([s1], mass);
+  }
+}
+
+// ════════════════════════════════════════════════════════════════════
+// UI STATE CHANGES
+// ════════════════════════════════════════════════════════════════════
+function setCalcMode(mode) {
+  calcMode = mode;
+  document.getElementById('modeProc').classList.toggle('act', mode==='process');
+  document.getElementById('modeCycle').classList.toggle('act', mode==='cycle');
+  const hint = document.getElementById('modeHint');
+  const closeBtn = document.getElementById('btnCloseCycle');
+  if (mode==='process') {
+    hint.className = 'mode-hint mode-hint-proc';
+    hint.textContent = 'Agrega procesos conectados en serie. El estado final de cada proceso es el estado inicial del siguiente.';
+    if (closeBtn) closeBtn.style.display = 'none';
+  } else {
+    hint.className = 'mode-hint mode-hint-cycle';
+    hint.textContent = 'El último proceso debe regresar al Estado 1 (T, P). Usa "Sugerir proceso de cierre" para agregar un proceso de retorno.';
+    if (closeBtn) closeBtn.style.display = '';
+  }
+  // Re-render results if already computed
+  if (lastStates && lastResults) {
+    renderResults(lastStates, lastResults,
+      parseFloat(document.getElementById('mass').value)||1,
+      R_BAR / A20[currentGas].M);
+  }
+}
+
+function setGas(gas, el) {
+  currentGas = gas;
+  document.querySelectorAll('.gas-pill').forEach(p=>p.classList.remove('act'));
+  el.classList.add('act');
+  onStateInput(); renderChainUI();
+}
+
+function setTempUnit(sub) {
+  // Convierte el T₁ actual antes de cambiar la unidad
+  const oldT = parseFloat(document.getElementById('T0').value) || 0;
+  const T_K  = TfromD(oldT); // guardar en K
+
+  tempSubUnit = sub;
+
+  // Actualizar toggle visual
+  const tg = document.getElementById('tempToggle');
+  if (tg) {
+    tg.innerHTML = currentUnit==='SI'
+      ? `<button class="ubtn-sm ${sub==='K'?'act':''}" onclick="setTempUnit('K')">K</button>
+         <button class="ubtn-sm ${sub==='C'?'act':''}" onclick="setTempUnit('C')">°C</button>`
+      : `<button class="ubtn-sm ${sub==='R'?'act':''}" onclick="setTempUnit('R')">°R</button>
+         <button class="ubtn-sm ${sub==='F'?'act':''}" onclick="setTempUnit('F')">°F</button>`;
+  }
+
+  // Actualizar campo T₁ con nuevo valor convertido
+  document.getElementById('T0').value = Td(T_K).toFixed(2);
+
+  // Convertir inp2a de procesos de temperatura (isocórico, isobárico)
+  processChain.forEach(p => {
+    if (p.type==='isochoric' || p.type==='isobaric') {
+      // inp2a está en OLD display units — convertir a K, luego a nuevo display
+      // necesitamos el antiguo TfromD; cambiamos tempSubUnit antes, así que
+      // calculamos: si era C→K: inp2a+273.15, si era K→C: inp2a-273.15
+      // Ya cambiamos tempSubUnit, así que la conversión inversa es:
+      const T_old_K = sub==='C' ? p.inp2a        // antes era K, ahora °C
+                    : sub==='K' ? p.inp2a + 273.15 // antes era °C, ahora K
+                    : sub==='F' ? (p.inp2a + 459.67)*5/9  // antes °R
+                    : p.inp2a*5/9;  // antes K (Rankine)
+      p.inp2a = Td(T_old_K);
+    }
+  });
+
+  updateUnitLabels();
+  onStateInput();
+  renderChainUI();
+}
+
+function setPressUnit(sub) {
+  if (sub === pressSubUnit) return;
+
+  // Guardar P₁ en kPa antes de cambiar subunidad
+  const oldP0  = parseFloat(document.getElementById('P0').value) || 0;
+  const P0_kPa = PfromD(oldP0);
+
+  // Guardar presiones de procesos en kPa
+  const procP_kPa = processChain.map(p =>
+    (p.type==='isothermal' || p.type==='adiabatic' || p.type==='polytropic')
+      ? PfromD(p.inp2a) : null
+  );
+
+  pressSubUnit = sub;
+  _rebuildPressToggle();
+
+  // Decimales según unidad
+  const decimals = sub==='bar' ? 3 : sub==='atm' ? 4 : sub==='lbpsf' ? 1 : 2; // psia:2, kPa:1
+  document.getElementById('P0').value = Pd(P0_kPa).toFixed(decimals);
+
+  // Convertir inp2a de procesos de presión
+  processChain.forEach((p, i) => {
+    if (procP_kPa[i] !== null) p.inp2a = parseFloat(Pd(procP_kPa[i]).toFixed(decimals));
+  });
+
+  updateUnitLabels();
+  onStateInput();
+  renderChainUI();
+}
+
+function setUnit(u) {
+  currentUnit = u;
+  // Subunidades por defecto al cambiar sistema
+  tempSubUnit  = u==='SI' ? 'C'    : 'F';
+  pressSubUnit = u==='SI' ? 'kPa'  : 'psia';
+
+  document.getElementById('btnSI').classList.toggle('act', u==='SI');
+  document.getElementById('btnENG').classList.toggle('act', u==='ENG');
+
+  // Toggle temperatura
+  const tg = document.getElementById('tempToggle');
+  if (tg) {
+    tg.innerHTML = u==='SI'
+      ? `<button class="ubtn-sm act" onclick="setTempUnit('C')">°C</button>
+         <button class="ubtn-sm"     onclick="setTempUnit('K')">K</button>`
+      : `<button class="ubtn-sm act" onclick="setTempUnit('F')">°F</button>
+         <button class="ubtn-sm"     onclick="setTempUnit('R')">°R</button>`;
+  }
+
+  // Toggle presión — ENG: psia | atm | lbf/ft²
+  _rebuildPressToggle();
+  updateUnitLabels();
+  onStateInput();
+  renderChainUI();
+}
+
+// Reconstruye el toggle de presión según sistema y subunidad activa
+function _rebuildPressToggle() {
+  const pg = document.getElementById('pressToggle');
+  if (!pg) return;
+  if (currentUnit==='SI') {
+    pg.innerHTML =
+      `<button class="ubtn-sm ${pressSubUnit==='kPa'?'act':''}" onclick="setPressUnit('kPa')">kPa</button>
+       <button class="ubtn-sm ${pressSubUnit==='bar'?'act':''}" onclick="setPressUnit('bar')">bar</button>`;
+  } else {
+    pg.innerHTML =
+      `<button class="ubtn-sm ${pressSubUnit==='psia' ?'act':''}" onclick="setPressUnit('psia')">psia</button>
+       <button class="ubtn-sm ${pressSubUnit==='atm'  ?'act':''}" onclick="setPressUnit('atm')">atm</button>
+       <button class="ubtn-sm ${pressSubUnit==='lbpsf'?'act':''}" onclick="setPressUnit('lbpsf')">lbf/ft²</button>`;
+  }
+}
+
+function updateUnitLabels() {
+  const tu = uT();
+  const el0 = document.getElementById('u-T0');
+  const elP  = document.getElementById('u-P0');
+  const elM  = document.getElementById('u-mass');
+  if (el0)  el0.textContent  = tu;
+  if (elP)  elP.textContent  = uP();
+  if (elM)  elM.textContent  = uM();
+
+  // Panel de propiedades: unidades y referencia de tabla según sistema
+  const isEng = currentUnit === 'ENG';
+  const cpUnit = isEng ? 'BTU/(lb·°R)' : 'kJ/(kg·K)';
+  const rUnit  = isEng ? 'BTU/(lb·°R)' : 'kJ/(kg·K)';
+  const tblRef = isEng
+    ? '📊 Tablas A-17/18/19/20/21/22E — Propiedades en T₁'
+    : '📊 Tabla A-20 — Propiedades en T₁';
+  const tblNote = isEng
+    ? 'Rango: 450–9540 °R · Datos: Moran & Shapiro App. 2 English · R = 1.986/M BTU/(lb·°R)'
+    : 'Rango tabla: 250–1000 K · Extrapolación cte. fuera del rango · R = 8.314/M';
+
+  const elTitle = document.getElementById('propsTableTitle');
+  const elNote  = document.getElementById('propsTblNote');
+  const elCpU   = document.getElementById('pc-cpU');
+  const elCvU   = document.getElementById('pc-cvU');
+  const elRU    = document.getElementById('pc-RU');
+
+  if (elTitle) {
+    // Mantener el span interno (Moran & Shapiro 7e)
+    elTitle.childNodes[0].nodeValue = tblRef + ' ';
+  }
+  if (elNote)  elNote.textContent  = tblNote;
+  if (elCpU)  elCpU.textContent   = cpUnit;
+  if (elCvU)  elCvU.textContent   = cpUnit;
+  if (elRU)   elRU.textContent    = rUnit;
+}
+
+function setPropMode(mode) {
+  propMode = mode;
+  ['constant','avg','integ'].forEach(m=>{
+    const el = document.getElementById(`pm${m.charAt(0).toUpperCase()+m.slice(1)}`);
+    if(el) el.classList.toggle('act', m===mode);
+  });
+  const labels = { constant:'Constantes en T₁', avg:'Promedio T_avg', integ:'Integración ∫c_v·dT' };
+  document.getElementById('propModeLabel').textContent = labels[mode];
+}
+
+// ════════════════════════════════════════════════════════════════════
+// MODAL DE AMPLIACIÓN
+// ════════════════════════════════════════════════════════════════════
+function toggleCard(btn) {
+  const hdr  = btn.closest('.card-hdr');
+  const card = hdr.parentElement;
+  const collapsed = card.dataset.collapsed === 'true';
+  Array.from(card.children).forEach(child => {
+    if (child !== hdr) child.style.display = collapsed ? '' : 'none';
+  });
+  card.dataset.collapsed = collapsed ? 'false' : 'true';
+  btn.textContent = collapsed ? '▼' : '▲';
+  btn.title = collapsed ? 'Contraer' : 'Expandir';
+  if (collapsed) {
+    const chart = card.querySelector('#pvChart');
+    if (chart) setTimeout(() => Plotly.Plots.resize(chart), 60);
+  }
+}
+
+function openModal(contentId, title) {
+  const modal = document.getElementById('expandModal');
+  const body  = document.getElementById('modalBody');
+  document.getElementById('modalTitle').textContent = title;
+  body.innerHTML = '';
+
+  if (contentId === 'pvChart') {
+    // Para Plotly: crear div nuevo y re-renderizar con mayor altura
+    const wrap = document.createElement('div');
+    wrap.id = 'pvChartModal';
+    wrap.style.cssText = 'width:100%;height:72vh';
+    body.appendChild(wrap);
+    modal.classList.add('open');
+    setTimeout(() => {
+      if (lastPVTraces && lastPVLayout) {
+        const ml = Object.assign({}, lastPVLayout,
+          { height: Math.round(window.innerHeight * 0.70),
+            margin: {l:80, r:30, t:50, b:70} });
+        Plotly.newPlot('pvChartModal', lastPVTraces, ml,
+          { responsive:true, displayModeBar:true, scrollZoom:true,
+            modeBarButtonsToRemove:['lasso2d','select2d'], displaylogo:false });
+      }
+    }, 50);
+  } else {
+    const src = document.getElementById(contentId);
+    if (!src) return;
+    const clone = src.cloneNode(true);
+    clone.id = contentId + '_modal';
+    body.appendChild(clone);
+    modal.classList.add('open');
+  }
+
+  modal.onclick = e => { if (e.target === modal) closeModal(); };
+  document.addEventListener('keydown', _escCloseModal);
+}
+
+function closeModal() {
+  const modal = document.getElementById('expandModal');
+  modal.classList.remove('open');
+  document.getElementById('modalBody').innerHTML = '';
+  document.removeEventListener('keydown', _escCloseModal);
+}
+
+function _escCloseModal(e) { if (e.key === 'Escape') closeModal(); }
+
+// ════════════════════════════════════════════════════════════════════
+// GUARDAR / CARGAR SESIÓN
+// ════════════════════════════════════════════════════════════════════
+function saveSession() {
+  const session = {
+    app:     'TermoIA-PrimeraLey',
+    version: '1.1',
+    savedAt: new Date().toISOString(),
+    config: {
+      currentUnit,
+      tempSubUnit,
+      pressSubUnit,
+      currentGas,
+      calcMode,
+      propMode
+    },
+    state1: {
+      T0:   parseFloat(document.getElementById('T0').value)   || 0,
+      P0:   parseFloat(document.getElementById('P0').value)   || 0,
+      mass: parseFloat(document.getElementById('mass').value) || 1
+    },
+    // Guardar inp2a/inp2b en unidades de visualización actuales
+    processes: processChain.map(p => ({
+      type:  p.type,
+      inp2a: p.inp2a,
+      inp2b: p.inp2b
+    }))
+  };
+
+  const json = JSON.stringify(session, null, 2);
+  const blob = new Blob([json], { type: 'application/json' });
+  const url  = URL.createObjectURL(blob);
+  const ts   = new Date().toISOString().slice(0,19).replace(/[T:]/g,'-');
+  const fname = `TermoIA_sesion_${ts}.json`;
+  const a = Object.assign(document.createElement('a'), { href:url, download:fname });
+  a.click();
+  URL.revokeObjectURL(url);
+
+  const lbl = document.getElementById('sessNameLbl');
+  if (lbl) lbl.textContent = `Guardado: ${fname}`;
+}
+
+function loadSessionFile(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try { _applySession(JSON.parse(e.target.result), file.name); }
+    catch(err) { alert('Error al cargar sesión:\n' + err.message); }
+  };
+  reader.readAsText(file);
+  input.value = ''; // reset — permite recargar el mismo archivo
+}
+
+function _applySession(sess, filename) {
+  if (sess.app !== 'TermoIA-PrimeraLey') {
+    alert('El archivo no es una sesión de TermoIA·Dinámica (Primera Ley).');
+    return;
+  }
+
+  const cfg = sess.config || {};
+
+  // ── 1. Sistema de unidades ─────────────────────────────────────
+  if (cfg.currentUnit) {
+    currentUnit  = cfg.currentUnit;
+    tempSubUnit  = cfg.tempSubUnit  || (currentUnit==='SI' ? 'C' : 'R');
+    pressSubUnit = cfg.pressSubUnit || (currentUnit==='SI' ? 'kPa' : 'psia');
+
+    // Botones SI / Inglés
+    document.getElementById('btnSI') ?.classList.toggle('act', currentUnit==='SI');
+    document.getElementById('btnENG')?.classList.toggle('act', currentUnit==='ENG');
+
+    // Toggle temperatura — mostrar sub-unidad correcta activa
+    const tg = document.getElementById('tempToggle');
+    if (tg) {
+      tg.innerHTML = currentUnit==='SI'
+        ? `<button class="ubtn-sm ${tempSubUnit==='C'?'act':''}" onclick="setTempUnit('C')">°C</button>
+           <button class="ubtn-sm ${tempSubUnit==='K'?'act':''}" onclick="setTempUnit('K')">K</button>`
+        : `<button class="ubtn-sm ${tempSubUnit==='F'?'act':''}" onclick="setTempUnit('F')">°F</button>
+           <button class="ubtn-sm ${tempSubUnit==='R'?'act':''}" onclick="setTempUnit('R')">°R</button>`;
+    }
+
+    // Toggle presión
+    _rebuildPressToggle();
+    updateUnitLabels();
+  }
+
+  // ── 2. Gas ─────────────────────────────────────────────────────
+  if (cfg.currentGas) {
+    currentGas = cfg.currentGas;
+    document.querySelectorAll('.gas-pill').forEach(el =>
+      el.classList.toggle('act', el.dataset.gas === currentGas));
+  }
+
+  // ── 3. Modo de cálculo ─────────────────────────────────────────
+  if (cfg.calcMode) setCalcMode(cfg.calcMode);
+
+  // ── 4. Modo propiedades (cp/cv) ────────────────────────────────
+  if (cfg.propMode) setPropMode(cfg.propMode);
+
+  // ── 5. Estado inicial ──────────────────────────────────────────
+  const s1 = sess.state1 || {};
+  if (s1.T0   !== undefined) document.getElementById('T0').value   = s1.T0;
+  if (s1.P0   !== undefined) document.getElementById('P0').value   = s1.P0;
+  if (s1.mass !== undefined) document.getElementById('mass').value = s1.mass;
+
+  // ── 6. Cadena de procesos ──────────────────────────────────────
+  processChain = (sess.processes || []).map(p => ({
+    id:    nextId++,
+    type:  p.type  || 'isochoric',
+    inp2a: p.inp2a !== undefined ? p.inp2a : 0,
+    inp2b: p.inp2b !== undefined ? p.inp2b : 1.3
+  }));
+
+  // ── 7. Renderizar y recalcular ─────────────────────────────────
+  renderChainUI();
+  onStateInput();
+  if (processChain.length > 0) {
+    setTimeout(() => computeAll(), 150);
+  }
+
+  const lbl = document.getElementById('sessNameLbl');
+  if (lbl) lbl.textContent = `Cargado: ${filename.replace(/\.json$/, '')}`;
+}
+
+// ════════════════════════════════════════════════════════════════════
+// INIT
+window.addEventListener('load', ()=>{
+  document.getElementById('mass').value = 2;
+  processChain = [
+    { id: nextId++, type:'adiabatic', inp2a: PfromD(600), inp2b: 1.3 }
+  ];
+  renderChainUI();
+  onStateInput();
+  setTimeout(() => computeAll(), 200);
+});
+</script>
+</body>
+</html>

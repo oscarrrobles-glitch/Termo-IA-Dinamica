@@ -1,0 +1,120 @@
+{
+  "app": "cyclepad",
+  "version": 1,
+  "title": "Ejemplo · Intercambiador de calor",
+  "cycleType": "open",
+  "substance": "water",
+  "unitSystem": "SI",
+  "nodes": [
+    {
+      "id": "h1",
+      "type": "SOURCE",
+      "name": "SRC1",
+      "params": {
+        "phase": "auto",
+        "T": 300,
+        "P": 200,
+        "m_dot": 1,
+        "x": ""
+      },
+      "x": 60,
+      "y": 70
+    },
+    {
+      "id": "h2",
+      "type": "SOURCE",
+      "name": "SRC2",
+      "params": {
+        "phase": "auto",
+        "T": 30,
+        "P": 300,
+        "m_dot": 2,
+        "x": ""
+      },
+      "x": 60,
+      "y": 320
+    },
+    {
+      "id": "h3",
+      "type": "HEAT_EXCHANGER",
+      "name": "HX1",
+      "params": {},
+      "x": 440,
+      "y": 190
+    },
+    {
+      "id": "h4",
+      "type": "SINK",
+      "name": "SNK1",
+      "params": {},
+      "x": 840,
+      "y": 90
+    },
+    {
+      "id": "h5",
+      "type": "SINK",
+      "name": "SNK2",
+      "params": {},
+      "x": 840,
+      "y": 330
+    }
+  ],
+  "edges": [
+    {
+      "id": "a1",
+      "fromNodeId": "h1",
+      "toNodeId": "h3",
+      "fromPort": 0,
+      "toPort": 0,
+      "cond": {
+        "phase": "auto",
+        "P": "",
+        "T": "",
+        "x": ""
+      },
+      "pts": []
+    },
+    {
+      "id": "a2",
+      "fromNodeId": "h2",
+      "toNodeId": "h3",
+      "fromPort": 0,
+      "toPort": 1,
+      "cond": {
+        "phase": "auto",
+        "P": "",
+        "T": "",
+        "x": ""
+      },
+      "pts": []
+    },
+    {
+      "id": "a3",
+      "fromNodeId": "h3",
+      "toNodeId": "h4",
+      "fromPort": 0,
+      "toPort": 0,
+      "cond": {
+        "phase": "auto",
+        "T": 150,
+        "P": 200,
+        "x": ""
+      },
+      "pts": []
+    },
+    {
+      "id": "a4",
+      "fromNodeId": "h3",
+      "toNodeId": "h5",
+      "fromPort": 1,
+      "toPort": 0,
+      "cond": {
+        "phase": "auto",
+        "P": "",
+        "T": "",
+        "x": ""
+      },
+      "pts": []
+    }
+  ]
+}

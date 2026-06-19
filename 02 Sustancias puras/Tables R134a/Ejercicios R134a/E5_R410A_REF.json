@@ -1,0 +1,16 @@
+{
+  "app": "sim-ciclo-vc",
+  "ver": 2,
+  "units": "SI",
+  "modo": "Refrigeración",
+  "state": {
+    "fluid": "R410A",
+    "Te": 5,
+    "Tc": 45,
+    "sh": 4,
+    "sc": 2,
+    "eta": 0.82,
+    "dimMode": "mdot",
+    "dimval": 0.08
+  }
+}

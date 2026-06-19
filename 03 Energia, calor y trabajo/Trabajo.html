@@ -1,0 +1,1942 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THERMOSIM — Simulador de Ciclo Cerrado</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Source+Code+Pro:wght@400;600;700&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:         #f0f4f8;
+  --surface:    #ffffff;
+  --surface2:   #f7f9fc;
+  --border:     #dde3ec;
+  --border2:    #c8d2e0;
+  --text:       #1e2d3d;
+  --muted:      #5a7184;
+  --dim:        #8fa3b8;
+  --header-bg:  #1a3a5c;
+  --header-txt: #ffffff;
+  --accent:     #1976d2;
+  --accent2:    #1565c0;
+  --green:      #2e7d32;
+  --green-bg:   #e8f5e9;
+  --orange:     #e65100;
+  --orange-bg:  #fff3e0;
+  --purple:     #6a1b9a;
+  --purple-bg:  #f3e5f5;
+  --red:        #c62828;
+  --red-light:  #ef5350;
+  --col1:       #d32f2f;   /* Isocórico  */
+  --col2:       #7b1fa2;   /* Isotérmico */
+  --col3:       #0277bd;   /* Isobárico  */
+  --sans: 'Nunito', sans-serif;
+  --mono: 'Source Code Pro', 'Courier New', monospace;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+  --shadow:    0 2px 8px rgba(0,0,0,0.10), 0 1px 4px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.07);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 19px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;   /* el scroll vive dentro de cada columna */
+}
+
+/* ═══════════════ HEADER ═══════════════ */
+header {
+  background: linear-gradient(135deg, #1a3a5c 0%, #1565c0 100%);
+  padding: 0;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.25);
+  flex: 0 0 auto; z-index: 100;
+}
+.header-inner {
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px 28px;
+}
+.header-icon {
+  width: 54px; height: 54px; background: rgba(255,255,255,0.15);
+  border-radius: 12px; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; border: 1px solid rgba(255,255,255,0.25);
+  font-size: 28px;
+}
+.header-text { flex: 1; }
+.header-title {
+  font-size: 25px; font-weight: 800; color: #fff;
+  letter-spacing: -0.3px; line-height: 1.2;
+}
+.header-sub {
+  font-size: 15px; color: rgba(255,255,255,0.72); margin-top: 2px;
+  font-weight: 400; letter-spacing: 0.2px;
+}
+.header-badge {
+  background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3);
+  color: #fff; font-size: 14px; font-weight: 700;
+  padding: 5px 14px; border-radius: 20px; letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+/* Unit toggle */
+.unit-toggle {
+  display: flex; background: rgba(0,0,0,0.25);
+  border-radius: 8px; padding: 3px; gap: 2px;
+}
+.unit-btn {
+  font-family: var(--sans); font-size: 15px; font-weight: 700;
+  padding: 7px 18px; border-radius: 6px; border: none;
+  cursor: pointer; transition: all 0.18s; color: rgba(255,255,255,0.65);
+  background: transparent; letter-spacing: 0.3px;
+}
+.unit-btn.active { background: #ffffff; color: #1a3a5c; box-shadow: var(--shadow-sm); }
+
+/* ═══════════════ PROCESS TABS ═══════════════ */
+.process-bar {
+  background: #fff; border-bottom: 2px solid var(--border);
+  display: flex; align-items: center; gap: 0;
+  padding: 0 28px; overflow-x: auto;
+  flex: 0 0 auto;
+}
+.proc-tab {
+  display: flex; align-items: center; gap: 8px;
+  padding: 14px 24px; font-size: 16px; font-weight: 700;
+  border-bottom: 3px solid transparent; margin-bottom: -2px;
+  white-space: nowrap; cursor: default;
+  transition: border-color 0.15s;
+}
+.proc-tab .dot { width: 14px; height: 14px; border-radius: 50%; flex-shrink: 0; }
+.proc-tab.t12 { color: var(--col1); border-color: var(--col1); }
+.proc-tab.t23 { color: var(--col2); border-color: var(--col2); }
+.proc-tab.t31 { color: var(--col3); border-color: var(--col3); }
+.proc-tab.t12 .dot { background: var(--col1); }
+.proc-tab.t23 .dot { background: var(--col2); }
+.proc-tab.t31 .dot { background: var(--col3); }
+.proc-tab .proc-label { color: var(--muted); font-weight: 600; }
+
+/* ═══════════════ LAYOUT ═══════════════ */
+.layout {
+  display: grid;
+  grid-template-columns: 390px 1fr;
+  grid-template-rows: minmax(0, 1fr);  /* limita la fila a la altura disponible */
+  gap: 0;
+  flex: 1 1 auto;     /* ocupa el alto restante del viewport */
+  min-height: 0;      /* permite que las columnas internas hagan scroll */
+  overflow: hidden;
+}
+
+/* ═══════════════ SIDEBAR ═══════════════ */
+aside {
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 18px 16px;
+  display: flex; flex-direction: column; gap: 16px;
+  height: 100%; min-height: 0;
+  overflow-y: auto;
+}
+
+.panel-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.panel-title {
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 16px;
+  font-size: 14px; font-weight: 800; color: var(--accent);
+  letter-spacing: 1.5px; text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px;
+}
+.panel-title.collapsible { cursor: pointer; user-select: none; transition: background 0.15s; }
+.panel-title.collapsible:hover { background: #e3f2fd; }
+.panel-title .ico { font-size: 17px; }
+.panel-toggle-btn {
+  margin-left: auto; font-size: 10px; font-weight: 800; letter-spacing: 0.5px;
+  padding: 3px 10px; border-radius: 20px;
+  background: #1565c020; color: #1565c0; font-family: var(--sans);
+}
+.panel-body { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+
+/* ── FIELDS ── */
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field-header { display: flex; align-items: center; justify-content: space-between; }
+.field-label { font-size: 16px; font-weight: 700; color: var(--text); }
+.badge-in  { font-size: 13px; font-weight: 800; padding: 3px 10px; border-radius: 20px; background: #e3f2fd; color: #1565c0; border: 1px solid #bbdefb; letter-spacing: 0.3px; }
+.badge-out { font-size: 13px; font-weight: 800; padding: 3px 10px; border-radius: 20px; background: var(--green-bg); color: var(--green); border: 1px solid #c8e6c9; letter-spacing: 0.3px; }
+.field-sub { font-size: 13px; color: var(--dim); margin-top: -2px; }
+.input-row { display: flex; border-radius: 8px; overflow: hidden; border: 1.5px solid var(--border2); transition: border-color 0.15s; box-shadow: var(--shadow-sm); }
+.input-row:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(25,118,210,0.12); }
+.input-row input {
+  flex: 1; border: none; background: #fff;
+  color: var(--text); padding: 11px 14px;
+  font-size: 19px; font-family: var(--mono);
+  font-weight: 600; outline: none;
+}
+.unit-tag {
+  background: #e8edf5; padding: 11px 14px;
+  font-size: 15px; color: var(--accent2); font-weight: 800;
+  white-space: nowrap; border-left: 1px solid var(--border2);
+  font-family: var(--sans); letter-spacing: 0.3px;
+}
+
+/* ── OUTPUT VALUE ── */
+.out-field { display: flex; flex-direction: column; gap: 5px; }
+.out-label { font-size: 16px; font-weight: 700; color: var(--text); display: flex; align-items: center; justify-content: space-between; }
+.out-sub   { font-size: 13px; color: var(--dim); }
+.out-value {
+  background: var(--green-bg);
+  border: 1.5px solid #a5d6a7;
+  border-radius: 8px; padding: 12px 15px;
+  font-family: var(--mono); font-size: 19px;
+  font-weight: 700; color: var(--green);
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+}
+.out-value .out-num { font-size: 22px; }
+.out-value .out-unit { font-size: 15px; color: #66bb6a; font-weight: 600; }
+
+/* ── STATE TABLE ── */
+.state-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.state-table thead tr { background: var(--surface2); }
+.state-table th { padding: 9px 10px; font-size: 14px; font-weight: 800; color: var(--muted); text-align: left; letter-spacing: 0.5px; border-bottom: 2px solid var(--border); }
+.state-table tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+.state-table tbody tr:hover { background: #f0f7ff; }
+.state-table td { padding: 9px 10px; }
+.st-id  { font-weight: 800; font-size: 18px; text-align: center; width: 36px; }
+.st-id-1 { color: var(--col1); }
+.st-id-2 { color: var(--col2); }
+.st-id-3 { color: var(--col3); }
+.st-T   { color: var(--orange); font-family: var(--mono); font-weight: 600; font-size: 15px; }
+.st-p   { color: var(--purple); font-family: var(--mono); font-weight: 600; font-size: 15px; }
+.st-v   { color: var(--green);  font-family: var(--mono); font-weight: 600; font-size: 15px; }
+
+/* ── PROCESS CARDS SIDEBAR ── */
+.proc-info-card {
+  border-radius: 8px; padding: 11px 13px;
+  border-left: 4px solid; margin-bottom: 0;
+}
+.pic-title { font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 7px; margin-bottom: 7px; }
+.pic-tag { font-size: 13px; padding: 2px 9px; border-radius: 10px; font-weight: 700; }
+.pic-rows { display: flex; flex-direction: column; gap: 5px; }
+.pic-row { display: flex; justify-content: space-between; font-size: 14px; }
+.pic-key { color: var(--muted); }
+.pic-val { font-family: var(--mono); font-weight: 600; color: var(--text); font-size: 14px; }
+
+/* gas info */
+.gas-card {
+  background: #f0f7ff; border: 1px solid #bbdefb; border-radius: 8px;
+  padding: 13px 16px; font-size: 15px; color: var(--muted);
+  line-height: 1.75;
+}
+.gas-title { color: var(--accent); font-weight: 800; font-size: 16px; margin-bottom: 5px; display: flex; align-items: center; gap: 6px; }
+
+/* ═══════════════ MAIN ═══════════════ */
+main { padding: 16px 20px; display: flex; flex-direction: column; gap: 16px; height: 100%; min-height: 0; overflow-y: auto; background: var(--bg); }
+
+/* Evita que las tarjetas (con overflow:hidden) se encojan; así desbordan y generan scroll */
+aside > *, main > * { flex-shrink: 0; }
+
+/* ── CHART CARD ── */
+.chart-card {
+  background: var(--surface); border-radius: 12px;
+  border: 1px solid var(--border); box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.chart-header {
+  padding: 10px 16px;
+  background: var(--surface2); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.chart-header-title { font-size: 18px; font-weight: 800; color: var(--text); }
+.chart-header-sub   { font-size: 14px; color: var(--muted); margin-left: auto; }
+.chart-body { padding: 18px 18px 10px; }
+.chart-wrap { position: relative; width: 100%; height: 400px; }
+#pvChart { position: absolute; top:0; left:0; width:100%!important; height:100%!important; }
+.chart-empty { height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--dim); gap: 12px; }
+.chart-empty .e-icon { font-size: 46px; opacity: 0.35; }
+.chart-empty .e-msg  { font-size: 17px; font-weight: 600; }
+
+/* ── LEGEND BAR ── */
+.legend-bar {
+  display: flex; gap: 20px; align-items: center; flex-wrap: wrap;
+  padding: 10px 16px 14px; border-top: 1px solid var(--border);
+}
+.leg-item { display: flex; align-items: center; gap: 8px; font-size: 15px; color: var(--muted); font-weight: 600; }
+.leg-line { width: 28px; height: 3px; border-radius: 2px; }
+.leg-circ {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: #fff; border: 2.5px solid;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; box-shadow: var(--shadow-sm);
+}
+.leg-circ span { font-size: 12px; font-weight: 900; }
+.leg-states { display: flex; gap: 5px; }
+
+/* ── STEPS CARD ── */
+.steps-card {
+  background: var(--surface); border-radius: 12px;
+  border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden;
+}
+.steps-header {
+  padding: 10px 16px;
+  background: linear-gradient(90deg, #e3f2fd, #f8f9ff);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+  cursor: pointer; user-select: none;
+  transition: background 0.15s;
+}
+.steps-header:hover { background: linear-gradient(90deg, #bbdefb, #e8f0ff); }
+.steps-header-title { font-size: 18px; font-weight: 800; color: var(--text); flex: 1; }
+.steps-toggle-btn {
+  font-size: 12px; font-weight: 800; letter-spacing: 0.5px;
+  padding: 4px 12px; border-radius: 20px; border: none; cursor: pointer;
+  background: #1565c020; color: #1565c0; font-family: var(--sans);
+  transition: background 0.15s;
+}
+.steps-header:hover .steps-toggle-btn { background: #1565c035; }
+.steps-body { padding: 20px; display: flex; flex-direction: column; gap: 16px; }
+
+.step { display: flex; gap: 16px; }
+.step-left { display: flex; flex-direction: column; align-items: center; }
+.step-num {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--accent); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 800; flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(25,118,210,0.35);
+}
+.step-line { width: 2px; flex: 1; background: var(--border); margin-top: 4px; min-height: 10px; }
+.step-right { flex: 1; padding-bottom: 4px; }
+.step-title { font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 8px; line-height: 1.3; }
+.step-content { display: flex; flex-direction: column; gap: 5px; }
+.math-line { font-size: 15px; font-family: var(--mono); color: var(--muted); padding: 2px 0; }
+.math-line.hi  { background: var(--orange-bg); color: var(--orange); padding: 6px 13px; border-radius: 6px; border-left: 3px solid var(--orange); font-weight: 600; }
+.math-line.res { background: var(--green-bg);  color: var(--green);  padding: 6px 13px; border-radius: 6px; border-left: 3px solid #4caf50; font-weight: 700; }
+
+/* ── PROCESS 2→3 SELECTOR ── */
+.proc-selector { display: flex; gap: 6px; }
+.proc-btn {
+  flex: 1; border-radius: 8px; border: 2px solid var(--border2);
+  background: var(--surface2); padding: 10px 6px; cursor: pointer;
+  font-family: var(--sans); text-align: center; transition: all 0.15s;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.proc-btn:hover { border-color: #7b1fa2; background: #f3e5f5; }
+.proc-btn-active { border-color: #7b1fa2 !important; background: #f3e5f5 !important; box-shadow: 0 0 0 3px rgba(123,31,162,0.15); }
+.proc-btn .pb-label { font-size: 13px; font-weight: 800; color: var(--text); }
+.proc-btn .pb-eq    { font-size: 10px; color: #7b1fa2; font-family: var(--mono); font-weight:700; }
+.proc-btn .pb-type  { font-size: 10px; color: var(--dim); }
+
+/* ── GAS SELECTOR ── */
+.gas-selector { display: flex; gap: 6px; flex-wrap: wrap; }
+.gas-btn {
+  flex: 1; min-width: 80px; border-radius: 8px; border: 2px solid var(--border2);
+  background: var(--surface2); padding: 9px 8px; cursor: pointer;
+  font-family: var(--sans); text-align: center; transition: all 0.15s;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+}
+.gas-btn:hover { border-color: var(--accent); background: #e3f2fd; }
+.gas-btn-active { border-color: var(--accent) !important; background: #e3f2fd !important; box-shadow: 0 0 0 3px rgba(25,118,210,0.15); }
+.gas-btn .g-icon { font-size: 20px; }
+.gas-btn .g-name { font-size: 13px; font-weight: 800; color: var(--text); }
+.gas-btn .g-formula { font-size: 11px; color: var(--muted); font-family: var(--mono); }
+
+/* ═══════════════ WORK PANEL ═══════════════ */
+.work-card {
+  background: var(--surface); border-radius: 12px;
+  border: 1px solid var(--border); box-shadow: var(--shadow); overflow: hidden;
+}
+.work-header {
+  padding: 10px 16px;
+  background: linear-gradient(90deg, #fff8e1, #fffde7);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+.work-header-title { font-size: 18px; font-weight: 800; color: var(--text); }
+.work-body { padding: 20px; display: flex; flex-direction: column; gap: 18px; }
+
+/* Summary row */
+.work-summary {
+  display: grid; grid-template-columns: 1fr 1fr 1fr 1.2fr;
+  gap: 10px;
+}
+.work-kpi {
+  border-radius: 10px; padding: 13px 14px;
+  border: 1.5px solid; display: flex; flex-direction: column; gap: 4px;
+}
+.wk-label { font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: 0.3px; }
+.wk-proc  { font-size: 11px; color: var(--dim); }
+.wk-val   { font-family: var(--mono); font-size: 18px; font-weight: 700; margin-top: 2px; }
+.wk-unit  { font-size: 11px; font-weight: 600; opacity: 0.75; }
+
+/* Bar chart */
+.work-bars { display: flex; flex-direction: column; gap: 10px; }
+.work-bar-row { display: flex; align-items: center; gap: 12px; }
+.wbr-label { font-size: 14px; font-weight: 700; min-width: 56px; }
+.wbr-track {
+  flex: 1; height: 26px; background: #f0f4f8;
+  border-radius: 6px; overflow: visible; position: relative;
+  border: 1px solid var(--border);
+}
+.wbr-fill {
+  height: 100%; border-radius: 5px;
+  transition: width 0.3s ease; position: absolute;
+  display: flex; align-items: center;
+}
+.wbr-fill.pos { left: 50%; }
+.wbr-fill.neg { right: 50%; border-radius: 5px; }
+.wbr-zero { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 2px; background: var(--border2); border-radius: 2px; }
+.wbr-val { font-family: var(--mono); font-size: 13px; font-weight: 700; min-width: 90px; text-align: right; }
+
+/* ── SEQUENCE SELECTOR ── */
+.seq-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.seq-btn {
+  border-radius: 8px; border: 2px solid var(--border2);
+  background: var(--surface2); padding: 9px 8px; cursor: pointer;
+  font-family: var(--sans); text-align: center; transition: all 0.15s;
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+}
+.seq-btn:hover { border-color: var(--accent); background: #e3f2fd; }
+.seq-btn-active { border-color: var(--accent) !important; background: #e3f2fd !important; box-shadow: 0 0 0 3px rgba(25,118,210,0.15); }
+.seq-btn .seq-code { font-size: 15px; font-weight: 800; letter-spacing: 0.5px; display: flex; gap: 4px; align-items: center; }
+.seq-btn .seq-code .sc { font-family: var(--mono); }
+.seq-btn .seq-sub { font-size: 11px; color: var(--dim); font-weight: 600; }
+
+/* ═══════════════ RESPONSIVE ═══════════════ */
+@media (max-width: 900px) {
+  /* En pantallas estrechas se vuelve a un flujo de página normal (scroll global) */
+  body { height: auto; overflow: visible; display: block; }
+  .layout { grid-template-columns: 1fr; overflow: visible; min-height: 0; }
+  aside, main { height: auto; overflow: visible; }
+  aside { border-right: none; border-bottom: 1px solid var(--border); }
+  .process-bar { padding: 0 14px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════ HEADER ═══════════════════════ -->
+<header>
+  <div class="header-inner">
+    <div class="header-icon">🌡️</div>
+    <div class="header-text">
+      <div class="header-title">THERMOSIM</div>
+      <div class="header-sub">Simulador de ciclo cerrado</div>
+    </div>
+    <span class="header-badge" style="display:none;"></span>
+    <div class="unit-toggle" style="margin-left:12px;">
+      <button class="unit-btn active" id="btn-SI"  onclick="setUnits('SI')">SI</button>
+      <button class="unit-btn"        id="btn-ENG" onclick="setUnits('ENG')">Inglés BG</button>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════ PROCESS BAR ═══════════════════════ -->
+<div class="process-bar">
+  <div class="proc-tab t12">
+    <div class="dot"></div>
+    <span>Proceso 1→2</span>
+    <span class="proc-label" id="bar-leg0">· Isocórico (v = cte)</span>
+  </div>
+  <div class="proc-tab t23">
+    <div class="dot"></div>
+    <span>Proceso 2→3</span>
+    <span class="proc-label" id="bar-leg1">· Isotérmico (T = cte)</span>
+  </div>
+  <div class="proc-tab t31">
+    <div class="dot"></div>
+    <span>Proceso 3→1</span>
+    <span class="proc-label" id="bar-leg2">· Isobárico (p = cte)</span>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- ═══════════════════════ SIDEBAR ═══════════════════════ -->
+  <aside>
+
+    <!-- ORDEN DEL CICLO -->
+    <div class="panel-card">
+      <div class="panel-title"><span class="ico">🔀</span> Orden del Ciclo</div>
+      <div class="panel-body">
+        <div class="field-sub" style="margin-bottom:4px;">
+          Secuencia de los tres procesos sobre los tramos 1→2 · 2→3 · 3→1.
+          Cada combinación define un ciclo cerrado distinto.
+          <b>V</b>=Isocórico · <b>T</b>=Isotérmico · <b>P</b>=Isobárico.
+        </div>
+        <div class="seq-selector" id="seqSelector"></div>
+      </div>
+    </div>
+
+    <!-- SELECCIÓN DE GAS -->
+    <div class="panel-card">
+      <div class="panel-title"><span class="ico">🔬</span> Gas de Trabajo</div>
+      <div class="panel-body">
+        <div class="gas-selector">
+          <button class="gas-btn gas-btn-active" id="gas-aire" onclick="setGas('aire')">
+            <span class="g-icon">💨</span>
+            <span class="g-name">Aire</span>
+            <span class="g-formula">Air</span>
+          </button>
+          <button class="gas-btn" id="gas-helio" onclick="setGas('helio')">
+            <span class="g-icon">🎈</span>
+            <span class="g-name">Helio</span>
+            <span class="g-formula">He</span>
+          </button>
+          <button class="gas-btn" id="gas-nitrogeno" onclick="setGas('nitrogeno')">
+            <span class="g-icon">🌿</span>
+            <span class="g-name">Nitrógeno</span>
+            <span class="g-formula">N₂</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODO DEL TRAMO ISOTÉRMICO -->
+    <div class="panel-card">
+      <div class="panel-title"><span class="ico">🔄</span> Tramo Isotérmico <span id="proc23-leg-tag" style="margin-left:auto;font-size:11px;font-weight:800;letter-spacing:0.5px;padding:3px 9px;border-radius:20px;background:#7b1fa220;color:#7b1fa2;">2→3</span></div>
+      <div class="panel-body">
+        <div class="field-sub" style="margin-bottom:2px;">Variante del proceso de temperatura constante (se aplica al tramo <b>T</b> según el orden elegido).</div>
+        <div class="proc-selector">
+          <button class="proc-btn proc-btn-active" id="proc23-isotermico" onclick="setProc23('isotermico')">
+            <span class="pb-label">Isotérmico</span>
+            <span class="pb-eq">T = cte</span>
+            <span class="pb-type">n = 1</span>
+          </button>
+          <button class="proc-btn" id="proc23-adiabatico" onclick="setProc23('adiabatico')">
+            <span class="pb-label">Adiabático</span>
+            <span class="pb-eq">pv^k = cte</span>
+            <span class="pb-type">Q = 0 · n = k</span>
+          </button>
+          <button class="proc-btn" id="proc23-politropico" onclick="setProc23('politropico')">
+            <span class="pb-label">Politrópico</span>
+            <span class="pb-eq">pv^n = cte</span>
+            <span class="pb-type">n libre</span>
+          </button>
+        </div>
+        <!-- Panel de n — solo visible en proceso politrópico -->
+        <div id="n-panel" style="display:none;margin-top:14px;">
+          <div class="field-header" style="margin-bottom:4px;">
+            <span class="field-label">n — Exponente politrópico</span>
+            <span class="badge-in">Param</span>
+          </div>
+          <div class="field-sub">n ≠ 0, 1, k · Isotérmico: n=1 · Adiabático: n=k · v=cte: n=∞</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:8px;">
+            <input type="range" id="n-exp" min="1.05" max="2.50" step="0.01" value="1.30"
+                   oninput="updateN(this.value)"
+                   style="flex:1;accent-color:#7b1fa2;">
+            <span id="n-val" style="font-family:var(--mono);font-weight:800;font-size:16px;color:#7b1fa2;min-width:44px;text-align:right;">1.30</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ENTRADAS -->
+    <div class="panel-card">
+      <div class="panel-title"><span class="ico">📥</span> Datos de Entrada</div>
+      <div class="panel-body">
+
+        <div class="field">
+          <div class="field-header">
+            <span class="field-label">T₁ — Temperatura Estado 1</span>
+            <span class="badge-in">Entrada</span>
+          </div>
+          <div class="field-sub">Temperatura absoluta · T &gt; 0</div>
+          <div class="input-row">
+            <input type="number" id="T1" value="300" oninput="compute()">
+            <span class="unit-tag" id="uT">K</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-header">
+            <span class="field-label">p₁ — Presión Estado 1</span>
+            <span class="badge-in">Entrada</span>
+          </div>
+          <div class="field-sub">Presión absoluta · p &gt; 0</div>
+          <div class="input-row">
+            <input type="number" id="p1" value="101.325" oninput="compute()">
+            <span class="unit-tag" id="uP">kPa</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-header">
+            <span class="field-label" id="secLabel">p₂ — Presión Estado 2</span>
+            <span class="badge-in">Entrada</span>
+          </div>
+          <div class="field-sub" id="secHint">Define el estado 2 sobre el primer tramo del ciclo</div>
+          <div class="input-row">
+            <input type="number" id="sec" value="202.65" oninput="compute()">
+            <span class="unit-tag" id="uSec">kPa</span>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-header">
+            <span class="field-label">m — Masa del gas</span>
+            <span class="badge-in">Entrada</span>
+          </div>
+          <div class="field-sub">Escala el trabajo total del ciclo</div>
+          <div class="input-row">
+            <input type="number" id="mass" value="1" min="0.001" step="0.1" oninput="compute()">
+            <span class="unit-tag" id="uM">kg</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SALIDAS -->
+    <div class="panel-card" id="outputPanel" style="display:none;">
+      <div class="panel-title"><span class="ico">📤</span> Resultados Principales</div>
+      <div class="panel-body">
+
+        <div class="out-field">
+          <div class="out-label">
+            <span id="out-T2-label">T₂ — Temperatura Estado 2</span> <span class="badge-out">Salida</span>
+          </div>
+          <div class="out-sub" id="out-T2-sub">Temperatura del estado 2</div>
+          <div class="out-value">
+            <span class="out-num" id="out-T2">—</span>
+            <span class="out-unit" id="out-T2-u"></span>
+          </div>
+        </div>
+
+        <div class="out-field">
+          <div class="out-label">
+            <span id="out-v12-label">v₂ — Volumen específico Estado 2</span> <span class="badge-out">Salida</span>
+          </div>
+          <div class="out-sub" id="out-v12-sub">v = RT/p (ecuación de estado)</div>
+          <div class="out-value">
+            <span class="out-num" id="out-v12">—</span>
+            <span class="out-unit" id="out-v12-u"></span>
+          </div>
+        </div>
+
+        <div class="out-field">
+          <div class="out-label">
+            <span id="out-v3-label">v₃ — Volumen específico Estado 3</span> <span class="badge-out">Salida</span>
+          </div>
+          <div class="out-sub" id="out-v3-sub">v₃ = RT₃/p₃  (ecuación de estado)</div>
+          <div class="out-value">
+            <span class="out-num" id="out-v3">—</span>
+            <span class="out-unit" id="out-v3-u"></span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TABLA DE ESTADOS -->
+    <div class="panel-card">
+      <div class="panel-title"><span class="ico">📊</span> Tabla de Estados</div>
+      <div style="overflow-x:auto;">
+        <table class="state-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th id="hT">T (K)</th>
+              <th id="hP">p (kPa)</th>
+              <th id="hV">v (m³/kg)</th>
+            </tr>
+          </thead>
+          <tbody id="stateBody">
+            <tr><td colspan="4" style="color:var(--dim);padding:12px;text-align:center;font-size:11px;">Ingrese valores válidos</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ANÁLISIS POR PROCESO -->
+    <div class="panel-card" id="procPanel" style="display:none;">
+      <div class="panel-title collapsible" onclick="toggleProcCards()">
+        <span class="ico">⚙️</span> Análisis por Proceso
+        <span class="panel-toggle-btn" id="procCardsBtn">▼ Ver</span>
+      </div>
+      <div class="panel-body" id="procCards" style="display:none;"></div>
+    </div>
+
+    <!-- GAS INFO -->
+    <div class="gas-card">
+      <div class="gas-title" id="gasTitle">💨 Propiedades — Aire (Air)</div>
+      <div id="gasM"><b>M</b> = 28.97 kg/kmol &nbsp;·&nbsp; <b>R̄</b> = 8 314 J/(kmol·K)</div>
+      <div id="gasR"><b>R</b> = 0.28705 kPa·m³/(kg·K)</div>
+      <div id="gasDesc" style="color:var(--dim);margin-top:3px;font-size:9.5px;">Gas diatómico mixto, seco · Modelo: Gas ideal · pv = RT</div>
+    </div>
+
+  </aside>
+
+  <!-- ═══════════════════════ MAIN ═══════════════════════ -->
+  <main>
+
+    <!-- DIAGRAMA -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <span style="font-size:16px;">📈</span>
+        <span class="chart-header-title">Diagrama p – v del Ciclo</span>
+        <span class="chart-header-sub" id="chartSubtitle"></span>
+      </div>
+      <div class="chart-body">
+        <div class="chart-wrap">
+          <div id="chartEmpty" class="chart-empty">
+            <div class="e-icon">📉</div>
+            <div class="e-msg">Ingrese parámetros válidos para visualizar el ciclo</div>
+          </div>
+          <canvas id="pvChart" style="display:none;"></canvas>
+        </div>
+      </div>
+      <div class="legend-bar" id="legendBar" style="display:none;">
+        <div class="leg-item">
+          <div class="leg-line" style="background:var(--col1);"></div>
+          <span style="color:var(--col1);">1→2</span> &nbsp;<span id="leg-label0">Isocórico (v = cte)</span>
+        </div>
+        <div class="leg-item">
+          <div class="leg-line" style="background:var(--col2);"></div>
+          <span style="color:var(--col2);">2→3</span> &nbsp;<span id="leg-label1">Isotérmico (T = cte)</span>
+        </div>
+        <div class="leg-item">
+          <div class="leg-line" style="background:var(--col3);"></div>
+          <span style="color:var(--col3);">3→1</span> &nbsp;<span id="leg-label2">Isobárico (p = cte)</span>
+        </div>
+        <div class="leg-item" style="margin-left:auto;">
+          <div class="leg-states">
+            <div class="leg-circ" style="border-color:var(--col1);"><span style="color:var(--col1);">1</span></div>
+            <div class="leg-circ" style="border-color:var(--col2);"><span style="color:var(--col2);">2</span></div>
+            <div class="leg-circ" style="border-color:var(--col3);"><span style="color:var(--col3);">3</span></div>
+          </div>
+          <span>Estados del ciclo</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- SOLUCIÓN PASO A PASO -->
+    <div class="steps-card" id="stepsCard" style="display:none;">
+      <div class="steps-header" onclick="toggleSteps()">
+        <span style="font-size:16px;">🧮</span>
+        <span class="steps-header-title">Desarrollo Analítico — Solución Paso a Paso</span>
+        <span class="steps-toggle-btn" id="stepsToggleBtn">▼ Ver</span>
+      </div>
+      <div class="steps-body" id="stepsBody" style="display:none;"></div>
+    </div>
+
+    <!-- TRABAJO -->
+    <div class="work-card" id="workCard" style="display:none;">
+      <div class="work-header">
+        <span style="font-size:18px;">⚡</span>
+        <span class="work-header-title">Trabajo por Proceso y Trabajo Neto del Ciclo</span>
+      </div>
+      <div class="work-body">
+
+        <!-- KPI tiles -->
+        <div class="work-summary" id="workSummary"></div>
+
+        <!-- Barra horizontal comparativa -->
+        <div>
+          <div style="font-size:13px;font-weight:800;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;">
+            Distribución proporcional de trabajo
+          </div>
+          <div class="work-bars" id="workBars"></div>
+        </div>
+
+        <!-- Pasos analíticos de trabajo -->
+        <div>
+          <div onclick="toggleWorkSteps()" style="font-size:13px;font-weight:800;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:6px 0;border-bottom:1px solid var(--border);">
+            <span>Desarrollo analítico</span>
+            <span id="workStepsToggleBtn" style="font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;background:#1565c020;color:#1565c0;letter-spacing:0.5px;">▼ Ver</span>
+          </div>
+          <div class="steps-body" style="padding:0;display:none;" id="workSteps"></div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════
+//  CONSTANTES
+// ══════════════════════════════════════════════════════
+const R_BAR = 8314;  // J/(kmol·K)
+
+// ── Base de datos de gases ─────────────────────────────
+const GASES = {
+  aire:      { name:'Aire',      formula:'Air',  M:28.97,  gamma:1.400,  color:'#1565c0', icon:'💨', desc:'Gas diatómico mixto, seco'  },
+  helio:     { name:'Helio',     formula:'He',   M:4.003,  gamma:1.6667, color:'#7b1fa2', icon:'🎈', desc:'Gas noble monoatómico'      },
+  nitrogeno: { name:'Nitrógeno', formula:'N₂',   M:28.014, gamma:1.400,  color:'#2e7d32', icon:'🌿', desc:'Gas diatómico inerte'       },
+};
+
+const UNITS = {
+  SI:  { T:'K',  p:'kPa',  v:'m³/kg',  W:'kJ/kg',  Wfactor:1,            mU:'kg', Wtot:'kJ'  },
+  ENG: { T:'°R', p:'psia', v:'ft³/lb', W:'BTU/lb', Wfactor:144/778.169,  mU:'lb', Wtot:'BTU' },
+};
+
+let currentUnit  = 'SI';
+let currentGas   = 'aire';
+let currentProc23= 'isotermico';   // modo del tramo T: 'isotermico' | 'adiabatico' | 'politropico'
+let currentSeq   = 'VTP';          // permutación activa de los tres procesos
+
+// ── Secuencias posibles (asignación de tipo a cada tramo [1→2, 2→3, 3→1]) ──
+//    V = Isocórico (v=cte) · T = Isotérmico/poli · P = Isobárico (p=cte)
+const SEQUENCES = {
+  VTP: ['V','T','P'],
+  VPT: ['V','P','T'],
+  TVP: ['T','V','P'],
+  TPV: ['T','P','V'],
+  PVT: ['P','V','T'],
+  PTV: ['P','T','V'],
+};
+
+// Nombres base de cada tipo de proceso
+const PROC_NAME = { V:'Isocórico', P:'Isobárico', T:'Isotérmico' };
+
+/** Modo activo del tramo isotérmico (exponente n y etiquetas). */
+function tLegMode() {
+  if (currentProc23 === 'adiabatico')
+    return { n: getGamma(), iso:false, name:'Adiabático',  eq:`pv^k = cte · k=${getGamma().toFixed(4)}` };
+  if (currentProc23 === 'politropico') {
+    const nEl = document.getElementById('n-exp');
+    const n = nEl ? Math.max(parseFloat(nEl.value)||1.30, 1.001) : 1.30;
+    return { n, iso:false, name:'Politrópico', eq:`pv^n = cte · n=${n.toFixed(2)}` };
+  }
+  return { n:1, iso:true, name:'Isotérmico', eq:'pv = cte · T = cte' };
+}
+
+/** Texto descriptivo de un tipo de proceso (para etiquetas). */
+function legText(type) {
+  if (type === 'V') return 'Isocórico (v = cte)';
+  if (type === 'P') return 'Isobárico (p = cte)';
+  const m = tLegMode();
+  return m.iso ? 'Isotérmico (T = cte)' : `${m.name} (${currentProc23==='adiabatico'?'pv^k = cte':'pv^n = cte'})`;
+}
+
+/** Nombre corto del tipo (respeta modo del tramo T). */
+function legName(type) {
+  if (type === 'V') return 'Isocórico';
+  if (type === 'P') return 'Isobárico';
+  return tLegMode().name;
+}
+
+/** Constante específica del gas actual en las unidades activas */
+function getR() {
+  const M = GASES[currentGas].M;
+  return currentUnit === 'SI'
+    ? R_BAR / M / 1000
+    : 1545 / M / 144;
+}
+
+/** Coeficiente de expansión adiabática del gas actual */
+function getGamma() { return GASES[currentGas].gamma; }
+
+// Color por estado
+const SCOL = ['#d32f2f', '#7b1fa2', '#0277bd'];
+
+let myChart      = null;
+let currentState = null;
+
+// Drag
+let dragIdx  = -1;
+let hoverIdx = -1;
+
+
+// ══════════════════════════════════════════════════════
+//  PLUGIN: solo círculos numerados (sin pills)
+//  Con efecto hover/drag: glow + escala
+// ══════════════════════════════════════════════════════
+const stateNodePlugin = {
+  id: 'stateNodes',
+  afterDraw(chart) {
+    if (!chart._spts) return;
+    const ctx = chart.ctx;
+    const xs  = chart.scales.x;
+    const ys  = chart.scales.y;
+
+    chart._spts.forEach((pt, i) => {
+      const col     = SCOL[i];
+      const cx      = xs.getPixelForValue(pt.x);
+      const cy      = ys.getPixelForValue(pt.y);
+      const isDrag  = dragIdx  === i;
+      const isHover = hoverIdx === i;
+      const DR      = isDrag ? 19 : isHover ? 17 : 15; // radio dinámico
+
+      // Glow suave en hover/drag
+      if (isHover || isDrag) {
+        ctx.save();
+        ctx.beginPath(); ctx.arc(cx, cy, DR + 7, 0, Math.PI*2);
+        ctx.fillStyle = col + '28';
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Círculo blanco con borde coloreado
+      ctx.save();
+      ctx.beginPath(); ctx.arc(cx, cy, DR, 0, Math.PI*2);
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = isDrag ? col+'88' : 'rgba(0,0,0,0.15)';
+      ctx.shadowBlur  = isDrag ? 14 : 6;
+      ctx.shadowOffsetY = isDrag ? 0 : 2;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+      ctx.strokeStyle = col;
+      ctx.lineWidth   = isDrag ? 3.5 : isHover ? 3 : 2.5;
+      ctx.stroke();
+      ctx.restore();
+
+      // Número centrado
+      ctx.save();
+      ctx.font = `bold ${isDrag ? 16 : 14}px 'Nunito', sans-serif`;
+      ctx.fillStyle = '#1e2d3d';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(String(i + 1), cx, cy + 0.5);
+      ctx.restore();
+
+      // Caja de datos: al arrastrar o al pasar el cursor sobre cualquier estado (incl. el 3)
+      if ((isDrag || isHover) && currentState) {
+        const u   = UNITS[currentUnit];
+        const st  = currentState.states[i];
+        const vals = [
+          { label: `v${i+1}`, val: (st?st.v:pt.x).toFixed(5), unit: u.v },
+          { label: `p${i+1}`, val: (st?st.p:pt.y).toFixed(4), unit: u.p },
+          { label: `T${i+1}`, val: (st?st.T:0).toFixed(2),    unit: u.T },
+        ];
+        const TW = 170, TH = 64, TR = 6, TPad = 8;
+        let tx = cx + 18, ty = cy - 44;
+        // Mantener dentro del canvas
+        if (tx + TW > chart.chartArea.right) tx = cx - TW - 18;
+        if (ty < chart.chartArea.top) ty = cy + 18;
+
+        ctx.save();
+        ctx.shadowColor = 'rgba(0,0,0,0.15)'; ctx.shadowBlur = 8; ctx.shadowOffsetY = 3;
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.moveTo(tx+TR, ty); ctx.lineTo(tx+TW-TR, ty);
+        ctx.quadraticCurveTo(tx+TW, ty, tx+TW, ty+TR);
+        ctx.lineTo(tx+TW, ty+TH-TR);
+        ctx.quadraticCurveTo(tx+TW, ty+TH, tx+TW-TR, ty+TH);
+        ctx.lineTo(tx+TR, ty+TH);
+        ctx.quadraticCurveTo(tx, ty+TH, tx, ty+TH-TR);
+        ctx.lineTo(tx, ty+TR);
+        ctx.quadraticCurveTo(tx, ty, tx+TR, ty);
+        ctx.closePath(); ctx.fill();
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.stroke();
+
+        ctx.font = "700 11px 'Nunito', sans-serif";
+        ctx.fillStyle = col; ctx.textAlign = 'left'; ctx.textBaseline = 'top';
+        ctx.fillText(`Estado ${i+1}`, tx+TPad, ty+TPad);
+        ctx.font = "600 10px 'Source Code Pro', monospace";
+        ctx.fillStyle = '#1e2d3d';
+        vals.forEach((v, vi) => {
+          ctx.fillText(`${v.label} = ${v.val} ${v.unit}`, tx+TPad, ty+TPad+14+vi*13);
+        });
+        ctx.restore();
+      }
+    });
+  }
+};
+
+Chart.register(stateNodePlugin);
+
+// ══════════════════════════════════════════════════════
+//  UTILIDADES DE COORDENADAS
+// ══════════════════════════════════════════════════════
+
+/** Distancia en píxeles CSS entre un punto del cliente y un punto de datos */
+function pixelDist(canvas, chart, clientX, clientY, dataX, dataY) {
+  const rect = canvas.getBoundingClientRect();
+  const cx   = chart.scales.x.getPixelForValue(dataX);
+  const cy   = chart.scales.y.getPixelForValue(dataY);
+  const dx   = (clientX - rect.left) - cx;
+  const dy   = (clientY - rect.top)  - cy;
+  return Math.sqrt(dx*dx + dy*dy);
+}
+
+/** Convierte coordenadas cliente a coordenadas de datos */
+function clientToData(canvas, chart, clientX, clientY) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: chart.scales.x.getValueForPixel(clientX - rect.left),
+    y: chart.scales.y.getValueForPixel(clientY - rect.top),
+  };
+}
+
+// ══════════════════════════════════════════════════════
+//  LÓGICA DE ARRASTRE
+// ══════════════════════════════════════════════════════
+
+/**
+ * Aplica el arrastre del nodo idx a (vNew, pNew).
+ * Solo son arrastrables el Estado 1 (libre) y el Estado 2 (a lo largo del primer tramo).
+ * El Estado 3 queda determinado por el cierre del ciclo (no arrastrable).
+ */
+function applyDrag(idx, vNew, pNew) {
+  const R  = getR();
+  vNew = Math.max(vNew, 1e-9);
+  pNew = Math.max(pNew, 1e-9);
+  const tA = SEQUENCES[currentSeq][0];
+
+  if (idx === 0) {
+    // Estado 1 — arrastre libre: p1 = pNew, T1 = p1·v1/R
+    document.getElementById('T1').value = (pNew * vNew / R).toFixed(4);
+    document.getElementById('p1').value = pNew.toFixed(5);
+
+  } else if (idx === 1) {
+    // Estado 2 — depende del tipo del primer tramo
+    const p1 = parseFloat(document.getElementById('p1').value) || 101.325;
+    if (tA === 'P') {
+      // isobárico: p2 = p1; el grado de libertad es v2 → T2 = p1·v2/R
+      document.getElementById('sec').value = (p1 * vNew / R).toFixed(4);   // sec = T2
+    } else {
+      // isocórico o isotérmico/poli: el grado de libertad es p2
+      document.getElementById('sec').value = pNew.toFixed(5);             // sec = p2
+    }
+  }
+  // idx === 2 (Estado 3): no arrastrable
+
+  fastUpdate();
+}
+
+/** Detecta si el cliente está sobre algún nodo (los 3, para mostrar datos al pasar el cursor). */
+function findNearNode(canvas, chart, clientX, clientY) {
+  if (!currentState || !chart) return -1;
+  const pts = currentState.states.map(st => ({ x:st.v, y:st.p }));
+  const HIT = 22;
+  for (let i = 0; i < 3; i++) {
+    if (pixelDist(canvas, chart, clientX, clientY, pts[i].x, pts[i].y) < HIT) return i;
+  }
+  return -1;
+}
+
+/** El Estado 3 (índice 2) no es arrastrable; sí muestra datos al pasar el cursor. */
+function isDraggable(i) { return i === 0 || i === 1; }
+
+/** Adjunta los listeners de ratón/toque al canvas */
+function setupDrag(canvas) {
+
+  // ── MOUSE ──────────────────────────────────────────
+  canvas.addEventListener('mousedown', e => {
+    const i = findNearNode(canvas, myChart, e.clientX, e.clientY);
+    if (!isDraggable(i)) return;   // Estado 3 no arrastrable
+    dragIdx = i;
+    canvas.style.cursor = 'grabbing';
+    if (myChart) { myChart.options.plugins.tooltip.enabled = false; myChart.update('none'); }
+    e.preventDefault();
+  });
+
+  canvas.addEventListener('mousemove', e => {
+    if (dragIdx >= 0) {
+      const {x, y} = clientToData(canvas, myChart, e.clientX, e.clientY);
+      applyDrag(dragIdx, x, y);
+      e.preventDefault();
+      return;
+    }
+    // Actualizar cursor y hover highlight
+    const i = findNearNode(canvas, myChart, e.clientX, e.clientY);
+    if (i !== hoverIdx) {
+      hoverIdx = i;
+      canvas.style.cursor = isDraggable(i) ? 'grab' : (i >= 0 ? 'help' : 'default');
+      if (myChart) myChart.draw(); // redibuja para mostrar glow + caja de datos
+    }
+  });
+
+  canvas.addEventListener('mouseup', () => {
+    dragIdx  = -1;
+    hoverIdx = -1;
+    canvas.style.cursor = 'default';
+    if (myChart) { myChart.options.plugins.tooltip.enabled = true; myChart.draw(); }
+  });
+
+  canvas.addEventListener('mouseleave', () => {
+    dragIdx  = -1;
+    hoverIdx = -1;
+    canvas.style.cursor = 'default';
+    if (myChart) { myChart.options.plugins.tooltip.enabled = true; myChart.draw(); }
+  });
+
+  // ── TOUCH ──────────────────────────────────────────
+  canvas.addEventListener('touchstart', e => {
+    const t = e.touches[0];
+    const i = findNearNode(canvas, myChart, t.clientX, t.clientY);
+    if (!isDraggable(i)) return;   // Estado 3 no arrastrable
+    dragIdx = i;
+    if (myChart) { myChart.options.plugins.tooltip.enabled = false; myChart.update('none'); }
+    e.preventDefault();
+  }, { passive: false });
+
+  canvas.addEventListener('touchmove', e => {
+    if (dragIdx < 0) return;
+    const t = e.touches[0];
+    const {x, y} = clientToData(canvas, myChart, t.clientX, t.clientY);
+    applyDrag(dragIdx, x, y);
+    e.preventDefault();
+  }, { passive: false });
+
+  canvas.addEventListener('touchend', () => {
+    dragIdx = -1;
+    if (myChart) { myChart.options.plugins.tooltip.enabled = true; myChart.draw(); }
+  });
+}
+
+// ══════════════════════════════════════════════════════
+//  SWITCH UNIDADES
+// ══════════════════════════════════════════════════════
+function setUnits(k) {
+  currentUnit = k;
+  const u = UNITS[k];
+  document.getElementById('btn-SI').classList.toggle('active', k==='SI');
+  document.getElementById('btn-ENG').classList.toggle('active', k==='ENG');
+  document.getElementById('uT').textContent  = u.T;
+  document.getElementById('uP').textContent  = u.p;
+  document.getElementById('uM').textContent  = u.mU;
+  document.getElementById('hT').textContent  = `T (${u.T})`;
+  document.getElementById('hP').textContent  = `p (${u.p})`;
+  document.getElementById('hV').textContent  = `v (${u.v})`;
+  document.getElementById('out-T2-u').textContent  = u.T;
+  document.getElementById('out-v12-u').textContent = u.v;
+  document.getElementById('out-v3-u').textContent  = u.v;
+  if (k === 'ENG') {
+    document.getElementById('T1').value = '540';
+    document.getElementById('p1').value = '14.696';
+    document.getElementById('mass').value = '1';
+  } else {
+    document.getElementById('T1').value = '300';
+    document.getElementById('p1').value = '101.325';
+    document.getElementById('mass').value = '1';
+  }
+  refreshSecField(true);   // reajusta etiqueta, unidad y valor del campo secundario
+  updateGasInfo();
+  compute();
+}
+
+// ══════════════════════════════════════════════════════
+//  SOLVER — multi-proceso 2→3
+// ══════════════════════════════════════════════════════
+/** Trabajo específico de un tramo de tipo `type`, recorrido de A→B. */
+function legWork(type, A, B, tl) {
+  if (type === 'V') return 0;                          // dv = 0
+  if (type === 'P') return A.p * (B.v - A.v);          // p = cte
+  if (tl.iso) return A.p * A.v * Math.log(B.v / A.v);  // pv·ln(v_f/v_i)
+  return (B.p*B.v - A.p*A.v) / (1 - tl.n);             // (p_f v_f − p_i v_i)/(1−n)
+}
+
+/**
+ * Solver general. Estado 1 = (T1,p1); `sec` = parámetro secundario
+ * (p2 si el primer tramo varía presión, o T2 si el primer tramo es isobárico).
+ */
+function solve(T1, p1, sec, R) {
+  if (!T1 || !p1 || !sec || T1<=0 || p1<=0 || sec<=0) return null;
+
+  const seq = SEQUENCES[currentSeq];
+  const tA = seq[0], tB = seq[1], tC = seq[2];
+  const tl = tLegMode();
+  const n  = tl.n;
+
+  const v1 = R*T1/p1;
+  const s1 = { T:T1, p:p1, v:v1 };
+
+  // Estado 2 según el primer tramo (1→2)
+  let p2, v2, T2;
+  if (tA === 'V') {
+    v2 = v1;  p2 = sec;
+    if (Math.abs(p2 - p1) < 1e-9) return null;
+  } else if (tA === 'P') {
+    p2 = p1;  T2 = sec;
+    if (Math.abs(T2 - T1) < 1e-9) return null;
+    v2 = R*T2/p2;
+  } else {
+    p2 = sec;
+    if (Math.abs(p2 - p1) < 1e-9) return null;
+    v2 = tl.iso ? v1*(p1/p2) : v1*Math.pow(p1/p2, 1/n);
+  }
+  T2 = p2*v2/R;
+  const s2 = { T:T2, p:p2, v:v2 };
+
+  // Estado 3: cierre con tramos B (2→3) y C (3→1)
+  let v3 = null, p3 = null, polyC = null;
+  const applyLeg = (type, ref) => {
+    if (type === 'V')       v3 = ref.v;
+    else if (type === 'P')  p3 = ref.p;
+    else                    polyC = tl.iso ? ref.p*ref.v : ref.p*Math.pow(ref.v, n);
+  };
+  applyLeg(tC, s1);
+  applyLeg(tB, s2);
+  if (polyC !== null) {
+    if (v3 !== null)       p3 = tl.iso ? polyC/v3 : polyC/Math.pow(v3, n);
+    else if (p3 !== null)  v3 = tl.iso ? polyC/p3 : Math.pow(polyC/p3, 1/n);
+  }
+  if (v3 === null || p3 === null || !isFinite(v3) || !isFinite(p3) || v3 <= 0 || p3 <= 0) return null;
+  const T3 = p3*v3/R;
+  const s3 = { T:T3, p:p3, v:v3 };
+
+  const states = [s1, s2, s3];
+  const W = [
+    legWork(tA, s1, s2, tl),
+    legWork(tB, s2, s3, tl),
+    legWork(tC, s3, s1, tl),
+  ];
+  const Wnet = W[0] + W[1] + W[2];
+
+  return { states, types:[tA,tB,tC], tl, n, gam:getGamma(),
+           W, Wnet, v1, p1, T1, p2, v2, T2, p3, v3, T3 };
+}
+
+// ══════════════════════════════════════════════════════
+//  CURVAS p-v
+// ══════════════════════════════════════════════════════
+/** Genera la curva p-v de un tramo de tipo `type` recorrido de A→B. */
+function legCurve(type, A, B, tl) {
+  const N = 120, pts = [];
+  if (type === 'V') {
+    for (let i=0;i<=N;i++) pts.push({ x:A.v, y:A.p+(B.p-A.p)*(i/N) });
+  } else if (type === 'P') {
+    for (let i=0;i<=N;i++) pts.push({ x:A.v+(B.v-A.v)*(i/N), y:A.p });
+  } else if (tl.iso) {
+    const C = A.p*A.v;
+    for (let i=0;i<=N;i++){ const v=A.v+(B.v-A.v)*(i/N); pts.push({ x:v, y:C/v }); }
+  } else {
+    const Cn = A.p*Math.pow(A.v, tl.n);
+    for (let i=0;i<=N;i++){ const v=A.v+(B.v-A.v)*(i/N); pts.push({ x:v, y:Cn/Math.pow(v, tl.n) }); }
+  }
+  return pts;
+}
+
+function makeCurve(s) {
+  const [A,B,C]   = s.states;
+  const [tA,tB,tC] = s.types;
+  return {
+    s12: legCurve(tA, A, B, s.tl),   // 1→2
+    s23: legCurve(tB, B, C, s.tl),   // 2→3
+    s31: legCurve(tC, C, A, s.tl),   // 3→1
+  };
+}
+
+/** Límites de escala con margen, a partir de los tres estados. */
+function calcLimits(s) {
+  const vs = s.states.map(x=>x.v), ps = s.states.map(x=>x.p);
+  const v0=Math.min(...vs), v1=Math.max(...vs);
+  const p0=Math.min(...ps), p1=Math.max(...ps);
+  const vSp = Math.max(v1-v0, v1*0.15) || 1;
+  const pSp = Math.max(p1-p0, p1*0.15) || 1;
+  return {
+    vMin: v0 - vSp*0.30,
+    vMax: v1 + vSp*0.30,
+    pMin: p0 - pSp*0.35,
+    pMax: p1 + pSp*0.35,
+  };
+}
+
+// ══════════════════════════════════════════════════════
+//  ACTUALIZACIÓN RÁPIDA (durante arrastre — sin recrear)
+// ══════════════════════════════════════════════════════
+function readInputs() {
+  return {
+    T1:  parseFloat(document.getElementById('T1').value),
+    p1:  parseFloat(document.getElementById('p1').value),
+    sec: parseFloat(document.getElementById('sec').value),
+  };
+}
+
+/** Subtítulo del diagrama, adaptado al tipo del primer tramo. */
+function chartSubtitleText(s) {
+  const u = UNITS[currentUnit];
+  const tA = s.types[0];
+  const secTxt = (tA === 'P')
+    ? `T₂=${s.T2.toFixed(1)} ${u.T}`
+    : `p₂=${s.p2.toFixed(3)} ${u.p}`;
+  return `${currentSeq.split('').join('→')}  ·  T₁=${s.T1.toFixed(1)} ${u.T} · p₁=${s.p1.toFixed(3)} ${u.p} · ${secTxt}`;
+}
+
+function fastUpdate() {
+  const {T1,p1,sec} = readInputs();
+  const s  = solve(T1, p1, sec, getR());
+
+  currentState = s;
+  renderOutputs(s);
+  renderTable(s);
+  renderCards(s);
+  renderWork(s);
+  renderSteps(s);
+
+  if (!s) return;
+
+  if (myChart) {
+    const {s12, s23, s31} = makeCurve(s);
+    myChart.data.datasets[0].data = s12;
+    myChart.data.datasets[1].data = s23;
+    myChart.data.datasets[2].data = s31;
+
+    const {vMin,vMax,pMin,pMax} = calcLimits(s);
+    myChart.options.scales.x.min = vMin;
+    myChart.options.scales.x.max = vMax;
+    myChart.options.scales.y.min = pMin;
+    myChart.options.scales.y.max = pMax;
+
+    const u = UNITS[currentUnit];
+    myChart.options.scales.x.title.text = `Volumen específico  v  (${u.v})`;
+    myChart.options.scales.y.title.text = `Presión  p  (${u.p})`;
+
+    myChart._spts = s.states.map(st => ({ x:st.v, y:st.p }));
+
+    document.getElementById('chartSubtitle').textContent = chartSubtitleText(s);
+
+    myChart.update('none');
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  CREACIÓN DEL DIAGRAMA (solo la primera vez o tras reset)
+// ══════════════════════════════════════════════════════
+function renderChart(s) {
+  const canvas = document.getElementById('pvChart');
+  const empty  = document.getElementById('chartEmpty');
+  const legBar = document.getElementById('legendBar');
+  const sub    = document.getElementById('chartSubtitle');
+
+  if (!s) {
+    canvas.style.display = 'none';
+    empty.style.display  = 'flex';
+    legBar.style.display = 'none';
+    sub.textContent = '';
+    if (myChart) { myChart.destroy(); myChart = null; }
+    return;
+  }
+
+  canvas.style.display = 'block';
+  empty.style.display  = 'none';
+  legBar.style.display = 'flex';
+
+  const u = UNITS[currentUnit];
+  sub.textContent = chartSubtitleText(s);
+
+  const {s12,s23,s31}   = makeCurve(s);
+  const {vMin,vMax,pMin,pMax} = calcLimits(s);
+  const dlabels = [
+    `1→2 ${legName(s.types[0])}`,
+    `2→3 ${legName(s.types[1])}`,
+    `3→1 ${legName(s.types[2])}`,
+  ];
+
+  // Si ya existe el chart, solo actualizar (no destruir)
+  if (myChart) {
+    myChart.data.datasets[0].data = s12; myChart.data.datasets[0].label = dlabels[0];
+    myChart.data.datasets[1].data = s23; myChart.data.datasets[1].label = dlabels[1];
+    myChart.data.datasets[2].data = s31; myChart.data.datasets[2].label = dlabels[2];
+    myChart.options.scales.x.min = vMin; myChart.options.scales.x.max = vMax;
+    myChart.options.scales.y.min = pMin; myChart.options.scales.y.max = pMax;
+    myChart.options.scales.x.title.text = `Volumen específico  v  (${u.v})`;
+    myChart.options.scales.y.title.text = `Presión  p  (${u.p})`;
+    myChart._spts = s.states.map(st => ({ x:st.v, y:st.p }));
+    myChart.update('none');
+    return;
+  }
+
+  // Primera creación
+  myChart = new Chart(canvas, {
+    type: 'scatter',
+    data: {
+      datasets: [
+        { label:dlabels[0], data:s12, showLine:true, borderColor:'#d32f2f', borderWidth:2.5, pointRadius:0, tension:0 },
+        { label:dlabels[1], data:s23, showLine:true, borderColor:'#7b1fa2', borderWidth:2.5, pointRadius:0, tension:0 },
+        { label:dlabels[2], data:s31, showLine:true, borderColor:'#0277bd', borderWidth:2.5, pointRadius:0, tension:0 },
+      ],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 200 },
+      layout: { padding: { top:40, right:40, bottom:8, left:8 } },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          enabled: true,
+          backgroundColor: '#fff',
+          borderColor: '#dde3ec', borderWidth: 1,
+          titleColor: '#5a7184', bodyColor: '#1e2d3d',
+          titleFont: { family:"'Nunito',sans-serif", size:14, weight:'600' },
+          bodyFont:  { family:"'Source Code Pro',monospace", size:15, weight:'600' },
+          padding: 12,
+          callbacks: {
+            title: () => '',
+            label: ctx => ` v = ${ctx.raw.x.toFixed(5)} ${u.v}   p = ${ctx.raw.y.toFixed(4)} ${u.p}`,
+          },
+        },
+      },
+      scales: {
+        x: {
+          type: 'linear', min: vMin, max: vMax,
+          title: { display:true, text:`Volumen específico  v  (${u.v})`, color:'#5a7184', font:{ family:"'Nunito',sans-serif", size:15, weight:'700' } },
+          ticks: { color:'#8fa3b8', font:{ size:14 }, maxTicksLimit:8 },
+          grid:  { color:'#e8eef5' }, border: { color:'#c8d2e0' },
+        },
+        y: {
+          type: 'linear', min: pMin, max: pMax,
+          title: { display:true, text:`Presión  p  (${u.p})`, color:'#5a7184', font:{ family:"'Nunito',sans-serif", size:15, weight:'700' } },
+          ticks: { color:'#8fa3b8', font:{ size:14 }, maxTicksLimit:7 },
+          grid:  { color:'#e8eef5' }, border: { color:'#c8d2e0' },
+        },
+      },
+    },
+  });
+
+  myChart._spts = s.states.map(st => ({ x:st.v, y:st.p }));
+
+  // Adjuntar drag al canvas recién creado
+  setupDrag(canvas);
+}
+
+// ══════════════════════════════════════════════════════
+//  RENDERIZADO DE SALIDAS
+// ══════════════════════════════════════════════════════
+function renderOutputs(s) {
+  const p = document.getElementById('outputPanel');
+  if (!s) { p.style.display='none'; return; }
+  p.style.display = 'block';
+  const u = UNITS[currentUnit];
+  const set = (id, v) => { const e=document.getElementById(id); if(e) e.textContent = v; };
+
+  // Campo 1 — T₂
+  set('out-T2', s.T2.toFixed(2));
+  set('out-T2-u', u.T);
+  set('out-T2-label', 'T₂ — Temperatura Estado 2');
+  set('out-T2-sub', `Tramo 1→2 ${legName(s.types[0]).toLowerCase()}`);
+
+  // Campo 2 — v₂
+  set('out-v12', s.v2.toFixed(5));
+  set('out-v12-u', u.v);
+  set('out-v12-label', 'v₂ — Volumen específico Estado 2');
+  set('out-v12-sub', s.types[0]==='V' ? 'v₂ = v₁ (tramo isocórico)' : 'v₂ = RT₂/p₂ (ecuación de estado)');
+
+  // Campo 3 — v₃
+  set('out-v3', s.v3.toFixed(5));
+  set('out-v3-u', u.v);
+  set('out-v3-label', 'v₃ — Volumen específico Estado 3');
+  set('out-v3-sub', 'v₃ = RT₃/p₃ (cierre del ciclo)');
+}
+
+// ══════════════════════════════════════════════════════
+//  TABLA DE ESTADOS
+// ══════════════════════════════════════════════════════
+function renderTable(s) {
+  const b = document.getElementById('stateBody');
+  if (!s) {
+    b.innerHTML = `<tr><td colspan="4" style="color:var(--dim);padding:12px;text-align:center;font-size:11px;">Ingrese valores válidos</td></tr>`;
+    return;
+  }
+  const rows = [
+    {id:1,T:s.T1,p:s.p1,v:s.v1},
+    {id:2,T:s.T2,p:s.p2,v:s.v2},
+    {id:3,T:s.T3,p:s.p3,v:s.v3},
+  ];
+  b.innerHTML = rows.map(r => `
+    <tr>
+      <td class="st-id st-id-${r.id}">${r.id}</td>
+      <td class="st-T">${r.T.toFixed(2)}</td>
+      <td class="st-p">${r.p.toFixed(4)}</td>
+      <td class="st-v">${r.v.toFixed(5)}</td>
+    </tr>`).join('');
+}
+
+// ══════════════════════════════════════════════════════
+//  CARDS DE PROCESO
+// ══════════════════════════════════════════════════════
+function renderCards(s) {
+  const sec   = document.getElementById('procPanel');
+  const cards = document.getElementById('procCards');
+  if (!s) { sec.style.display='none'; return; }
+  sec.style.display = 'block';
+  const u = UNITS[currentUnit];
+
+  const palette = [
+    { col:'#d32f2f', bg:'#ffebee', border:'#ef9a9a' },  // 1→2
+    { col:'#7b1fa2', bg:'#f3e5f5', border:'#ce93d8' },  // 2→3
+    { col:'#0277bd', bg:'#e1f5fe', border:'#81d4fa' },  // 3→1
+  ];
+  const posLabel = ['1→2','2→3','3→1'];
+  const sign = v => v>=0 ? '+' : '';
+  const tl = s.tl;
+
+  const cardRows = (type, A, B) => {
+    const dT = `${sign(B.T-A.T)}${(B.T-A.T).toFixed(2)} ${u.T}`;
+    const dp = `${sign(B.p-A.p)}${(B.p-A.p).toFixed(4)} ${u.p}`;
+    const dv = `${sign(B.v-A.v)}${(B.v-A.v).toFixed(5)} ${u.v}`;
+    if (type === 'V') return [
+      ['Relación', `p_f/p_i = T_f/T_i = ${(B.p/A.p).toFixed(4)}`],
+      ['ΔT', dT], ['Δp', dp], ['Δv', '0  (v = cte)'],
+    ];
+    if (type === 'P') return [
+      ['Relación', `v_f/v_i = T_f/T_i = ${(B.v/A.v).toFixed(4)}`],
+      ['ΔT', dT], ['Δv', dv], ['Δp', '0  (p = cte)'],
+    ];
+    // tramo T
+    return [
+      ['Relación', tl.eq],
+      ['Δv', dv], ['Δp', dp],
+      ['ΔT', `${(B.T-A.T).toFixed(2)} ${u.T}${tl.iso?' (T = cte)':''}`],
+      ['Nota', tl.iso ? 'W = mRT·ln(v_f/v_i) = mRT·ln(p_i/p_f)' : `W = (p_f v_f − p_i v_i)/(1−n) · n=${tl.n.toFixed(4)}`],
+    ];
+  };
+
+  const defs = s.types.map((type, i) => {
+    const A = s.states[i], B = s.states[(i+1)%3];
+    return { ...palette[i], label:posLabel[i], name:legName(type), rows:cardRows(type, A, B) };
+  });
+
+  cards.innerHTML = defs.map(d => `
+    <div class="proc-info-card" style="background:${d.bg};border:1px solid ${d.border};border-left:4px solid ${d.col};">
+      <div class="pic-title" style="color:${d.col};">
+        Proceso ${d.label}
+        <span class="pic-tag" style="background:${d.col}22;color:${d.col};">${d.name}</span>
+      </div>
+      <div class="pic-rows">
+        ${d.rows.map(([k,v])=>`
+          <div class="pic-row">
+            <span class="pic-key">${k}</span>
+            <span class="pic-val">${v}</span>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+  cards.style.display = procCardsOpen ? 'flex' : 'none';
+  document.getElementById('procCardsBtn').textContent = procCardsOpen ? '▲ Ocultar' : '▼ Ver';
+}
+
+// ══════════════════════════════════════════════════════
+//  TRABAJO POR PROCESO
+// ══════════════════════════════════════════════════════
+function renderWork(s) {
+  const card = document.getElementById('workCard');
+  if (!s) { card.style.display='none'; return; }
+  card.style.display = 'block';
+
+  const u    = UNITS[currentUnit];
+  const f    = u.Wfactor;
+  const mass = Math.max(parseFloat(document.getElementById('mass').value)||1, 1e-9);
+
+  const Wsp  = s.W.map(w => w*f);          // trabajo específico (unidad actual)
+  const Wn   = s.Wnet * f;
+  const Wtot = Wsp.map(w => w*mass);       // trabajo total (× masa)
+  const TWn  = Wn * mass;
+
+  const sign = v => v >= 0 ? '+' : '';
+  const fmt  = v => `${sign(v)}${v.toFixed(4)}`;
+
+  const sub    = ['₁₂','₂₃','₃₁'];
+  const posPal = [
+    { col:'#d32f2f', bg:'#ffebee', border:'#ef9a9a' },
+    { col:'#7b1fa2', bg:'#f3e5f5', border:'#ce93d8' },
+    { col:'#0277bd', bg:'#e1f5fe', border:'#81d4fa' },
+  ];
+
+  // ── KPI tiles — específico y total ────────────────
+  const kpis = s.types.map((t,i) => ({
+    label:`W${sub[i]}`, proc:legName(t), sp:Wsp[i], tot:Wtot[i], ...posPal[i],
+  }));
+  kpis.push({ label:'W_net', proc:'Ciclo total', sp:Wn, tot:TWn,
+    col: Wn>=0 ? '#2e7d32' : '#c62828',
+    bg:  Wn>=0 ? '#e8f5e9' : '#ffebee',
+    border: Wn>=0 ? '#a5d6a7' : '#ef9a9a' });
+
+  document.getElementById('workSummary').innerHTML = kpis.map(k => `
+    <div class="work-kpi" style="background:${k.bg};border-color:${k.border};">
+      <div class="wk-label" style="color:${k.col};">${k.label}</div>
+      <div class="wk-proc">${k.proc}</div>
+      <div class="wk-val" style="color:${k.col};">${fmt(k.sp)}</div>
+      <div class="wk-unit">${u.W}</div>
+      <div style="border-top:1px solid ${k.border};margin:5px 0;"></div>
+      <div class="wk-proc">Total · m = ${mass} ${u.mU}</div>
+      <div class="wk-val" style="color:${k.col};font-size:15px;">${fmt(k.tot)}</div>
+      <div class="wk-unit">${u.Wtot}</div>
+    </div>`).join('');
+
+  // ── Barras proporcionales ──────────────────────────
+  const ws   = [...Wsp, Wn];
+  const labs = [`W${sub[0]}`, `W${sub[1]}`, `W${sub[2]}`, 'W_net'];
+  const cols = [posPal[0].col, posPal[1].col, posPal[2].col, Wn>=0?'#2e7d32':'#c62828'];
+  const maxAbs = Math.max(...ws.map(Math.abs), 1e-12);
+
+  document.getElementById('workBars').innerHTML = ws.map((w, i) => {
+    const pct = Math.abs(w) / maxAbs * 50;
+    const isPos = w >= 0;
+    return `
+      <div class="work-bar-row">
+        <div class="wbr-label" style="color:${cols[i]};">${labs[i]}</div>
+        <div class="wbr-track">
+          <div class="wbr-zero"></div>
+          <div class="wbr-fill ${isPos?'pos':'neg'}"
+               style="width:${pct}%;background:${cols[i]}22;border:1.5px solid ${cols[i]}88;">
+          </div>
+        </div>
+        <div class="wbr-val" style="color:${cols[i]};">${fmt(w)} <span style="font-size:11px;opacity:0.7;">${u.W}</span></div>
+      </div>`;
+  }).join('');
+
+  // ── Pasos analíticos de trabajo (por tramo, según tipo) ──
+  const mLabel = `m = ${mass} ${u.mU}`;
+  const posTitle = ['1→2','2→3','3→1'];
+  const tl = s.tl;
+
+  const workLines = (type, A, B, i) => {
+    const Wi = `W${sub[i]}`;
+    const tail = {t:'r', s:`${Wi} = ${fmt(Wsp[i])} ${u.W}   →   ${mLabel}: ${fmt(Wtot[i])} ${u.Wtot}${Wsp[i]<0?'  [sobre el sistema]':''}`};
+    if (type === 'V') return [
+      {t:'n', s:`Volumen constante  →  dv = 0`},
+      {t:'n', s:`${Wi} = ∫ p dv = 0`},
+      tail,
+    ];
+    if (type === 'P') return [
+      {t:'n', s:`Presión constante  p = ${A.p.toFixed(4)} ${u.p}`},
+      {t:'n', s:`${Wi} = ∫ p dv = p·(v_f − v_i)`},
+      {t:'h', s:`${Wi} = ${A.p.toFixed(4)} × (${B.v.toFixed(5)} − ${A.v.toFixed(5)})`},
+      tail,
+    ];
+    if (tl.iso) return [
+      {t:'n', s:`Isotérmico:  pv = cte  →  W = mRT·ln(v_f/v_i) = mRT·ln(p_i/p_f)`},
+      {t:'h', s:`${Wi} = ${(A.p*A.v).toFixed(5)} × ln(${B.v.toFixed(5)}/${A.v.toFixed(5)}) = ${(A.p*A.v).toFixed(5)} × ${Math.log(B.v/A.v).toFixed(6)}`},
+      tail,
+    ];
+    return [
+      {t:'n', s:`${tl.name}:  pv^n = cte  ·  n = ${tl.n.toFixed(4)}`},
+      {t:'n', s:`W = (p_f v_f − p_i v_i)/(1−n)`},
+      {t:'h', s:`${Wi} = (${(B.p*B.v).toFixed(5)} − ${(A.p*A.v).toFixed(5)}) / (1 − ${tl.n.toFixed(4)})`},
+      tail,
+    ];
+  };
+
+  const letter = ['a','b','c'];
+  const wSteps = s.types.map((type, i) => {
+    const A = s.states[i], B = s.states[(i+1)%3];
+    return { n:letter[i], col:posPal[i].col,
+      title:`Proceso ${posTitle[i]} — Trabajo ${legName(type)}`,
+      lines: workLines(type, A, B, i) };
+  });
+  wSteps.push({ n:'d', col: Wn>=0?'#2e7d32':'#c62828', title:'Trabajo Neto del Ciclo', lines:[
+      {t:'n', s:`W_net = W${sub[0]} + W${sub[1]} + W${sub[2]}`},
+      {t:'h', s:`W_net = ${fmt(Wsp[0])} + ${fmt(Wsp[1])} + ${fmt(Wsp[2])}`},
+      {t:'r', s:`W_net = ${fmt(Wn)} ${u.W}   →   ${mLabel}: ${fmt(TWn)} ${u.Wtot}`},
+      {t:'r', s: Wn>0 ? '→ Ciclo motor: el sistema produce trabajo neto' : (Wn<0 ? '→ Ciclo inverso: el sistema consume trabajo neto' : '→ Trabajo neto nulo')},
+  ]});
+
+  const isLastW = i => i === wSteps.length - 1;
+  const workStepsEl = document.getElementById('workSteps');
+  workStepsEl.innerHTML = wSteps.map((st, si) => `
+    <div class="step">
+      <div class="step-left">
+        <div class="step-num" style="background:${st.col};">${st.n}</div>
+        ${!isLastW(si) ? '<div class="step-line"></div>' : ''}
+      </div>
+      <div class="step-right">
+        <div class="step-title">${st.title}</div>
+        <div class="step-content">
+          ${st.lines.map(l=>`<div class="math-line ${l.t==='h'?'hi':l.t==='r'?'res':''}">${l.s}</div>`).join('')}
+        </div>
+      </div>
+    </div>`).join('');
+  workStepsEl.style.display = workStepsOpen ? 'flex' : 'none';
+  document.getElementById('workStepsToggleBtn').textContent = workStepsOpen ? '▲ Ocultar' : '▼ Ver';
+}
+
+// ══════════════════════════════════════════════════════
+//  PASOS ANALÍTICOS
+// ══════════════════════════════════════════════════════
+function renderSteps(s) {
+  const card = document.getElementById('stepsCard');
+  const body = document.getElementById('stepsBody');
+  if (!s) { card.style.display='none'; return; }
+  card.style.display = 'block';
+  // Respetar estado abierto/cerrado
+  document.getElementById('stepsBody').style.display = stepsOpen ? 'flex' : 'none';
+  document.getElementById('stepsToggleBtn').textContent = stepsOpen ? '▲ Ocultar' : '▼ Ver';
+  const u  = UNITS[currentUnit];
+  const R  = getR();
+  const tl = s.tl;
+  const [tA,tB,tC] = s.types;
+  const s1 = s.states[0], s2 = s.states[1];
+
+  // ── Paso 2: Estado 2 (tramo 1→2) ──
+  let step2lines;
+  if (tA === 'V') {
+    step2lines = [
+      {t:'n', s:`Tramo 1→2 isocórico:  v₂ = v₁ = ${s.v1.toFixed(6)} ${u.v}`},
+      {t:'n', s:`Dato: p₂ = ${s.p2.toFixed(4)} ${u.p}  ·  T₂ = p₂·v₂/R`},
+      {t:'h', s:`T₂ = ${s.p2.toFixed(4)} × ${s.v2.toFixed(6)} / ${R.toFixed(5)}`},
+      {t:'r', s:`T₂ = ${s.T2.toFixed(2)} ${u.T}`},
+    ];
+  } else if (tA === 'P') {
+    step2lines = [
+      {t:'n', s:`Tramo 1→2 isobárico:  p₂ = p₁ = ${s.p1.toFixed(4)} ${u.p}`},
+      {t:'n', s:`Dato: T₂ = ${s.T2.toFixed(2)} ${u.T}  ·  v₂ = R·T₂/p₂`},
+      {t:'h', s:`v₂ = ${R.toFixed(5)} × ${s.T2.toFixed(2)} / ${s.p2.toFixed(4)}`},
+      {t:'r', s:`v₂ = ${s.v2.toFixed(6)} ${u.v}`},
+    ];
+  } else if (tl.iso) {
+    step2lines = [
+      {t:'n', s:`Tramo 1→2 isotérmico:  T₂ = T₁ = ${s.T1.toFixed(2)} ${u.T}  ·  pv = cte`},
+      {t:'n', s:`Dato: p₂ = ${s.p2.toFixed(4)} ${u.p}  ·  v₂ = v₁·(p₁/p₂)`},
+      {t:'h', s:`v₂ = ${s.v1.toFixed(6)} × (${s.p1.toFixed(4)}/${s.p2.toFixed(4)})`},
+      {t:'r', s:`v₂ = ${s.v2.toFixed(6)} ${u.v}`},
+    ];
+  } else {
+    step2lines = [
+      {t:'n', s:`Tramo 1→2 ${tl.name.toLowerCase()}:  pv^n = cte  ·  n = ${tl.n.toFixed(4)}`},
+      {t:'n', s:`Dato: p₂ = ${s.p2.toFixed(4)} ${u.p}  ·  v₂ = v₁·(p₁/p₂)^(1/n)`},
+      {t:'h', s:`v₂ = ${s.v1.toFixed(6)} × (${s.p1.toFixed(4)}/${s.p2.toFixed(4)})^(1/${tl.n.toFixed(4)})`},
+      {t:'r', s:`v₂ = ${s.v2.toFixed(6)} ${u.v}`},
+      {t:'h', s:`T₂ = p₂·v₂/R = ${s.p2.toFixed(4)} × ${s.v2.toFixed(6)} / ${R.toFixed(5)}`},
+      {t:'r', s:`T₂ = ${s.T2.toFixed(2)} ${u.T}`},
+    ];
+  }
+
+  // ── Paso 3: Estado 3 (cierre con tramos 2→3 y 3→1) ──
+  const constraintLine = (type, sub, ref) => {
+    if (type === 'V') return {t:'h', s:`Isocórico:  v₃ = v${sub} = ${ref.v.toFixed(6)} ${u.v}`};
+    if (type === 'P') return {t:'h', s:`Isobárico:  p₃ = p${sub} = ${ref.p.toFixed(4)} ${u.p}`};
+    if (tl.iso)       return {t:'h', s:`Isotérmico:  p₃v₃ = p${sub}v${sub} = ${(ref.p*ref.v).toFixed(5)}`};
+    return {t:'h', s:`${tl.name}:  p₃v₃^n = p${sub}v${sub}^n = ${(ref.p*Math.pow(ref.v,tl.n)).toFixed(5)}  (n=${tl.n.toFixed(4)})`};
+  };
+  const step3lines = [
+    {t:'n', s:`Estado 3 por cierre del ciclo: tramo 2→3 (${legName(tB)}) y tramo 3→1 (${legName(tC)})`},
+    constraintLine(tC, '1', s1),   // 3→1 referencia estado 1
+    constraintLine(tB, '2', s2),   // 2→3 referencia estado 2
+    {t:'r', s:`p₃ = ${s.p3.toFixed(4)} ${u.p}  ·  v₃ = ${s.v3.toFixed(6)} ${u.v}  ·  T₃ = p₃v₃/R = ${s.T3.toFixed(2)} ${u.T}`},
+  ];
+
+  const steps = [
+    { n:1, title:'Estado 1 — Volumen Específico mediante Ecuación de Estado', lines:[
+        {t:'n', s:`Dados:  T₁ = ${s.T1.toFixed(2)} ${u.T}     p₁ = ${s.p1.toFixed(4)} ${u.p}`},
+        {t:'n', s:`Gas ideal: pv = RT  →  v = RT / p`},
+        {t:'h', s:`v₁ = (${R.toFixed(5)}) × ${s.T1.toFixed(2)} / ${s.p1.toFixed(4)}`},
+        {t:'r', s:`v₁ = ${s.v1.toFixed(6)} ${u.v}`},
+    ]},
+    { n:2, title:`Tramo 1→2 ${legName(tA)} — Estado 2`, lines: step2lines },
+    { n:3, title:`Estado 3 — Cierre del Ciclo (tramos 2→3 ${legName(tB)} · 3→1 ${legName(tC)})`, lines: step3lines },
+    { n:4, title:'Verificación — Ecuación de Estado en los Tres Estados', lines:[
+        {t:'n', s:`p₁v₁ = ${(s.p1*s.v1).toFixed(5)}   ·   R·T₁ = ${(R*s.T1).toFixed(5)}`},
+        {t:'n', s:`p₂v₂ = ${(s.p2*s.v2).toFixed(5)}   ·   R·T₂ = ${(R*s.T2).toFixed(5)}`},
+        {t:'n', s:`p₃v₃ = ${(s.p3*s.v3).toFixed(5)}   ·   R·T₃ = ${(R*s.T3).toFixed(5)}`},
+        {t:'r', s: (Math.abs(s.p1*s.v1-R*s.T1)+Math.abs(s.p2*s.v2-R*s.T2)+Math.abs(s.p3*s.v3-R*s.T3)) < 1e-4
+            ? '✓  Consistencia verificada:  pv = RT en los tres estados'
+            : 'Revisar consistencia de la ecuación de estado'},
+    ]},
+  ];
+
+  const isLast = i => i === steps.length - 1;
+  body.innerHTML = steps.map((st, si) => `
+    <div class="step">
+      <div class="step-left">
+        <div class="step-num">${st.n}</div>
+        ${!isLast(si) ? '<div class="step-line"></div>' : ''}
+      </div>
+      <div class="step-right">
+        <div class="step-title">${st.title}</div>
+        <div class="step-content">
+          ${st.lines.map(l=>`<div class="math-line ${l.t==='h'?'hi':l.t==='r'?'res':''}">${l.s}</div>`).join('')}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════════════════
+//  ETIQUETAS DINÁMICAS (barra de procesos, leyenda, tag)
+// ══════════════════════════════════════════════════════
+function refreshLabels() {
+  const types = SEQUENCES[currentSeq];
+  for (let i=0; i<3; i++) {
+    const bar = document.getElementById(`bar-leg${i}`);
+    const leg = document.getElementById(`leg-label${i}`);
+    if (bar) bar.textContent = '· ' + legText(types[i]);
+    if (leg) leg.textContent = legText(types[i]);
+  }
+  // Posición del tramo isotérmico (tipo 'T') para el tag del panel
+  const tPos = types.indexOf('T');
+  const posLabel = ['1→2','2→3','3→1'][tPos];
+  const tag = document.getElementById('proc23-leg-tag');
+  if (tag) tag.textContent = posLabel;
+}
+
+// ══════════════════════════════════════════════════════
+//  SELECTOR DE ORDEN (6 secuencias)
+// ══════════════════════════════════════════════════════
+function buildSeqSelector() {
+  const cont = document.getElementById('seqSelector');
+  if (!cont) return;
+  cont.innerHTML = Object.keys(SEQUENCES).map(key => {
+    const t = SEQUENCES[key];
+    return `
+      <button class="seq-btn${key===currentSeq?' seq-btn-active':''}" id="seq-${key}" onclick="setSeq('${key}')">
+        <span class="seq-code"><span class="sc">${t[0]}</span>→<span class="sc">${t[1]}</span>→<span class="sc">${t[2]}</span></span>
+        <span class="seq-sub">1→2 · 2→3 · 3→1</span>
+      </button>`;
+  }).join('');
+}
+
+function setSeq(key) {
+  if (!SEQUENCES[key]) return;
+  const prevTempDriver = SEQUENCES[currentSeq][0] === 'P';
+  currentSeq = key;
+  Object.keys(SEQUENCES).forEach(k =>
+    document.getElementById(`seq-${k}`)?.classList.toggle('seq-btn-active', k === key));
+  const tempDriver = SEQUENCES[key][0] === 'P';
+  // Si cambia el tipo de parámetro secundario (presión↔temperatura), reiniciar el campo
+  refreshSecField(prevTempDriver !== tempDriver);
+  refreshLabels();
+  compute();
+}
+
+// ══════════════════════════════════════════════════════
+//  CAMPO SECUNDARIO ADAPTABLE (p₂ o T₂)
+// ══════════════════════════════════════════════════════
+function secDefault() {
+  const tempDriver = SEQUENCES[currentSeq][0] === 'P';
+  if (currentUnit === 'SI') return tempDriver ? 450 : 202.65;
+  return tempDriver ? 810 : 29.392;
+}
+
+function refreshSecField(resetValue) {
+  const tempDriver = SEQUENCES[currentSeq][0] === 'P';
+  const u = UNITS[currentUnit];
+  const label = document.getElementById('secLabel');
+  const hint  = document.getElementById('secHint');
+  const unit  = document.getElementById('uSec');
+  const input = document.getElementById('sec');
+  if (tempDriver) {
+    if (label) label.textContent = 'T₂ — Temperatura Estado 2';
+    if (hint)  hint.textContent  = 'El primer tramo es isobárico (p₂ = p₁); T₂ fija el estado 2 · T₂ ≠ T₁';
+    if (unit)  unit.textContent  = u.T;
+  } else {
+    if (label) label.textContent = 'p₂ — Presión Estado 2';
+    if (hint)  hint.textContent  = 'Define el estado 2 sobre el primer tramo del ciclo · p₂ ≠ p₁';
+    if (unit)  unit.textContent  = u.p;
+  }
+  if (resetValue && input) input.value = secDefault();
+}
+
+// ══════════════════════════════════════════════════════
+//  MODO DEL TRAMO ISOTÉRMICO (isotérmico/adiabático/politrópico)
+// ══════════════════════════════════════════════════════
+function setProc23(key) {
+  currentProc23 = key;
+  ['isotermico','adiabatico','politropico'].forEach(k => {
+    document.getElementById(`proc23-${k}`)?.classList.toggle('proc-btn-active', k === key);
+  });
+  const nPanel = document.getElementById('n-panel');
+  if (nPanel) nPanel.style.display = key === 'politropico' ? 'block' : 'none';
+  refreshLabels();
+  compute();
+}
+
+function updateN(val) {
+  document.getElementById('n-val').textContent = parseFloat(val).toFixed(2);
+  refreshLabels();
+  compute();
+}
+
+// ══════════════════════════════════════════════════════
+//  SELECCIÓN DE GAS
+// ══════════════════════════════════════════════════════
+function setGas(key) {
+  currentGas = key;
+  // Actualizar botones
+  Object.keys(GASES).forEach(k => {
+    const btn = document.getElementById(`gas-${k}`);
+    if (btn) btn.classList.toggle('gas-btn-active', k === key);
+  });
+  updateGasInfo();
+  compute();
+}
+
+function updateGasInfo() {
+  const g  = GASES[currentGas];
+  const R  = getR();
+  const u  = UNITS[currentUnit];
+  const Ru = currentUnit === 'SI' ? 'kPa·m³/(kg·K)' : 'psia·ft³/(lb·°R)';
+  document.getElementById('gasTitle').textContent = `${g.icon} Propiedades — ${g.name} (${g.formula})`;
+  document.getElementById('gasM').innerHTML = `<b>M</b> = ${g.M} kg/kmol &nbsp;·&nbsp; <b>k</b> = ${g.gamma.toFixed(4)} &nbsp;·&nbsp; <b>R̄</b> = 8 314 J/(kmol·K)`;
+  document.getElementById('gasR').innerHTML   = `<b>R</b> = ${R.toFixed(5)} ${Ru}`;
+  document.getElementById('gasDesc').textContent = g.desc;
+}
+
+// ══════════════════════════════════════════════════════
+//  TOGGLE DESARROLLO ANALÍTICO
+// ══════════════════════════════════════════════════════
+let stepsOpen     = false;
+let workStepsOpen = false;
+let procCardsOpen = false;
+
+function toggleSteps() {
+  stepsOpen = !stepsOpen;
+  const body = document.getElementById('stepsBody');
+  const btn  = document.getElementById('stepsToggleBtn');
+  body.style.display = stepsOpen ? 'flex' : 'none';
+  btn.textContent    = stepsOpen ? '▲ Ocultar' : '▼ Ver';
+}
+
+function toggleWorkSteps() {
+  workStepsOpen = !workStepsOpen;
+  const body = document.getElementById('workSteps');
+  const btn  = document.getElementById('workStepsToggleBtn');
+  body.style.display = workStepsOpen ? 'flex' : 'none';
+  btn.textContent    = workStepsOpen ? '▲ Ocultar' : '▼ Ver';
+}
+
+function toggleProcCards() {
+  procCardsOpen = !procCardsOpen;
+  const body = document.getElementById('procCards');
+  const btn  = document.getElementById('procCardsBtn');
+  body.style.display = procCardsOpen ? 'flex' : 'none';
+  btn.textContent    = procCardsOpen ? '▲ Ocultar' : '▼ Ver';
+}
+
+// ══════════════════════════════════════════════════════
+//  COMPUTE (disparado por los inputs de texto)
+// ══════════════════════════════════════════════════════
+function compute() {
+  const {T1,p1,sec} = readInputs();
+  const s  = solve(T1, p1, sec, getR());
+
+  currentState = s;
+  renderOutputs(s);
+  renderTable(s);
+  renderCards(s);
+  renderWork(s);
+  renderChart(s);
+  renderSteps(s);
+}
+
+// ══════════════════════════════════════════════════════
+//  AJUSTE DE ALTURA — scroll independiente por columna
+// ══════════════════════════════════════════════════════
+function fitLayout() {
+  const layout = document.querySelector('.layout');
+  if (!layout) return;
+  if (window.innerWidth <= 900) {        // móvil: flujo de página normal
+    layout.style.height = '';
+    return;
+  }
+  const top = layout.getBoundingClientRect().top;      // alto de cabecera + barra
+  layout.style.height = (window.innerHeight - top) + 'px';
+}
+window.addEventListener('resize', fitLayout);
+
+window.addEventListener('load', () => {
+  buildSeqSelector();
+  refreshSecField(false);
+  refreshLabels();
+  updateGasInfo();
+  compute();
+  fitLayout();
+});
+// Por si 'load' ya ocurrió o el render es diferido
+document.addEventListener('DOMContentLoaded', fitLayout);
+setTimeout(fitLayout, 50);
+</script>
+</body>
+</html>

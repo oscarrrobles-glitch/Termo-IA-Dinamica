@@ -1,0 +1,1940 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Diagrama de Mollier h–s · Refrigerante-134a</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.27.0/plotly.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f5f7fa;--surface:#fff;--border:#dde3ec;--text:#1a2233;--muted:#6b7a99;
+  --accent:#1976d2;--dome:#7b1fa2;--critical:#f57c00;
+  --hdr:linear-gradient(90deg,#1565c0 0%,#1976d2 60%,#1e88e5 100%)}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 0 40px}
+.topbar{width:100%;background:var(--hdr);display:flex;align-items:center;
+  justify-content:space-between;gap:14px;padding:0 28px;height:66px;
+  box-shadow:0 2px 8px rgba(21,101,192,.18);margin-bottom:24px;flex-shrink:0;
+  position:relative;overflow:hidden}
+.topbar::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 280px 100px at 50% 140%,rgba(255,179,0,.22),transparent 70%);
+  opacity:.9;z-index:0}
+.topbar-brand{display:flex;align-items:center;gap:10px;
+  font-family:'IBM Plex Sans',sans-serif;font-weight:700;
+  font-size:1.45rem;letter-spacing:-.01em;color:#fff;line-height:1;
+  position:relative;z-index:2;text-shadow:0 1px 2px rgba(0,0,0,.20);flex-shrink:0}
+.topbar-brand .t-name{display:flex;align-items:baseline;gap:3px}
+.topbar-logo{width:38px;height:38px;flex-shrink:0;
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,.22))
+         drop-shadow(0 0 6px rgba(255,179,0,.28))}
+.topbar-logo .ring{transform-origin:center;animation:brand-rot 18s linear infinite}
+.topbar-logo .spark{transform-origin:center;animation:brand-pulse 2.4s ease-in-out infinite}
+@keyframes brand-rot{to{transform:rotate(360deg)}}
+@keyframes brand-pulse{0%,100%{opacity:.55;transform:scale(.9)}50%{opacity:1;transform:scale(1.08)}}
+.topbar-brand .t-sep{color:rgba(255,224,178,.85);font-weight:400;padding:0 2px}
+.topbar-brand .t-ia{background:linear-gradient(135deg,#ffeb3b 0%,#ffb300 45%,#ff5722 80%,#ef5350 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  font-weight:900;letter-spacing:.01em;filter:drop-shadow(0 0 6px rgba(255,152,0,.35))}
+.topbar-center{position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);display:flex;align-items:center;gap:12px;z-index:1}
+.topbar-icon{width:46px;height:46px;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.12);border-radius:10px;
+  box-shadow:inset 0 0 0 1px rgba(255,236,179,.30),0 0 14px rgba(255,152,0,.30),0 1px 3px rgba(0,0,0,.15)}
+.topbar-icon svg{width:28px;height:40px;display:block;overflow:visible}
+.th-glow{transform-origin:16px 46px;animation:th-pulse 2.2s ease-in-out infinite}
+.th-bulb{transform-origin:16px 46px;animation:th-bulb 2.2s ease-in-out infinite}
+.th-col{transform-origin:16px 51px;animation:th-rise 3.8s ease-in-out infinite}
+@keyframes th-pulse{0%,100%{opacity:.55;transform:scale(.80)}50%{opacity:1;transform:scale(1.20)}}
+@keyframes th-bulb{0%,100%{filter:brightness(1) saturate(1)}50%{filter:brightness(1.18) saturate(1.25)}}
+@keyframes th-rise{0%,100%{transform:scaleY(.94)}50%{transform:scaleY(1.03)}}
+.topbar-text h1{font-size:1rem;font-weight:700;color:#fff;letter-spacing:.04em;
+  text-transform:uppercase;line-height:1.1}
+.topbar-text h1 .lc{text-transform:lowercase;font-weight:800;letter-spacing:.01em}
+.topbar-text p{font-size:.72rem;color:rgba(255,255,255,.78);font-weight:300;margin-top:1px}
+.topbar-spacer{visibility:hidden;pointer-events:none}
+.main-wrapper{width:100%;max-width:1140px;padding:0 20px 0 54px;display:flex;flex-direction:column;gap:0}
+.subtitle-bar{display:flex;align-items:center;gap:10px;padding:10px 18px;background:#fff;
+  border:1px solid var(--border);border-radius:8px 8px 0 0;border-bottom:none}
+.subtitle-bar .ci{font-size:1rem;color:var(--accent)}
+.subtitle-bar .ct{font-size:.95rem;font-weight:600;color:var(--text)}
+.unit-toggle{margin-left:auto;display:flex;border:1.5px solid var(--accent);border-radius:6px;overflow:hidden}
+.unit-btn{padding:4px 14px;font-size:.78rem;font-weight:600;background:#fff;color:var(--accent);
+  border:none;cursor:pointer;transition:background .18s,color .18s;letter-spacing:.04em}
+.unit-btn:first-child{border-right:1.5px solid var(--accent)}
+.unit-btn.active{background:var(--accent);color:#fff}
+.unit-btn:not(.active):hover{background:#e3edf9}
+#chart{width:100%;height:630px;background:#fff;border:1px solid var(--border);
+  border-radius:0 0 8px 8px;overflow:visible;box-shadow:0 2px 12px rgba(25,118,210,.07)}
+.ax-drag-handle{position:absolute;width:26px;height:26px;background:rgba(255,255,255,0.95);
+  border-radius:5px;display:flex;align-items:center;justify-content:center;
+  z-index:25;user-select:none;font-size:14px;font-weight:700;
+  box-shadow:0 2px 6px rgba(0,0,0,0.20);transition:background 0.15s,transform 0.12s;
+  pointer-events:all}
+.ax-drag-handle.round{border-radius:50%}
+.ax-drag-handle:hover{transform:scale(1.18)}
+.sidebar{position:fixed;top:50%;left:0;transform:translateY(-50%);display:flex;align-items:center;z-index:100}
+.sidebar-tab{writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);
+  background:var(--accent);color:#fff;font-size:.68rem;font-weight:600;letter-spacing:.07em;
+  text-transform:uppercase;padding:14px 8px;border-radius:6px 0 0 6px;cursor:pointer;
+  user-select:none;white-space:nowrap;transition:background .2s;display:flex;align-items:center;
+  gap:6px;box-shadow:2px 0 8px rgba(25,118,210,.15)}
+.sidebar-tab:hover{background:#1565c0}
+.sidebar-tab .arrow{display:inline-block;font-size:.65rem;transition:transform .35s;writing-mode:horizontal-tb}
+.sidebar.open .sidebar-tab .arrow{transform:rotate(180deg)}
+.sidebar-panel{width:0;overflow:hidden;transition:width .35s cubic-bezier(.4,0,.2,1);background:#fff;
+  border:1px solid var(--border);border-left:none;border-radius:0 8px 8px 0;
+  box-shadow:4px 0 16px rgba(25,118,210,.10)}
+.sidebar.open .sidebar-panel{width:238px}
+.spi{padding:18px 16px;width:238px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:85vh}
+.sb-sub{font-size:.68rem;font-weight:700;color:var(--dome);letter-spacing:.07em;text-transform:uppercase;
+  border-bottom:1px solid var(--border);padding-bottom:5px;margin-top:2px}
+.info-btn{display:inline-flex;align-items:center;justify-content:center;
+  width:15px;height:15px;border-radius:50%;border:1px solid var(--accent);
+  background:#fff;color:var(--accent);font-family:Georgia,serif;
+  font-size:.64rem;font-weight:700;font-style:italic;line-height:1;
+  cursor:pointer;transition:background .15s,color .15s;user-select:none;
+  text-transform:none;letter-spacing:0}
+.info-btn:hover{background:var(--accent);color:#fff}
+.info-btn.active{background:var(--accent);color:#fff}
+.info-box{font-size:.68rem;color:#6b7a99;line-height:1.35;
+  background:#f5f8fd;border:1px solid #d9e5f5;border-radius:5px;
+  padding:7px 9px;margin-bottom:4px;display:none}
+.info-box.open{display:block}
+.fc-mode{display:flex;gap:4px;margin:4px 0}
+.fc-mode-btn{flex:1;padding:5px 4px;font-size:.68rem;font-weight:600;
+  color:#bf360c;background:#fff3e0;border:1px solid #ffb74d;
+  border-radius:5px;cursor:pointer;transition:all .15s;text-align:center}
+.fc-mode-btn.active{background:#e65100;color:#fff;border-color:#e65100}
+.fc-mode-btn:hover:not(.active){background:#ffe0b2}
+.pt-mode{display:flex;gap:4px;margin:4px 0}
+.pt-mode-btn{flex:1;padding:5px 4px;font-size:.7rem;font-weight:700;
+  color:#4a148c;background:#faf4fc;border:1px solid #ce93d8;
+  border-radius:5px;cursor:pointer;transition:all .15s;text-align:center;
+  font-family:'IBM Plex Mono',monospace;letter-spacing:.02em}
+.pt-mode-btn.active{background:#7b1fa2;color:#fff;border-color:#7b1fa2}
+.pt-mode-btn:hover:not(.active){background:#f3e5f5}
+.rtog{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;
+  background:#f5f8fd;border:1px solid #d9e5f5;border-radius:6px;cursor:pointer;transition:background .15s;user-select:none}
+.rtog:hover{background:#e8f0fc}
+.rtog .rl{font-size:.78rem;color:var(--text);display:flex;align-items:center;gap:7px}
+.rtog .rd{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.sw{width:32px;height:17px;background:#c8d6e8;border-radius:999px;position:relative;transition:background .2s;flex-shrink:0}
+.sw::after{content:'';position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#8fa8c8;transition:transform .2s,background .2s}
+.rtog.active .sw{background:rgba(25,118,210,.25);border:1px solid var(--accent)}
+.rtog.active .sw::after{transform:translateX(15px);background:var(--accent)}
+.ctrl{display:flex;gap:6px;align-items:center}
+.sel{flex:1;font-size:.74rem;color:var(--text);background:#f5f8fd;border:1px solid #d9e5f5;
+  border-radius:5px;padding:5px 6px;cursor:pointer;outline:none}
+.sel:focus{border-color:var(--accent)}
+.addbtn{flex-shrink:0;background:var(--accent);color:#fff;border:none;border-radius:5px;
+  padding:5px 10px;font-size:.74rem;font-weight:600;cursor:pointer;transition:background .18s;white-space:nowrap}
+.addbtn:hover{background:#1565c0}
+.sg{display:flex;flex-direction:column;gap:5px}
+.sr{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:#f5f8fd;border:1px solid #d9e5f5;border-radius:6px}
+.sl{font-size:.73rem;color:var(--text);cursor:pointer;user-select:none}
+.ss{position:relative;display:inline-block;width:34px;height:18px;flex-shrink:0}
+.ss input{opacity:0;width:0;height:0}
+.ss-knob{position:absolute;inset:0;background:#c8d6e8;border-radius:999px;cursor:pointer;transition:background .2s}
+.ss-knob::before{content:'';position:absolute;width:13px;height:13px;left:2px;top:2.5px;background:#8fa8c8;border-radius:50%;transition:transform .2s,background .2s}
+.ss input:checked+.ss-knob{background:rgba(25,118,210,.28);border:1px solid var(--accent)}
+.ss input:checked+.ss-knob::before{transform:translateX(16px);background:var(--accent)}
+.ic{background:#f5f8fd;border:1px solid #d9e5f5;border-radius:6px;padding:10px 12px}
+.ic .lb{font-size:.62rem;font-family:'IBM Plex Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.ic .vl{font-size:.88rem;font-weight:600;color:var(--text)}
+#chart .xtick text,#chart .ytick text,#chart .y2tick text{font-weight:600 !important}
+#chart .xtitle,#chart .ytitle,#chart .y2title{font-weight:700 !important}
+#chart .scatterlayer .textpoint text,#chart g.scatter text{font-weight:700 !important;
+  paint-order:stroke fill;stroke:#fff;stroke-width:2.5px;stroke-linejoin:round}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-brand" aria-label="TermoIA Dinámica">
+    <svg class="topbar-logo" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="tg-top" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#64b5f6"/><stop offset="55%" stop-color="#1565c0"/><stop offset="100%" stop-color="#0d47a1"/>
+        </linearGradient>
+        <linearGradient id="dg-top" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#ffeb3b"/><stop offset="55%" stop-color="#ff9800"/><stop offset="100%" stop-color="#e65100"/>
+        </linearGradient>
+        <radialGradient id="sg-top" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#fff59d"/><stop offset="60%" stop-color="#ffb300"/><stop offset="100%" stop-color="#e65100"/>
+        </radialGradient>
+      </defs>
+      <g class="ring"><circle cx="32" cy="32" r="24" fill="none" stroke="url(#tg-top)" stroke-width="4" stroke-linecap="round" stroke-dasharray="110 40"/></g>
+      <path d="M20 38 Q26 20 32 30 Q38 40 44 26" fill="none" stroke="url(#dg-top)" stroke-width="3.2" stroke-linecap="round"/>
+      <circle class="spark" cx="48" cy="18" r="3.2" fill="url(#sg-top)"/>
+      <circle cx="32" cy="32" r="2.6" fill="#fff"/>
+    </svg>
+    <div class="t-name"><span>Termo</span><span class="t-sep">·</span><span class="t-ia">IA</span><span class="t-sep">·</span><span>Dinámica</span></div>
+  </div>
+  <div class="topbar-center">
+    <div class="topbar-icon" aria-hidden="true">
+      <svg viewBox="0 0 32 56" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="th-merc" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0%" stop-color="#1565c0"/><stop offset="25%" stop-color="#ef5350"/>
+            <stop offset="60%" stop-color="#ff9800"/><stop offset="85%" stop-color="#ffeb3b"/>
+            <stop offset="100%" stop-color="#fffde7"/>
+          </linearGradient>
+          <radialGradient id="th-bulb" cx=".5" cy=".55" r=".55">
+            <stop offset="0%" stop-color="#fff59d"/><stop offset="45%" stop-color="#ff9800"/><stop offset="100%" stop-color="#bf360c"/>
+          </radialGradient>
+          <radialGradient id="th-glow" cx=".5" cy=".5" r=".5">
+            <stop offset="0%" stop-color="#ffeb3b" stop-opacity=".85"/><stop offset="55%" stop-color="#ff7043" stop-opacity=".35"/>
+            <stop offset="100%" stop-color="#e65100" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <circle class="th-glow" cx="16" cy="46" r="12" fill="url(#th-glow)"/>
+        <path d="M12 6 Q12 2.5 16 2.5 Q20 2.5 20 6 L20 36 Q23.5 38.5 23.5 43.5 Q23.5 52.5 16 52.5 Q8.5 52.5 8.5 43.5 Q8.5 38.5 12 36 Z"
+              fill="rgba(255,255,255,.16)" stroke="#e3f2fd" stroke-width="1.4" stroke-linejoin="round"/>
+        <g class="th-col">
+          <path d="M14.2 7.5 L17.8 7.5 L17.8 38 Q20 39.8 20 42.5 Q20 46.5 16 46.5 Q12 46.5 12 42.5 Q12 39.8 14.2 38 Z" fill="url(#th-merc)"/>
+        </g>
+        <circle class="th-bulb" cx="16" cy="46" r="5.2" fill="url(#th-bulb)" stroke="#ffecb3" stroke-width=".6" opacity=".96"/>
+        <g stroke="#fff3e0" stroke-width=".85" stroke-linecap="round" opacity=".80">
+          <line x1="20.5" y1="12" x2="23.5" y2="12"/><line x1="20.5" y1="18" x2="22.3" y2="18"/>
+          <line x1="20.5" y1="24" x2="23.5" y2="24"/><line x1="20.5" y1="30" x2="22.3" y2="30"/>
+        </g>
+        <path d="M13.2 10 L13.2 34" stroke="#ffffff" stroke-width=".9" stroke-linecap="round" opacity=".45"/>
+      </svg>
+    </div>
+    <div class="topbar-text">
+      <h1>R-134a &nbsp;·&nbsp; Diagrama de Mollier <span class="lc">h</span>–<span class="lc">s</span></h1>
+      <p>Refrigerante 134a — Saturado y Vapor Sobrecalentado</p>
+    </div>
+  </div>
+  <div class="topbar-spacer topbar-brand" aria-hidden="true">
+    <span style="display:inline-block;width:38px;height:38px"></span>
+    <div class="t-name"><span>Termo</span><span class="t-sep">·</span><span class="t-ia">IA</span><span class="t-sep">·</span><span>Dinámica</span></div>
+  </div>
+</div>
+<div class="main-wrapper">
+<div class="subtitle-bar">
+  <span class="ci">📈</span>
+  <span class="ct">Diagrama de Mollier — Entalpía vs. Entropía Específica · R-134a</span>
+  <div class="unit-toggle">
+    <button id="btn-si" class="unit-btn active" onclick="setUnits('SI')">SI</button>
+    <button id="btn-ing" class="unit-btn" onclick="setUnits('ING')">Inglés</button>
+  </div>
+</div>
+<div id="chart"></div>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-panel"><div class="spi">
+    <div class="sb-sub">Isobaras</div>
+    <div class="sg">
+      <div class="sr"><label class="sl" id="lbl-low">Bajas P</label>
+        <label class="ss"><input type="checkbox" id="sh-low" onchange="toggleGrp('low')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-mid">Medias P</label>
+        <label class="ss"><input type="checkbox" id="sh-mid" onchange="toggleGrp('mid')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-high">Altas P</label>
+        <label class="ss"><input type="checkbox" id="sh-high" onchange="toggleGrp('high')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-vhigh">Muy altas P</label>
+        <label class="ss"><input type="checkbox" id="sh-vhigh" onchange="toggleGrp('vhigh')"><span class="ss-knob"></span></label></div>
+    </div>
+    <div class="ctrl" style="margin-top:4px">
+      <select id="sel-single" class="sel"></select>
+      <button class="addbtn" onclick="addSingle()">+ Ver</button>
+      <button class="addbtn" onclick="clearSingles()" style="background:#e53935">Limpiar</button>
+    </div>
+    <div id="list-single"></div>
+    <div class="sb-sub" style="margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:6px">
+      <span>Isobara personalizada</span>
+      <span class="info-btn" id="info-customP-btn" onclick="toggleInfo('customP')" title="Ayuda">i</span>
+    </div>
+    <div class="info-box" id="info-customP">
+      Ingresa una presión arbitraria dentro del intervalo tabulado. La isobara se construye interpolando linealmente entre las dos isobaras adyacentes; el tramo bifásico usa h<sub>f</sub>,h<sub>g</sub>,s<sub>f</sub>,s<sub>g</sub> de saturación. Trazo discontinuo.
+    </div>
+    <div class="ctrl">
+      <input type="number" id="inp-customP" class="sel" style="flex:1" placeholder="ej. 3.5" step="any">
+      <span id="unit-customP" style="font-size:.72rem;color:#6b7a99;min-width:30px">bar</span>
+    </div>
+    <div id="msg-customP" style="font-size:.68rem;color:#e53935;min-height:.9rem;line-height:1.2"></div>
+    <div class="ctrl" style="margin-top:2px">
+      <button class="addbtn" onclick="addCustomP()" style="flex:1">+ Ver</button>
+      <button class="addbtn" onclick="clearCustomsP()" style="background:#e53935;flex:1">Limpiar todo</button>
+    </div>
+    <div id="list-customP"></div>
+    <div class="sb-sub">Isotermas</div>
+    <div class="sg">
+      <div class="sr"><label class="sl" id="lbl-tlow">Bajas T</label>
+        <label class="ss"><input type="checkbox" id="st-low" onchange="toggleGrpT('low')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-tmid">Medias T</label>
+        <label class="ss"><input type="checkbox" id="st-mid" onchange="toggleGrpT('mid')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-thigh">Altas T</label>
+        <label class="ss"><input type="checkbox" id="st-high" onchange="toggleGrpT('high')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-tvhigh">Muy altas T</label>
+        <label class="ss"><input type="checkbox" id="st-vhigh" onchange="toggleGrpT('vhigh')"><span class="ss-knob"></span></label></div>
+    </div>
+    <div class="ctrl" style="margin-top:4px">
+      <select id="sel-singleT" class="sel"></select>
+      <button class="addbtn" onclick="addSingleT()">+ Ver</button>
+      <button class="addbtn" onclick="clearSinglesT()" style="background:#e53935">Limpiar</button>
+    </div>
+    <div id="list-singleT"></div>
+    <div class="sb-sub" style="margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:6px">
+      <span>Isoterma personalizada</span>
+      <span class="info-btn" id="info-customT-btn" onclick="toggleInfo('customT')" title="Ayuda">i</span>
+    </div>
+    <div class="info-box" id="info-customT">
+      Ingresa una temperatura arbitraria dentro del intervalo tabulado. La isoterma se construye recorriendo las isobaras tabuladas, interpolando (h,s) a la T solicitada; se ancla en la curva de saturación de vapor. Trazo discontinuo.
+    </div>
+    <div class="ctrl">
+      <input type="number" id="inp-customT" class="sel" style="flex:1" placeholder="ej. 50" step="any">
+      <span id="unit-customT" style="font-size:.72rem;color:#6b7a99;min-width:30px">°C</span>
+    </div>
+    <div id="msg-customT" style="font-size:.68rem;color:#e53935;min-height:.9rem;line-height:1.2"></div>
+    <div class="ctrl" style="margin-top:2px">
+      <button class="addbtn" onclick="addCustomT()" style="flex:1">+ Ver</button>
+      <button class="addbtn" onclick="clearCustomsT()" style="background:#e53935;flex:1">Limpiar todo</button>
+    </div>
+    <div id="list-customT"></div>
+    <div class="sb-sub">Isoentálpicas (h = const)</div>
+    <div class="sg">
+      <div class="sr"><label class="sl" id="lbl-hlow">Bajas h</label>
+        <label class="ss"><input type="checkbox" id="sh-h-low" onchange="toggleGrpH('low')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-hmid">Medias h</label>
+        <label class="ss"><input type="checkbox" id="sh-h-mid" onchange="toggleGrpH('mid')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-hhigh">Altas h</label>
+        <label class="ss"><input type="checkbox" id="sh-h-high" onchange="toggleGrpH('high')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-hvhigh">Muy altas h</label>
+        <label class="ss"><input type="checkbox" id="sh-h-vhigh" onchange="toggleGrpH('vhigh')"><span class="ss-knob"></span></label></div>
+    </div>
+    <div class="ctrl" style="margin-top:4px">
+      <select id="sel-singleH" class="sel"></select>
+      <button class="addbtn" onclick="addSingleH()">+ Ver</button>
+      <button class="addbtn" onclick="clearSinglesH()" style="background:#e53935">Limpiar</button>
+    </div>
+    <div id="list-singleH"></div>
+    <div class="sb-sub" style="margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:6px">
+      <span>Isoentálpica personalizada</span>
+      <span class="info-btn" id="info-customH-btn" onclick="toggleInfo('customH')" title="Ayuda">i</span>
+    </div>
+    <div class="info-box" id="info-customH">
+      Ingresa una entalpía arbitraria dentro del intervalo del diagrama. Se traza la recta horizontal h = const a lo largo del eje s. Trazo discontinuo.
+    </div>
+    <div class="ctrl">
+      <input type="number" id="inp-customH" class="sel" style="flex:1" placeholder="ej. 250" step="any">
+      <span id="unit-customH" style="font-size:.72rem;color:#6b7a99;min-width:42px">kJ/kg</span>
+    </div>
+    <div id="msg-customH" style="font-size:.68rem;color:#e53935;min-height:.9rem;line-height:1.2"></div>
+    <div class="ctrl" style="margin-top:2px">
+      <button class="addbtn" onclick="addCustomH()" style="flex:1">+ Ver</button>
+      <button class="addbtn" onclick="clearCustomsH()" style="background:#e53935;flex:1">Limpiar todo</button>
+    </div>
+    <div id="list-customH"></div>
+    <div class="sb-sub">Isoentrópicas (s = const)</div>
+    <div class="sg">
+      <div class="sr"><label class="sl" id="lbl-slow">Bajas s</label>
+        <label class="ss"><input type="checkbox" id="sh-s-low" onchange="toggleGrpS('low')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-smid">Medias s</label>
+        <label class="ss"><input type="checkbox" id="sh-s-mid" onchange="toggleGrpS('mid')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-shigh">Altas s</label>
+        <label class="ss"><input type="checkbox" id="sh-s-high" onchange="toggleGrpS('high')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-svhigh">Muy altas s</label>
+        <label class="ss"><input type="checkbox" id="sh-s-vhigh" onchange="toggleGrpS('vhigh')"><span class="ss-knob"></span></label></div>
+    </div>
+    <div class="ctrl" style="margin-top:4px">
+      <select id="sel-singleS" class="sel"></select>
+      <button class="addbtn" onclick="addSingleS()">+ Ver</button>
+      <button class="addbtn" onclick="clearSinglesS()" style="background:#e53935">Limpiar</button>
+    </div>
+    <div id="list-singleS"></div>
+    <div class="sb-sub" style="margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:6px">
+      <span>Isoentrópica personalizada</span>
+      <span class="info-btn" id="info-customS-btn" onclick="toggleInfo('customS')" title="Ayuda">i</span>
+    </div>
+    <div class="info-box" id="info-customS">
+      Ingresa una entropía arbitraria dentro del intervalo del diagrama. Se traza la recta vertical s = const a lo largo del eje h. Trazo discontinuo.
+    </div>
+    <div class="ctrl">
+      <input type="number" id="inp-customS" class="sel" style="flex:1" placeholder="ej. 0.95" step="any">
+      <span id="unit-customS" style="font-size:.72rem;color:#6b7a99;min-width:62px">kJ/(kg·K)</span>
+    </div>
+    <div id="msg-customS" style="font-size:.68rem;color:#e53935;min-height:.9rem;line-height:1.2"></div>
+    <div class="ctrl" style="margin-top:2px">
+      <button class="addbtn" onclick="addCustomS()" style="flex:1">+ Ver</button>
+      <button class="addbtn" onclick="clearCustomsS()" style="background:#e53935;flex:1">Limpiar todo</button>
+    </div>
+    <div id="list-customS"></div>
+    <div class="sb-sub">Líneas de Calidad (x)</div>
+    <div class="rtog" id="tog-qx" onclick="toggleQx()">
+      <div class="rl"><div class="rd" style="background:#f50057"></div>Mostrar x = 0.10 … 0.90</div>
+      <div class="sw"></div>
+    </div>
+    <div class="sb-sub" style="margin-top:6px;display:flex;align-items:center;justify-content:space-between;gap:6px">
+      <span>Isocalidad de x</span>
+      <span class="info-btn" id="info-customQX-btn" onclick="toggleInfo('customQX')" title="Ayuda" style="border-color:#c2185b;color:#c2185b">i</span>
+    </div>
+    <div class="info-box" id="info-customQX" style="background:#fff0f5;border-color:#f8bbd0;color:#6b3a5a">
+      Ingresa una calidad de vapor en (0, 1). La curva se construye recorriendo la cúpula con h(x,P)=h<sub>f</sub>+x·(h<sub>g</sub>−h<sub>f</sub>) y s(x,P)=s<sub>f</sub>+x·(s<sub>g</sub>−s<sub>f</sub>).
+    </div>
+    <div class="ctrl">
+      <input type="number" id="inp-customQX" class="sel" style="flex:1" placeholder="0.01 – 0.99" step="0.01" min="0" max="1">
+      <span id="unit-customQX" style="font-size:.72rem;color:#6b7a99;min-width:22px">—</span>
+    </div>
+    <div id="msg-customQX" style="font-size:.68rem;color:#e53935;min-height:.9rem;line-height:1.2"></div>
+    <div class="ctrl" style="margin-top:2px">
+      <button class="addbtn" onclick="addCustomQX()" style="flex:1;background:#c2185b">+ Ver</button>
+      <button class="addbtn" onclick="clearCustomsQX()" style="background:#e53935;flex:1">Limpiar todo</button>
+    </div>
+    <div id="list-customQX"></div>
+    <div class="sb-sub">Cursor</div>
+    <div class="rtog" id="tog-fc" onclick="toggleFC()">
+      <div class="rl"><div class="rd" style="background:#e65100"></div>Libre</div>
+      <div class="sw"></div>
+    </div>
+    <div id="fc-panel" style="display:none;flex-direction:column;gap:6px">
+      <div class="ic"><div class="lb">Entalpía h</div><div class="vl" id="fr-h" style="color:#e65100">— kJ/kg</div></div>
+      <div class="ic"><div class="lb">Entropía s</div><div class="vl" id="fr-s" style="color:#e65100">— kJ/(kg·K)</div></div>
+      <div class="ic" style="background:#fff3e0;border-color:#ffb74d">
+        <div class="lb" style="color:#bf360c;display:flex;align-items:center;justify-content:space-between;gap:6px">
+          <span id="fc-mode-lb">Trayectoria</span>
+          <span class="info-btn" id="info-fc-btn" onclick="toggleInfo('fc')" title="Ayuda" style="border-color:#e65100;color:#e65100">i</span>
+        </div>
+        <div class="info-box" id="info-fc" style="background:#fff8f0;border-color:#ffcc80;color:#6b5a4a">
+          Clic en el plano para marcar un punto. En modo <b>Trayectoria</b> los segmentos se unen con flecha; en modo <b>Puntos</b> los marcadores son independientes.
+        </div>
+        <div class="fc-mode">
+          <div class="fc-mode-btn active" id="fcm-path" onclick="setFCMode('path')">Trayectoria</div>
+          <div class="fc-mode-btn" id="fcm-points" onclick="setFCMode('points')">Puntos</div>
+        </div>
+        <div class="vl" id="fr-nmk" style="color:#bf360c;font-size:.82rem">0 puntos</div>
+        <div id="fr-mlist" style="display:flex;flex-direction:column;gap:4px;margin-top:6px;max-height:220px;overflow-y:auto"></div>
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <button class="addbtn" onclick="undoFCMark()" style="background:#fb8c00;flex:1">Deshacer</button>
+          <button class="addbtn" onclick="clearFCMarks()" style="background:#e53935;flex:1">Limpiar</button>
+        </div>
+      </div>
+      <div class="ic" style="background:#f3e5f5;border-color:#ce93d8">
+        <div class="lb" style="color:#4a148c;display:flex;align-items:center;justify-content:space-between;gap:6px">
+          <span>Punto por <span id="pt-mode-lb" style="font-family:'IBM Plex Mono',monospace">(T, P)</span></span>
+          <span class="info-btn" id="info-tp-btn" onclick="toggleInfo('tp')" title="Ayuda" style="border-color:#7b1fa2;color:#7b1fa2">i</span>
+        </div>
+        <div class="info-box" id="info-tp" style="background:#faf4fc;border-color:#e1bee7;color:#4a148c">
+          Selecciona el par de coordenadas y captura sus valores. Se interpola la variable restante. Estados bifásicos y líquido no se resuelven.
+        </div>
+        <div class="pt-mode">
+          <div class="pt-mode-btn active" id="pm-TP" onclick="setPointMode('TP')">(T,P)</div>
+          <div class="pt-mode-btn" id="pm-Ts" onclick="setPointMode('Ts')">(T,s)</div>
+          <div class="pt-mode-btn" id="pm-Ps" onclick="setPointMode('Ps')">(P,s)</div>
+        </div>
+        <div class="ctrl" style="margin-top:4px">
+          <input type="number" id="inp-pt-a" class="sel" style="flex:1" placeholder="T" step="any">
+          <span id="unit-pt-a" style="font-size:.7rem;color:#6b7a99;min-width:54px;text-align:right">°C</span>
+        </div>
+        <div class="ctrl" style="margin-top:4px">
+          <input type="number" id="inp-pt-b" class="sel" style="flex:1" placeholder="P" step="any">
+          <span id="unit-pt-b" style="font-size:.7rem;color:#6b7a99;min-width:54px;text-align:right">bar</span>
+        </div>
+        <div id="msg-tp" style="font-size:.68rem;color:#e53935;min-height:.9rem;line-height:1.2;margin-top:2px"></div>
+        <div style="display:flex;gap:6px;margin-top:4px">
+          <button class="addbtn" onclick="addPoint()" style="background:#7b1fa2;flex:1">+ Trazar</button>
+          <button class="addbtn" onclick="clearTPPoints()" style="background:#e53935;flex:1">Limpiar</button>
+        </div>
+        <div id="list-tp" style="display:flex;flex-direction:column;gap:4px;margin-top:6px;max-height:160px;overflow-y:auto"></div>
+      </div>
+    </div>
+  </div></div>
+  <div class="sidebar-tab" onclick="toggleSidebar()"><span class="arrow">&#9660;</span>Visualizar</div>
+</div>
+</div>
+<script>
+// ════════════════════════════════════════════════════════════
+// TABLA SATURACIÓN (SI) — R134a
+// P(bar), T_sat(°C), hf,hg (kJ/kg), sf,sg (kJ/(kg·K))
+// ════════════════════════════════════════════════════════════
+const satSI=[
+  {P:0.6,  T:-37.07, hf:3.46,   hg:224.72, sf:0.0147, sg:0.9520},
+  {P:1.0,  T:-26.43, hf:16.29,  hg:231.35, sf:0.0678, sg:0.9395},
+  {P:1.4,  T:-18.80, hf:25.77,  hg:236.04, sf:0.1055, sg:0.9322},
+  {P:1.8,  T:-12.73, hf:33.45,  hg:239.71, sf:0.1352, sg:0.9273},
+  {P:2.0,  T:-10.09, hf:36.84,  hg:241.30, sf:0.1481, sg:0.9253},
+  {P:2.4,  T:-5.37,  hf:42.95,  hg:244.09, sf:0.1710, sg:0.9222},
+  {P:2.8,  T:-1.23,  hf:48.39,  hg:246.52, sf:0.1911, sg:0.9197},
+  {P:3.2,  T: 2.48,  hf:53.31,  hg:248.66, sf:0.2089, sg:0.9177},
+  {P:4.0,  T: 8.93,  hf:62.00,  hg:252.32, sf:0.2399, sg:0.9145},
+  {P:5.0,  T:15.74,  hf:71.33,  hg:256.07, sf:0.2723, sg:0.9117},
+  {P:6.0,  T:21.58,  hf:79.48,  hg:259.19, sf:0.2999, sg:0.9097},
+  {P:7.0,  T:26.72,  hf:86.78,  hg:261.85, sf:0.3242, sg:0.9080},
+  {P:8.0,  T:31.33,  hf:93.42,  hg:264.15, sf:0.3459, sg:0.9066},
+  {P:9.0,  T:35.53,  hf:99.56,  hg:266.18, sf:0.3656, sg:0.9054},
+  {P:10.0, T:39.39,  hf:105.29, hg:267.97, sf:0.3838, sg:0.9043},
+  {P:12.0, T:46.32,  hf:115.76, hg:270.99, sf:0.4164, sg:0.9023},
+  {P:14.0, T:52.43,  hf:125.26, hg:273.40, sf:0.4453, sg:0.9003},
+  {P:16.0, T:57.92,  hf:134.02, hg:275.33, sf:0.4714, sg:0.8982},
+  {P:18.0, T:62.91,  hf:142.22, hg:276.83, sf:0.4954, sg:0.8959},
+  {P:20.0, T:67.49,  hf:149.97, hg:277.92, sf:0.5178, sg:0.8934},
+  {P:24.0, T:75.66,  hf:164.45, hg:279.04, sf:0.5505, sg:0.8873},
+  {P:28.0, T:82.83,  hf:178.00, hg:279.07, sf:0.5878, sg:0.8800},
+  {P:32.0, T:89.27,  hf:191.07, hg:278.20, sf:0.6307, sg:0.8707},
+  {P:36.0, T:95.16,  hf:204.27, hg:276.61, sf:0.6660, sg:0.8580},
+  {P:40.0, T:100.69, hf:232.41, hg:262.32, sf:0.6995, sg:0.8391},
+  {P:40.59,T:101.06, hf:241.94, hg:241.94, sf:0.7657, sg:0.7657}
+];
+
+// ════════════════════════════════════════════════════════════
+// VAPOR SOBRECALENTADO (SI) — R134a
+// {P(bar), pts:[[T(°C), h(kJ/kg), s(kJ/(kg·K))],...]}
+// ════════════════════════════════════════════════════════════
+const shSI=[
+  {P:0.6,pts:[[-37.07,224.72,0.9520],[-20,237.98,1.0062],[-10,245.96,1.0371],[0,254.10,1.0675],[10,262.41,1.0973],[20,270.89,1.1267],[30,279.53,1.1557],[40,288.35,1.1844],[50,297.34,1.2126],[60,306.51,1.2405],[70,315.84,1.2681],[80,325.34,1.2954],[90,335.00,1.3224]]},
+  {P:1.0,pts:[[-26.43,231.35,0.9395],[-20,236.54,0.9602],[-10,244.70,0.9918],[0,252.99,1.0227],[10,261.43,1.0531],[20,270.02,1.0829],[30,278.76,1.1122],[40,287.66,1.1411],[50,296.72,1.1696],[60,305.94,1.1977],[70,315.32,1.2254],[80,324.87,1.2528],[90,334.57,1.2799]]},
+  {P:1.4,pts:[[-18.80,236.04,0.9322],[-10,243.40,0.9606],[0,251.86,0.9922],[10,260.43,1.0230],[20,269.13,1.0532],[30,277.97,1.0828],[40,286.96,1.1120],[50,296.09,1.1407],[60,305.37,1.1690],[70,314.80,1.1969],[80,324.39,1.2244],[90,334.14,1.2516]]},
+  {P:1.8,pts:[[-12.73,239.71,0.9273],[-10,242.06,0.9362],[0,250.69,0.9684],[10,259.41,0.9998],[20,268.23,1.0304],[30,277.17,1.0604],[40,286.24,1.0898],[50,295.45,1.1187],[60,304.79,1.1472],[70,314.28,1.1753],[80,323.92,1.2030],[90,333.70,1.2303]]},
+  {P:2.0,pts:[[-10.09,241.30,0.9253],[0,250.10,0.9582],[10,258.89,0.9898],[20,267.78,1.0206],[30,276.77,1.0508],[40,285.88,1.0804],[50,295.12,1.1094],[60,304.50,1.1380],[70,314.02,1.1661],[80,323.68,1.1939],[90,333.48,1.2212]]},
+  {P:2.4,pts:[[-5.37,244.09,0.9222],[0,248.89,0.9399],[10,257.84,0.9721],[20,266.85,1.0034],[30,275.95,1.0339],[40,285.16,1.0637],[50,294.47,1.0930],[60,303.91,1.1218],[70,313.49,1.1501],[80,323.19,1.1780],[90,333.04,1.2055]]},
+  {P:2.8,pts:[[-1.23,246.52,0.9197],[0,247.64,0.9238],[10,256.76,0.9566],[20,265.91,0.9883],[30,275.12,1.0192],[40,284.42,1.0494],[50,293.81,1.0789],[60,303.32,1.1079],[70,312.95,1.1364],[80,322.71,1.1644],[90,332.60,1.1920]]},
+  {P:3.2,pts:[[2.48,248.66,0.9177],[10,255.65,0.9427],[20,264.95,0.9749],[30,274.28,1.0062],[40,283.67,1.0367],[50,293.15,1.0665],[60,302.72,1.0957],[70,312.41,1.1243],[80,322.22,1.1525],[90,332.15,1.1802]]},
+  {P:4.0,pts:[[8.93,252.32,0.9145],[10,253.35,0.9182],[20,262.96,0.9515],[30,272.54,0.9837],[40,282.14,1.0148],[50,291.79,1.0452],[60,301.51,1.0748],[70,311.32,1.1038],[80,321.27,1.1324],[90,331.30,1.1604]]},
+  {P:5.0,pts:[[15.74,256.07,0.9117],[20,260.34,0.9264],[30,270.28,0.9597],[40,280.16,0.9918],[50,290.04,1.0229],[60,299.95,1.0531],[70,309.92,1.0825],[80,319.96,1.1114],[90,330.10,1.1397],[100,340.33,1.1675]]},
+  {P:6.0,pts:[[21.58,259.19,0.9097],[30,267.89,0.9388],[40,278.09,0.9719],[50,288.23,1.0037],[60,298.35,1.0346],[70,308.48,1.0645],[80,318.67,1.0938],[90,328.93,1.1225],[100,339.27,1.1505]]},
+  {P:7.0,pts:[[26.72,261.85,0.9080],[30,265.37,0.9197],[40,275.93,0.9539],[50,286.35,0.9867],[60,296.69,1.0182],[70,307.01,1.0487],[80,317.35,1.0784],[90,327.74,1.1074],[100,338.19,1.1358]]},
+  {P:8.0,pts:[[31.33,264.15,0.9066],[40,273.66,0.9374],[50,284.39,0.9711],[60,294.98,1.0034],[70,305.50,1.0345],[80,316.00,1.0647],[90,326.52,1.0940],[100,337.08,1.1227],[110,347.71,1.1508]]},
+  {P:10.0,pts:[[39.39,267.97,0.9043],[40,268.68,0.9066],[50,280.19,0.9428],[60,291.36,0.9768],[70,302.34,1.0093],[80,313.20,1.0405],[90,324.01,1.0707],[100,334.82,1.1000],[110,345.65,1.1286],[120,356.52,1.1567]]},
+  {P:12.0,pts:[[46.32,270.99,0.9023],[50,275.52,0.9164],[60,287.44,0.9527],[70,298.96,0.9868],[80,310.24,1.0192],[90,321.39,1.0503],[100,332.47,1.0804],[110,343.52,1.1096],[120,354.58,1.1381],[130,365.68,1.1660],[140,376.83,1.1933]]},
+  {P:14.0,pts:[[52.43,273.40,0.9003],[60,283.10,0.9297],[70,295.31,0.9658],[80,307.10,0.9997],[90,318.63,1.0319],[100,329.96,1.0628],[110,341.32,1.0926],[120,352.59,1.1218],[130,363.86,1.1500],[140,375.15,1.1777]]},
+  {P:16.0,pts:[[57.92,275.33,0.8982],[60,278.20,0.9069],[70,291.33,0.9457],[80,303.74,0.9813],[90,315.72,1.0148],[100,327.46,1.0467],[110,339.04,1.0773],[120,350.53,1.1069],[130,361.99,1.1357],[140,373.44,1.1638]]},
+  {P:18.0,pts:[[62.91,276.83,0.8959],[70,287.04,0.9239],[80,300.18,0.9636],[90,312.62,0.9989],[100,324.71,1.0318],[110,336.62,1.0631],[120,348.40,1.0934],[130,360.10,1.1227],[140,371.78,1.1513]]},
+  {P:20.0,pts:[[67.49,277.92,0.8934],[80,296.31,0.9438],[90,309.36,0.9831],[100,321.81,1.0181],[110,334.00,1.0509],[120,346.01,1.0816],[130,357.91,1.1109],[140,369.74,1.1392]]},
+  {P:24.0,pts:[[75.66,279.04,0.8873],[80,282.20,0.8961],[90,297.92,0.9433],[100,312.27,0.9844],[110,325.92,1.0211],[120,339.06,1.0551],[130,351.84,1.0871],[140,364.33,1.1175],[150,376.65,1.1465]]},
+  {P:28.0,pts:[[82.83,279.07,0.8800],[90,287.65,0.9043],[100,304.34,0.9509],[110,319.62,0.9913],[120,333.85,1.0277],[130,347.40,1.0617],[140,360.50,1.0935],[150,373.26,1.1235]]},
+  {P:32.0,pts:[[89.27,278.20,0.8707],[100,294.92,0.9197],[110,312.16,0.9637],[120,327.74,1.0026],[130,342.32,1.0384],[140,356.20,1.0716],[150,369.56,1.1028]]},
+  {P:36.0,pts:[[95.16,276.61,0.8580],[100,281.05,0.8709],[110,303.38,0.9290],[120,321.40,0.9750],[130,337.45,1.0142],[140,352.28,1.0491],[150,366.28,1.0815]]},
+  {P:40.0,pts:[[100.69,262.32,0.8391],[110,287.83,0.8842],[120,312.61,0.9444],[130,331.46,0.9904],[140,347.96,1.0297],[150,363.10,1.0644],[160,377.40,1.0962]]}
+];
+
+// ════════════════════════════════════════════════════════════
+// TABLA SATURACIÓN (Inglés) — R134a
+// P(psia), T_sat(°F), hf,hg (Btu/lbm), sf,sg (Btu/(lbm·°R))
+// ════════════════════════════════════════════════════════════
+const satENG=[
+  {P:10,   T:-29.71, hf:6.91,  hg:97.69,  sf:0.0073, sg:0.2271},
+  {P:15,   T:-14.25, hf:11.16, hg:99.95,  sf:0.0162, sg:0.2218},
+  {P:20,   T:-2.48,  hf:14.42, hg:101.66, sf:0.0228, sg:0.2183},
+  {P:30,   T:15.38,  hf:19.43, hg:104.18, sf:0.0327, sg:0.2138},
+  {P:40,   T:29.04,  hf:23.31, hg:106.04, sf:0.0403, sg:0.2108},
+  {P:50,   T:40.27,  hf:26.55, hg:107.45, sf:0.0464, sg:0.2086},
+  {P:60,   T:49.89,  hf:29.35, hg:108.55, sf:0.0517, sg:0.2068},
+  {P:70,   T:58.35,  hf:31.84, hg:109.43, sf:0.0563, sg:0.2053},
+  {P:80,   T:65.93,  hf:34.09, hg:110.14, sf:0.0604, sg:0.2040},
+  {P:90,   T:72.83,  hf:36.16, hg:110.71, sf:0.0641, sg:0.2029},
+  {P:100,  T:79.17,  hf:38.08, hg:111.17, sf:0.0674, sg:0.2019},
+  {P:120,  T:90.54,  hf:41.58, hg:111.78, sf:0.0735, sg:0.2003},
+  {P:140,  T:100.56, hf:44.71, hg:112.18, sf:0.0789, sg:0.1989},
+  {P:160,  T:109.55, hf:47.56, hg:112.45, sf:0.0837, sg:0.1976},
+  {P:180,  T:117.74, hf:50.18, hg:112.65, sf:0.0880, sg:0.1965},
+  {P:200,  T:125.28, hf:52.63, hg:112.77, sf:0.0921, sg:0.1955},
+  {P:240,  T:138.79, hf:57.16, hg:112.84, sf:0.0992, sg:0.1937},
+  {P:280,  T:150.70, hf:61.31, hg:112.71, sf:0.1055, sg:0.1921},
+  {P:300,  T:156.17, hf:63.30, hg:112.56, sf:0.1085, sg:0.1913},
+  {P:350,  T:168.72, hf:68.05, hg:112.10, sf:0.1153, sg:0.1894},
+  {P:400,  T:179.95, hf:72.65, hg:111.40, sf:0.1216, sg:0.1875},
+  {P:500,  T:199.38, hf:81.93, hg:108.95, sf:0.1334, sg:0.1835},
+  {P:588.75,T:213.91,hf:95.50, hg:95.50,  sf:0.1697, sg:0.1697}
+];
+
+// ════════════════════════════════════════════════════════════
+// VAPOR SOBRECALENTADO (Inglés) — R134a
+// {P(psia), pts:[[T(°F), h(Btu/lbm), s(Btu/(lbm·°R))],...]}
+// ════════════════════════════════════════════════════════════
+const shENG=[
+  {P:10,pts:[[-29.71,97.69,0.2271],[0,103.34,0.2410],[20,107.43,0.2494],[40,111.66,0.2575],[60,116.05,0.2655],[80,120.59,0.2731],[100,125.29,0.2806],[120,130.14,0.2880],[140,135.16,0.2952],[160,140.33,0.3023]]},
+  {P:15,pts:[[-14.25,99.95,0.2218],[0,102.27,0.2275],[20,106.50,0.2361],[40,110.86,0.2444],[60,115.34,0.2525],[80,119.96,0.2603],[100,124.72,0.2680],[120,129.62,0.2755],[140,134.66,0.2828]]},
+  {P:20,pts:[[-2.48,101.66,0.2183],[0,101.94,0.2196],[20,106.27,0.2283],[40,110.71,0.2369],[60,115.27,0.2452],[80,119.95,0.2531],[100,124.76,0.2609],[120,129.69,0.2685],[140,134.76,0.2759]]},
+  {P:30,pts:[[15.38,104.18,0.2138],[20,104.74,0.2155],[40,109.30,0.2244],[60,114.00,0.2331],[80,118.81,0.2414],[100,123.75,0.2494],[120,128.81,0.2573],[140,133.99,0.2650]]},
+  {P:40,pts:[[29.04,106.04,0.2108],[40,107.83,0.2139],[60,112.71,0.2231],[80,117.69,0.2317],[100,122.77,0.2400],[120,127.94,0.2481],[140,133.22,0.2559]]},
+  {P:50,pts:[[40.27,107.45,0.2086],[60,111.35,0.2151],[80,116.51,0.2240],[100,121.72,0.2326],[120,127.02,0.2408],[140,132.41,0.2488],[160,137.90,0.2566]]},
+  {P:60,pts:[[49.89,108.55,0.2068],[60,109.91,0.2075],[80,115.27,0.2169],[100,120.65,0.2257],[120,126.05,0.2342],[140,131.55,0.2423]]},
+  {P:80,pts:[[65.93,110.14,0.2040],[80,112.61,0.2050],[100,118.39,0.2143],[120,124.16,0.2231],[140,129.95,0.2316],[160,135.84,0.2397]]},
+  {P:100,pts:[[79.17,111.17,0.2019],[100,114.66,0.2050],[120,121.68,0.2144],[140,127.97,0.2232],[160,134.16,0.2316],[180,140.41,0.2397]]},
+  {P:120,pts:[[90.54,111.78,0.2003],[100,109.21,0.1971],[120,118.74,0.2068],[140,125.47,0.2160],[160,132.04,0.2247],[180,138.59,0.2330]]},
+  {P:140,pts:[[100.56,112.18,0.1989],[120,115.04,0.2000],[140,122.65,0.2099],[160,129.74,0.2189],[180,136.69,0.2274],[200,143.59,0.2356]]},
+  {P:160,pts:[[109.55,112.45,0.1976],[120,110.84,0.1937],[140,119.49,0.2042],[160,127.27,0.2137],[180,134.62,0.2225],[200,141.86,0.2308]]},
+  {P:180,pts:[[117.74,112.65,0.1965],[140,115.97,0.1989],[160,124.71,0.2090],[180,132.50,0.2181],[200,140.04,0.2267]]},
+  {P:200,pts:[[125.28,112.77,0.1955],[140,111.78,0.1942],[160,121.79,0.2048],[180,130.27,0.2143],[200,138.23,0.2231],[220,146.06,0.2315]]},
+  {P:240,pts:[[138.79,112.84,0.1937],[160,114.78,0.1969],[180,125.18,0.2074],[200,134.27,0.2167],[220,142.70,0.2255],[240,150.91,0.2337]]},
+  {P:280,pts:[[150.70,112.71,0.1921],[160,107.07,0.1898],[180,119.59,0.2008],[200,129.85,0.2106],[220,139.10,0.2197],[240,147.84,0.2281]]},
+  {P:300,pts:[[156.17,112.56,0.1913],[180,116.50,0.1976],[200,127.46,0.2077],[220,137.16,0.2170],[240,146.20,0.2256]]},
+  {P:350,pts:[[168.72,112.10,0.1894],[200,121.07,0.2003],[220,131.95,0.2104],[240,141.78,0.2196],[260,151.05,0.2282]]},
+  {P:400,pts:[[179.95,111.40,0.1875],[200,113.71,0.1934],[220,126.16,0.2043],[240,137.06,0.2140],[260,147.04,0.2230]]},
+  {P:500,pts:[[199.38,108.95,0.1835],[220,114.33,0.1900],[240,127.93,0.2018],[260,139.84,0.2120],[280,150.76,0.2213]]}
+];
+
+// ════════════════════════════════════════════════════════════
+// PALETAS
+// ════════════════════════════════════════════════════════════
+const PAL_ISO=['#d50000','#ff3d00','#ff6d00','#e65100','#bf360c',
+  '#c51162','#ad1457','#aa00ff','#6200ea','#4527a0','#311b92',
+  '#2962ff','#0091ea','#0277bd','#1565c0','#283593','#00838f',
+  '#00695c','#004d40','#2e7d32','#33691e','#7b1fa2'];
+
+// ── Grupos de isobaras por presión ──────────────────────────
+const GRP_SI={
+  low:  [0.6,1.0,1.4,1.8,2.0],
+  mid:  [2.4,2.8,3.2,4.0,5.0],
+  high: [6.0,8.0,10.0,12.0,14.0,16.0],
+  vhigh:[18.0,20.0,24.0,28.0,32.0,36.0,40.0]
+};
+const GRP_ENG={
+  low:  [10,15,20,30,40],
+  mid:  [50,60,70,80,100],
+  high: [120,140,160,180,200],
+  vhigh:[240,280,300,350,400,500]
+};
+const activeGrp={low:false,mid:false,high:false,vhigh:false};
+
+// ── Grupos de isotermas por temperatura ─────────────────────
+const GRP_T_SI={
+  low:  [-20,0,20],
+  mid:  [40,60,80],
+  high: [100,120,140],
+  vhigh:[160]
+};
+const GRP_T_ENG={
+  low:  [0,40,80],
+  mid:  [100,120,140],
+  high: [160,180,200],
+  vhigh:[220,240,260]
+};
+const activeGrpT={low:false,mid:false,high:false,vhigh:false};
+
+// ── Líneas de isocalidad x = constante ──────────────────────
+const QLINES=[0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9];
+
+// ── Grupos de isoentálpicas h = const ───────────────────────
+const GRP_H_SI={
+  low:  [20,50,80],
+  mid:  [120,160,200],
+  high: [250,300,350],
+  vhigh:[400]
+};
+const GRP_H_ENG={
+  low:  [10,20,30],
+  mid:  [50,70,90],
+  high: [110,130,150],
+  vhigh:[165]
+};
+const activeGrpH={low:false,mid:false,high:false,vhigh:false};
+
+// ── Grupos de isoentrópicas s = const ───────────────────────
+const GRP_S_SI={
+  low:  [0.1,0.2,0.3],
+  mid:  [0.4,0.5,0.6],
+  high: [0.7,0.8,0.9],
+  vhigh:[1.0,1.1,1.2]
+};
+const GRP_S_ENG={
+  low:  [0.02,0.05,0.08],
+  mid:  [0.10,0.12,0.15],
+  high: [0.18,0.20,0.22],
+  vhigh:[0.24,0.26,0.28]
+};
+const activeGrpS={low:false,mid:false,high:false,vhigh:false};
+
+// ════════════════════════════════════════════════════════════
+// ESTADO
+// ════════════════════════════════════════════════════════════
+let units='SI';
+let grpIso=[],singles=[];
+let grpTIso=[],singlesT=[];
+let grpHIso=[],singlesH=[];
+let grpSIso=[],singlesS=[];
+let singleId=0,singleCI=0,singleTId=0,singleHId=0,singleSId=0;
+let qxOn=false;
+let customsQX=[],customQXId=0,customQXCI=0;
+let customsP=[],customPId=0,customPCI=0;
+let customsT=[],customTId=0,customTCI=0;
+let tpPoints=[],tpPointId=0,tpPointCI=0;
+let pointMode='TP';
+let customsH=[],customHId=0,customHCI=0;
+let customsS=[],customSId=0,customSCI=0;
+let fcOn=false,overTrace=false;
+let fcMarks=[];
+let fcMode='path';
+let fcSSI=null,fcHSI=null;
+
+// ── Conversiones ─────────────────────────────────────────────
+const CS=0.238846; // kJ/(kg·K) → Btu/(lbm·°R)
+const CH=0.429923; // kJ/kg     → Btu/lbm
+function getSat(){return units==='SI'?satSI:satENG;}
+function getSH() {return units==='SI'?shSI:shENG;}
+function getGRP(){return units==='SI'?GRP_SI:GRP_ENG;}
+
+// ── Interpolación saturación por P ──────────────────────────
+function satAtP(P){
+  const s=getSat();
+  if(P<=s[0].P)return{...s[0]};
+  if(P>=s[s.length-1].P)return{...s[s.length-1]};
+  for(let i=0;i<s.length-1;i++){
+    if(s[i].P<=P&&P<=s[i+1].P){
+      const f=(P-s[i].P)/(s[i+1].P-s[i].P);
+      return{P,T:s[i].T+f*(s[i+1].T-s[i].T),
+        hf:s[i].hf+f*(s[i+1].hf-s[i].hf),
+        hg:s[i].hg+f*(s[i+1].hg-s[i].hg),
+        sf:s[i].sf+f*(s[i+1].sf-s[i].sf),
+        sg:s[i].sg+f*(s[i+1].sg-s[i].sg)};
+    }
+  }
+  return{...s[s.length-1]};
+}
+
+// ════════════════════════════════════════════════════════════
+// CONSTRUCCIÓN DE ISOBARA — h-s (Mollier) — R134a
+// ════════════════════════════════════════════════════════════
+const X_MIN_ISOBAR=0.0;   // Cúpula completa desde x=0
+function buildIsobar(P_native,color){
+  const sat=getSat(),sh=getSH();
+  const Pcrit=sat[sat.length-1].P;
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const pU=units==='SI'?'bar':'psia';
+  const Plbl=`${P_native} ${pU}`;
+
+  const shEntry=sh.find(iso=>Math.abs(iso.P-P_native)<0.001);
+  if(!shEntry)return[];
+
+  const isSub=P_native<Pcrit*0.9999;
+  let hfS=null,hgS=null,sfS=null,sgS=null,Tsat=null;
+  if(isSub){
+    const s=satAtP(P_native);
+    hfS=s.hf;hgS=s.hg;sfS=s.sf;sgS=s.sg;Tsat=s.T;
+  }else{
+    Tsat=sat[sat.length-1].T;
+  }
+
+  const supPts=shEntry.pts.map(([T,h,s])=>({T,h,s})).sort((a,b)=>a.T-b.T);
+
+  const bipX=[],bipY=[],bipT=[];
+  if(isSub){
+    const nBip=24;
+    for(let k=0;k<=nBip;k++){
+      const x=X_MIN_ISOBAR+(1-X_MIN_ISOBAR)*(k/nBip);
+      bipX.push(sfS+x*(sgS-sfS));
+      bipY.push(hfS+x*(hgS-hfS));
+      bipT.push(Tsat);
+    }
+  }
+
+  const supX=[],supY=[],supT=[];
+  if(isSub&&sgS!==null&&hgS!==null){
+    if(supPts.length===0||Math.abs(supPts[0].s-sgS)>0.001){
+      supX.push(sgS);supY.push(hgS);supT.push(Tsat);
+    }
+  }
+  supPts.forEach(pt=>{
+    if(!isSub||pt.s>=(sgS||0)-0.001){
+      supX.push(pt.s);supY.push(pt.h);supT.push(pt.T);
+    }
+  });
+
+  const xAll=bipX.length>0?[...bipX,...supX.slice(1)]:[...supX];
+  const yAll=bipY.length>0?[...bipY,...supY.slice(1)]:[...supY];
+  const tArr=bipT.length>0?[...bipT,...supT.slice(1)]:[...supT];
+
+  const tU=units==='SI'?'°C':'°F';
+  const main={x:xAll,y:yAll,mode:'lines',meta:'isobar',name:Plbl,
+    line:{color,width:2.0},showlegend:false,connectgaps:false,
+    customdata:tArr,
+    hovertemplate:`<b>P = ${Plbl}</b><br>T = %{customdata:.1f} ${tU}<br>h = %{y:.1f} ${hU}<br>s = %{x:.4g} ${sU}<extra></extra>`};
+
+  const lx=supX.length>0?supX[supX.length-1]:(bipX[0]||0);
+  const ly=supY.length>0?supY[supY.length-1]:(bipY[0]||0);
+  const lbl={x:[lx],y:[ly],mode:'text',text:[`<b>${Plbl}</b>`],
+    textposition:'top right',textfont:{color,size:11,family:'IBM Plex Sans, sans-serif',weight:700},
+    showlegend:false,hoverinfo:'skip'};
+  return[main,lbl];
+}
+
+// ════════════════════════════════════════════════════════════
+// CONSTRUCCIÓN DE ISOTERMA
+// ════════════════════════════════════════════════════════════
+function buildIsotherm(T_native,color){
+  const sat=getSat(),sh=getSH();
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const pU=units==='SI'?'bar':'psia';
+  const tU=units==='SI'?'°C':'°F';
+  const Tlbl=`${T_native} ${tU}`;
+  const pts=[];
+
+  let satAnchor=null;
+  for(let i=0;i<sat.length-1;i++){
+    if(sat[i].T<=T_native&&T_native<=sat[i+1].T){
+      const f=(T_native-sat[i].T)/(sat[i+1].T-sat[i].T);
+      satAnchor={
+        P:  sat[i].P +f*(sat[i+1].P -sat[i].P ),
+        hg: sat[i].hg+f*(sat[i+1].hg-sat[i].hg),
+        sg: sat[i].sg+f*(sat[i+1].sg-sat[i].sg)
+      };
+      break;
+    }
+  }
+
+  sh.forEach(iso=>{
+    const ordered=iso.pts.slice().sort((a,b)=>a[0]-b[0]);
+    const Tsat_iso=ordered[0][0];
+    if(T_native<Tsat_iso-0.1)return;
+    if(Math.abs(T_native-Tsat_iso)<0.1){
+      pts.push({P:iso.P,h:ordered[0][1],s:ordered[0][2]});
+      return;
+    }
+    for(let i=0;i<ordered.length-1;i++){
+      if(ordered[i][0]<=T_native&&T_native<=ordered[i+1][0]){
+        const f=(T_native-ordered[i][0])/(ordered[i+1][0]-ordered[i][0]);
+        const h=ordered[i][1]+f*(ordered[i+1][1]-ordered[i][1]);
+        const s=ordered[i][2]+f*(ordered[i+1][2]-ordered[i][2]);
+        pts.push({P:iso.P,h,s});
+        return;
+      }
+    }
+  });
+
+  if(pts.length===0&&!satAnchor)return[];
+  pts.sort((a,b)=>a.s-b.s);
+  if(satAnchor){
+    if(pts.length===0||satAnchor.sg<pts[0].s-1e-4){
+      pts.unshift({P:satAnchor.P,h:satAnchor.hg,s:satAnchor.sg});
+    }
+  }
+  if(pts.length<2)return[];
+
+  const main={x:pts.map(p=>p.s),y:pts.map(p=>p.h),mode:'lines',meta:'isotherm',
+    name:Tlbl,line:{color,width:2.0,shape:'spline',smoothing:0.6},showlegend:false,
+    customdata:pts.map(p=>p.P),
+    hovertemplate:`<b>T = ${Tlbl}</b><br>P = %{customdata:.4g} ${pU}<br>h = %{y:.1f} ${hU}<br>s = %{x:.4g} ${sU}<extra></extra>`};
+  const lp=pts[pts.length-1];
+  const lbl={x:[lp.s],y:[lp.h],mode:'text',text:[`<b>${Tlbl}</b>`],
+    textposition:'bottom right',textfont:{color,size:11,family:'IBM Plex Sans, sans-serif',weight:700},
+    showlegend:false,hoverinfo:'skip'};
+  return[main,lbl];
+}
+
+// ════════════════════════════════════════════════════════════
+// LÍNEAS DE ISOCALIDAD x = constante
+// ════════════════════════════════════════════════════════════
+function buildQualityLines(){
+  const sat=getSat();
+  const Pcrit=sat[sat.length-1].P;
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const pU=units==='SI'?'bar':'psia';
+  const tU=units==='SI'?'°C':'°F';
+  const traces=[];
+  QLINES.forEach(x=>{
+    const xs=[],ys=[],meta=[];
+    sat.forEach(r=>{
+      if(r.P>=Pcrit*0.9999)return;
+      xs.push(r.sf+x*(r.sg-r.sf));
+      ys.push(r.hf+x*(r.hg-r.hf));
+      meta.push([r.P,r.T]);
+    });
+    if(xs.length<2)return;
+    traces.push({x:xs,y:ys,mode:'lines',meta:'quality',name:`x=${x.toFixed(2)}`,
+      line:{color:'#f50057',width:1.8,shape:'spline',smoothing:0.8},showlegend:false,
+      customdata:meta,opacity:0.90,
+      hovertemplate:`<b>x = ${x.toFixed(2)}</b><br>P = %{customdata[0]:.4g} ${pU}<br>T = %{customdata[1]:.2f} ${tU}<br>h = %{y:.1f} ${hU}<br>s = %{x:.4g} ${sU}<extra></extra>`});
+    const mid=Math.floor(xs.length*0.62);
+    traces.push({x:[xs[mid]],y:[ys[mid]],mode:'text',text:[`<b>${x.toFixed(2)}</b>`],
+      textposition:'top right',
+      textfont:{color:'#880e4f',size:10.5,family:'IBM Plex Sans, sans-serif',weight:700},
+      showlegend:false,hoverinfo:'skip'});
+  });
+  return traces;
+}
+
+function buildCustomQualityLine(xVal,color){
+  const sat=getSat();
+  const Pcrit=sat[sat.length-1].P;
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const pU=units==='SI'?'bar':'psia';
+  const tU=units==='SI'?'°C':'°F';
+  const xs=[],ys=[],meta=[];
+  sat.forEach(r=>{
+    if(r.P>=Pcrit*0.9999)return;
+    xs.push(r.sf+xVal*(r.sg-r.sf));
+    ys.push(r.hf+xVal*(r.hg-r.hf));
+    meta.push([r.P,r.T]);
+  });
+  if(xs.length<2)return[];
+  const lbl=xVal.toFixed(4).replace(/0+$/,'').replace(/\.$/,'');
+  const main={x:xs,y:ys,mode:'lines',meta:'quality',name:`x=${lbl}`,
+    line:{color,width:2.2,shape:'spline',smoothing:0.8,dash:'dash'},
+    showlegend:false,customdata:meta,opacity:0.95,
+    hovertemplate:`<b>x = ${lbl}</b><br>P = %{customdata[0]:.4g} ${pU}<br>T = %{customdata[1]:.2f} ${tU}<br>h = %{y:.1f} ${hU}<br>s = %{x:.4g} ${sU}<extra></extra>`};
+  const mid=Math.floor(xs.length*0.55);
+  const lblT={x:[xs[mid]],y:[ys[mid]],mode:'text',text:[`<b>${lbl}</b>`],
+    textposition:'top right',
+    textfont:{color,size:11,family:'IBM Plex Sans, sans-serif',weight:700},
+    showlegend:false,hoverinfo:'skip'};
+  return[main,lblT];
+}
+
+function interpAtT(sortedPts,T){
+  if(sortedPts.length===0)return null;
+  if(T<sortedPts[0][0]-0.05)return null;
+  if(T>sortedPts[sortedPts.length-1][0]+0.05)return null;
+  for(let i=0;i<sortedPts.length-1;i++){
+    if(sortedPts[i][0]<=T&&T<=sortedPts[i+1][0]){
+      const f=(T-sortedPts[i][0])/(sortedPts[i+1][0]-sortedPts[i][0]);
+      return{h:sortedPts[i][1]+f*(sortedPts[i+1][1]-sortedPts[i][1]),
+             s:sortedPts[i][2]+f*(sortedPts[i+1][2]-sortedPts[i][2])};
+    }
+  }
+  return null;
+}
+
+function bracketIsobars(P_native){
+  const sh=getSH();
+  const shSorted=sh.slice().sort((a,b)=>a.P-b.P);
+  if(P_native<shSorted[0].P-1e-6||P_native>shSorted[shSorted.length-1].P+1e-6)return null;
+  for(let i=0;i<shSorted.length-1;i++){
+    if(shSorted[i].P<=P_native&&P_native<=shSorted[i+1].P){
+      const f=(P_native-shSorted[i].P)/(shSorted[i+1].P-shSorted[i].P);
+      return{lower:shSorted[i],upper:shSorted[i+1],f};
+    }
+  }
+  return null;
+}
+
+function buildCustomIsobar(P_native,color){
+  const sat=getSat();
+  const Pcrit=sat[sat.length-1].P;
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const pU=units==='SI'?'bar':'psia';
+  const tU=units==='SI'?'°C':'°F';
+  const Plbl=`${(+P_native.toFixed(4))} ${pU}`;
+  const br=bracketIsobars(P_native);
+  if(!br)return[];
+  if(Math.abs(br.lower.P-P_native)<1e-4)return buildIsobar(br.lower.P,color);
+  if(Math.abs(br.upper.P-P_native)<1e-4)return buildIsobar(br.upper.P,color);
+  const lowerSorted=br.lower.pts.slice().sort((a,b)=>a[0]-b[0]);
+  const upperSorted=br.upper.pts.slice().sort((a,b)=>a[0]-b[0]);
+  const f=br.f;
+  const isSub=P_native<Pcrit*0.9999;
+  let hfS=null,hgS=null,sfS=null,sgS=null,Tsat=null;
+  if(isSub){
+    const s=satAtP(P_native);
+    hfS=s.hf;hgS=s.hg;sfS=s.sf;sgS=s.sg;Tsat=s.T;
+  }else{
+    Tsat=sat[sat.length-1].T;
+  }
+  const bipX=[],bipY=[],bipT=[];
+  if(isSub){
+    const nBip=24;
+    for(let k=0;k<=nBip;k++){
+      const x=X_MIN_ISOBAR+(1-X_MIN_ISOBAR)*(k/nBip);
+      bipX.push(sfS+x*(sgS-sfS));
+      bipY.push(hfS+x*(hgS-hfS));
+      bipT.push(Tsat);
+    }
+  }
+  const Tset=new Set();
+  lowerSorted.forEach(p=>Tset.add(p[0]));
+  upperSorted.forEach(p=>Tset.add(p[0]));
+  const Ts=Array.from(Tset).sort((a,b)=>a-b);
+  const supX=[],supY=[],supT=[];
+  if(isSub&&sgS!==null){supX.push(sgS);supY.push(hgS);supT.push(Tsat);}
+  Ts.forEach(T=>{
+    if(isSub&&T<Tsat-0.5)return;
+    const lv=interpAtT(lowerSorted,T);
+    const uv=interpAtT(upperSorted,T);
+    if(!lv||!uv)return;
+    const h=lv.h+f*(uv.h-lv.h);
+    const s=lv.s+f*(uv.s-lv.s);
+    if(isSub&&s<sgS-1e-3)return;
+    supX.push(s);supY.push(h);supT.push(T);
+  });
+  const xAll=bipX.length>0?[...bipX,...supX.slice(1)]:[...supX];
+  const yAll=bipY.length>0?[...bipY,...supY.slice(1)]:[...supY];
+  const tArr=bipT.length>0?[...bipT,...supT.slice(1)]:[...supT];
+  if(xAll.length<2)return[];
+  const main={x:xAll,y:yAll,mode:'lines',meta:'isobar',name:Plbl,
+    line:{color,width:2.2,dash:'dash'},showlegend:false,
+    customdata:tArr,
+    hovertemplate:`<b>P = ${Plbl}</b> <i>(personalizada)</i><br>T = %{customdata:.1f} ${tU}<br>h = %{y:.1f} ${hU}<br>s = %{x:.4g} ${sU}<extra></extra>`};
+  const lx=supX.length>0?supX[supX.length-1]:(bipX[0]||0);
+  const ly=supY.length>0?supY[supY.length-1]:(bipY[0]||0);
+  const lbl={x:[lx],y:[ly],mode:'text',text:[`<b>${Plbl}</b>`],
+    textposition:'top right',textfont:{color,size:11,family:'IBM Plex Sans, sans-serif',weight:700},
+    showlegend:false,hoverinfo:'skip'};
+  return[main,lbl];
+}
+
+function buildCustomIsotherm(T_native,color){
+  const traces=buildIsotherm(T_native,color);
+  if(traces.length===0)return[];
+  if(traces[0]&&traces[0].line){
+    traces[0].line={...traces[0].line,dash:'dash',width:2.2};
+    if(traces[0].hovertemplate){
+      traces[0].hovertemplate=traces[0].hovertemplate.replace(/<b>T = /,'<b>T = ').replace(/<\/b>/,'</b> <i>(personalizada)</i>');
+    }
+  }
+  return traces;
+}
+
+function interpHSatTP(T_native,P_native){
+  const sat=getSat();
+  const Pcrit=sat[sat.length-1].P;
+  const isSub=P_native<Pcrit*0.9999;
+  const br=bracketIsobars(P_native);
+  if(!br)return null;
+  const lowerSorted=br.lower.pts.slice().sort((a,b)=>a[0]-b[0]);
+  const upperSorted=br.upper.pts.slice().sort((a,b)=>a[0]-b[0]);
+  const f=br.f;
+  let Tsat=null;
+  if(isSub){
+    Tsat=satAtP(P_native).T;
+    if(T_native<Tsat-0.05)return{error:'two-phase',Tsat};
+  }
+  const lv=interpAtT(lowerSorted,T_native);
+  const uv=interpAtT(upperSorted,T_native);
+  if(!lv||!uv)return null;
+  const h=lv.h+f*(uv.h-lv.h);
+  const s=lv.s+f*(uv.s-lv.s);
+  return{h,s,Tsat,phase:isSub?'superheated':'supercritical'};
+}
+
+function satAtT(T_native){
+  const s=getSat();
+  if(T_native<=s[0].T)return{...s[0],T:T_native};
+  if(T_native>=s[s.length-1].T)return{...s[s.length-1],T:T_native};
+  for(let i=0;i<s.length-1;i++){
+    if(s[i].T<=T_native&&T_native<=s[i+1].T){
+      const f=(T_native-s[i].T)/(s[i+1].T-s[i].T);
+      return{T:T_native,
+        P:s[i].P+f*(s[i+1].P-s[i].P),
+        hf:s[i].hf+f*(s[i+1].hf-s[i].hf),
+        hg:s[i].hg+f*(s[i+1].hg-s[i].hg),
+        sf:s[i].sf+f*(s[i+1].sf-s[i].sf),
+        sg:s[i].sg+f*(s[i+1].sg-s[i].sg)};
+    }
+  }
+  return{...s[s.length-1],T:T_native};
+}
+
+function interpHSatTs(T_native,s_native){
+  const sat=getSat();
+  const sh=getSH();
+  const Tcrit=sat[sat.length-1].T;
+  const isSubT=T_native<Tcrit-0.05;
+  if(isSubT){
+    const sT=satAtT(T_native);
+    const sfT=sT.sf,sgT=sT.sg;
+    if(s_native<sfT-1e-3)return{error:'liquid',sf:sfT,sg:sgT,Psat:sT.P,Tsat:T_native};
+    if(s_native<=sgT+1e-3)return{error:'two-phase',sf:sfT,sg:sgT,Psat:sT.P,Tsat:T_native};
+  }
+  const shSorted=sh.slice().sort((a,b)=>a.P-b.P);
+  const pts=[];
+  shSorted.forEach(iso=>{
+    const sorted=iso.pts.slice().sort((a,b)=>a[0]-b[0]);
+    const r=interpAtT(sorted,T_native);
+    if(r)pts.push([iso.P,r.h,r.s]);
+  });
+  if(pts.length<2)return null;
+  for(let i=0;i<pts.length-1;i++){
+    const s1=pts[i][2],s2=pts[i+1][2];
+    const sLo=Math.min(s1,s2),sHi=Math.max(s1,s2);
+    if(sLo-1e-6<=s_native&&s_native<=sHi+1e-6){
+      const den=(s2-s1);
+      const f=Math.abs(den)<1e-9?0:(s_native-s1)/den;
+      const P=pts[i][0]+f*(pts[i+1][0]-pts[i][0]);
+      const h=pts[i][1]+f*(pts[i+1][1]-pts[i][1]);
+      return{h,P,phase:isSubT?'superheated':'supercritical'};
+    }
+  }
+  return null;
+}
+
+function interpHSatPs(P_native,s_native){
+  const sat=getSat();
+  const Pcrit=sat[sat.length-1].P;
+  const isSub=P_native<Pcrit*0.9999;
+  if(isSub){
+    const sP=satAtP(P_native);
+    const sfP=sP.sf,sgP=sP.sg;
+    if(s_native<sfP-1e-3)return{error:'liquid',sf:sfP,sg:sgP,Tsat:sP.T,Psat:P_native};
+    if(s_native<=sgP+1e-3)return{error:'two-phase',sf:sfP,sg:sgP,Tsat:sP.T,Psat:P_native};
+  }
+  const br=bracketIsobars(P_native);
+  if(!br)return null;
+  const lowerSorted=br.lower.pts.slice().sort((a,b)=>a[0]-b[0]);
+  const upperSorted=br.upper.pts.slice().sort((a,b)=>a[0]-b[0]);
+  const f=br.f;
+  const Tset=new Set();
+  lowerSorted.forEach(p=>Tset.add(p[0]));
+  upperSorted.forEach(p=>Tset.add(p[0]));
+  const Ts=Array.from(Tset).sort((a,b)=>a-b);
+  const pts=[];
+  Ts.forEach(T=>{
+    const lv=interpAtT(lowerSorted,T);
+    const uv=interpAtT(upperSorted,T);
+    if(!lv||!uv)return;
+    const h=lv.h+f*(uv.h-lv.h);
+    const s=lv.s+f*(uv.s-lv.s);
+    pts.push([T,h,s]);
+  });
+  if(pts.length<2)return null;
+  for(let i=0;i<pts.length-1;i++){
+    const s1=pts[i][2],s2=pts[i+1][2];
+    const sLo=Math.min(s1,s2),sHi=Math.max(s1,s2);
+    if(sLo-1e-6<=s_native&&s_native<=sHi+1e-6){
+      const den=(s2-s1);
+      const fr=Math.abs(den)<1e-9?0:(s_native-s1)/den;
+      const T=pts[i][0]+fr*(pts[i+1][0]-pts[i][0]);
+      const h=pts[i][1]+fr*(pts[i+1][1]-pts[i][1]);
+      return{h,T,phase:isSub?'superheated':'supercritical'};
+    }
+  }
+  return null;
+}
+
+function buildTPPointsTrace(){
+  if(tpPoints.length===0)return null;
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const pU=units==='SI'?'bar':'psia';
+  const tU=units==='SI'?'°C':'°F';
+  const xs=tpPoints.map(p=>units==='SI'?p.sSi:p.sSi*CS);
+  const ys=tpPoints.map(p=>units==='SI'?p.hSi:p.hSi*CH);
+  const Ts=tpPoints.map(p=>units==='SI'?p.Tsi:p.Tsi*9/5+32);
+  const Ps=tpPoints.map(p=>units==='SI'?p.Psi:p.Psi*14.5038);
+  const labels=tpPoints.map((p,i)=>`T${i+1}`);
+  const MODE_LBL={TP:'(T,P)',Ts:'(T,s)',Ps:'(P,s)'};
+  const modes=tpPoints.map(p=>MODE_LBL[p.mode||'TP']);
+  const cd=tpPoints.map((p,i)=>[Ts[i],Ps[i],modes[i]]);
+  return{x:xs,y:ys,mode:'markers+text',meta:'tppoint',name:'Puntos',
+    text:labels.map(l=>`<b>${l}</b>`),textposition:'bottom right',
+    textfont:{size:11.5,color:'#4a148c',family:"'IBM Plex Sans',sans-serif",weight:700},
+    marker:{size:13,color:'#7b1fa2',symbol:'diamond',line:{color:'#fff',width:2}},
+    customdata:cd,showlegend:false,
+    hovertemplate:`<b>%{text}</b> <i>%{customdata[2]}</i><br>T = %{customdata[0]:.2f} ${tU}<br>P = %{customdata[1]:.4g} ${pU}<br>h = %{y:.2f} ${hU}<br>s = %{x:.4f} ${sU}<extra></extra>`};
+}
+
+// ════════════════════════════════════════════════════════════
+// ISOENTÁLPICA  h = const  (recta horizontal)
+// ════════════════════════════════════════════════════════════
+function buildHLine(h_native,color){
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const xR=units==='SI'?[-0.05,1.40]:[-0.02,0.32];
+  const lbl=`h = ${h_native} ${hU}`;
+  const main={x:[xR[0],xR[1]],y:[h_native,h_native],mode:'lines',meta:'hline',
+    name:lbl,line:{color,width:1.8},showlegend:false,
+    hovertemplate:`<b>h = ${h_native} ${hU}</b><br>s = %{x:.4g} ${sU}<extra></extra>`};
+  const lblT={x:[xR[0]+(xR[1]-xR[0])*0.015],y:[h_native],mode:'text',
+    text:[`<b>${h_native}</b>`],textposition:'top right',
+    textfont:{color,size:11,family:'IBM Plex Sans, sans-serif',weight:700},
+    showlegend:false,hoverinfo:'skip'};
+  return[main,lblT];
+}
+
+// ════════════════════════════════════════════════════════════
+// ISOENTRÓPICA  s = const  (recta vertical)
+// ════════════════════════════════════════════════════════════
+function buildSLine(s_native,color){
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const yR=units==='SI'?[0,400]:[0,170];
+  const lbl=`s = ${s_native} ${sU}`;
+  const main={x:[s_native,s_native],y:[yR[0],yR[1]],mode:'lines',meta:'sline',
+    name:lbl,line:{color,width:1.8},showlegend:false,
+    hovertemplate:`<b>s = ${s_native} ${sU}</b><br>h = %{y:.1f} ${hU}<extra></extra>`};
+  const lblT={x:[s_native],y:[yR[1]-(yR[1]-yR[0])*0.015],mode:'text',
+    text:[`<b>${s_native}</b>`],textposition:'bottom right',
+    textfont:{color,size:11,family:'IBM Plex Sans, sans-serif',weight:700},
+    showlegend:false,hoverinfo:'skip'};
+  return[main,lblT];
+}
+
+// ════════════════════════════════════════════════════════════
+// TRAZA DE SATURACIÓN DE VAPOR
+// ════════════════════════════════════════════════════════════
+const trVap={mode:'lines+markers',name:'Vapor saturado',meta:'sat',
+  line:{color:'#2e7d32',width:2.5},marker:{size:4,color:'#2e7d32'},showlegend:false,
+  hoverlabel:{bgcolor:'#fff',bordercolor:'#2e7d32',
+    font:{family:"'IBM Plex Mono',monospace",size:12,color:'#2e7d32'}}};
+
+// ════════════════════════════════════════════════════════════
+// LAYOUT
+// ════════════════════════════════════════════════════════════
+const layout={
+  paper_bgcolor:'#fff',plot_bgcolor:'#fafcff',
+  font:{family:"'IBM Plex Sans',sans-serif",color:'#1a2233',size:11.5},
+  margin:{l:90,r:92,t:40,b:75},
+  xaxis:{type:'linear',showgrid:true,gridcolor:'#e3edf9',zeroline:false,
+    showline:true,linecolor:'#1976d2',linewidth:2.5,tickcolor:'#1976d2',
+    tickwidth:2,ticklen:7,mirror:'ticks',
+    tickfont:{size:11.5,color:'#0d3b66',family:"'IBM Plex Sans',sans-serif"},
+    minor:{showgrid:true,gridcolor:'#eef4fb',tickcolor:'#90b8e0',ticklen:4}},
+  yaxis:{type:'linear',showgrid:true,gridcolor:'#e3edf9',zeroline:false,
+    showline:true,linecolor:'#7b1fa2',linewidth:2.5,tickcolor:'#7b1fa2',
+    tickwidth:2,ticklen:7,side:'left',
+    tickfont:{size:11.5,color:'#4a148c',family:"'IBM Plex Sans',sans-serif"},
+    minor:{showgrid:true,gridcolor:'#eef4fb',tickcolor:'#b39ddb',ticklen:4}},
+  yaxis2:{type:'linear',overlaying:'y',side:'right',showgrid:false,zeroline:false,
+    showline:true,linecolor:'#7b1fa2',linewidth:2.5,tickcolor:'#7b1fa2',
+    tickwidth:2,ticklen:7,matches:'y',
+    tickfont:{size:11.5,color:'#4a148c',family:"'IBM Plex Sans',sans-serif"}},
+  dragmode:'pan',showlegend:false,hovermode:'closest',
+  hoverlabel:{bgcolor:'#fff',bordercolor:'#1976d2',
+    font:{family:"'IBM Plex Mono',monospace",size:12,color:'#1a2233'}},
+  annotations:[],shapes:[]
+};
+const config={responsive:true,displayModeBar:true,scrollZoom:true,
+  modeBarButtonsToRemove:['lasso2d','select2d'],displaylogo:false,
+  toImageButtonOptions:{format:'png',filename:'diagrama_hs_R134a',scale:2}};
+
+// ════════════════════════════════════════════════════════════
+// RENDERIZADO CENTRAL
+// ════════════════════════════════════════════════════════════
+function rebuild(){
+  const sat=getSat();
+  const hgD=sat.map(d=>d.hg);
+  const sgD=sat.map(d=>d.sg);
+  const tUl=units==='SI'?'°C':'°F';
+  const hUl=units==='SI'?'kJ/kg':'Btu/lbm';
+  const sUl=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const pUl=units==='SI'?'bar':'psia';
+  const sU=units==='SI'?'(kJ/(kg·K))':'(Btu/(lbm·°R))';
+  const hU=units==='SI'?'(kJ/kg)':'(Btu/lbm)';
+  const xR=units==='SI'?[-0.05,1.40]:[-0.02,0.32];
+  const yR=units==='SI'?[0,400]:[0,170];
+
+  const hV=sat.map(d=>`<b>Vapor Saturado</b><br>T<sub>sat</sub>=${d.T.toFixed(2)} ${tUl}<br>P=${d.P.toFixed(4)} ${pUl}<br>h<sub>g</sub>=${d.hg.toFixed(2)} ${hUl}<br>s<sub>g</sub>=${d.sg.toFixed(4)} ${sUl}<extra></extra>`);
+
+  const crit=sat[sat.length-1];
+  const critPt={x:[crit.sg],y:[crit.hg],mode:'markers+text',
+    text:['<b>Punto crítico</b>'],textposition:'top right',
+    textfont:{size:11.5,color:'#bf360c',family:"'IBM Plex Sans',sans-serif",weight:700},
+    marker:{size:12,color:'#e65100',symbol:'star',line:{color:'#fff',width:2}},
+    showlegend:false,hovertemplate:`<b>Punto Crítico</b><br>T = ${crit.T} ${tUl}<br>h = ${crit.hg.toFixed(1)} ${hUl}<br>s = ${crit.sg.toFixed(4)} ${sUl}<br>P = ${crit.P} ${pUl}<extra></extra>`};
+
+  const gIso =grpIso.flatMap(i=>buildIsobar(i.P,i.c));
+  const sIso =singles.flatMap(i=>buildIsobar(i.P,i.c));
+  const gT_  =grpTIso.flatMap(i=>buildIsotherm(i.T,i.c));
+  const sT_  =singlesT.flatMap(i=>buildIsotherm(i.T,i.c));
+  const gH_  =grpHIso.flatMap(i=>buildHLine(i.h,i.c));
+  const sH_  =singlesH.flatMap(i=>buildHLine(i.h,i.c));
+  const gS_  =grpSIso.flatMap(i=>buildSLine(i.s,i.c));
+  const sS_  =singlesS.flatMap(i=>buildSLine(i.s,i.c));
+  const qL   =qxOn?buildQualityLines():[];
+  const qLC  =customsQX.flatMap(i=>buildCustomQualityLine(i.x,i.c));
+  const cP_  =customsP.flatMap(i=>buildCustomIsobar(units==='SI'?i.Psi:i.Psi*14.5038,i.c));
+  const cT_  =customsT.flatMap(i=>buildCustomIsotherm(units==='SI'?i.Tsi:(i.Tsi*9/5+32),i.c));
+  const tpTr =buildTPPointsTrace();
+  const cH_  =customsH.flatMap(i=>buildHLine(units==='SI'?i.hSi:i.hSi*CH,i.c));
+  const cS_  =customsS.flatMap(i=>buildSLine(units==='SI'?i.sSi:i.sSi*CS,i.c));
+
+  const y2Anchor={x:[xR[0]],y:[yR[0]],yaxis:'y2',mode:'markers',
+    marker:{size:0.1,color:'rgba(0,0,0,0)'},showlegend:false,hoverinfo:'skip',meta:'axis2'};
+
+  const fcPath=buildFCPath();
+
+  Plotly.react('chart',[
+    y2Anchor,
+    ...qL,...qLC,
+    ...gH_,...sH_,...gS_,...sS_,...cH_,...cS_,
+    {...trVap,x:sgD,y:hgD,hovertemplate:hV},
+    ...gIso,...sIso,...gT_,...sT_,...cP_,...cT_,
+    critPt,
+    ...(fcPath.trace?[fcPath.trace]:[]),
+    ...(tpTr?[tpTr]:[])
+  ],{...layout,
+    annotations:fcPath.annotations,
+    xaxis:{...layout.xaxis,range:xR,
+      title:{text:`<b>Entropía Específica  s  ${sU}</b>`,
+        font:{size:14,color:'#0d47a1',family:"'IBM Plex Sans',sans-serif"},standoff:16}},
+    yaxis:{...layout.yaxis,range:yR,
+      title:{text:`<b>Entalpía Específica  h  ${hU}</b>`,
+        font:{size:14,color:'#4a148c',family:"'IBM Plex Sans',sans-serif"},standoff:16}},
+    yaxis2:{...layout.yaxis2,range:yR,
+      title:{text:`<b>h  ${hU}</b>`,
+        font:{size:13,color:'#4a148c',family:"'IBM Plex Sans',sans-serif"},standoff:12}}
+  },config);
+  setTimeout(buildAxHandles,80);
+}
+
+// ════════════════════════════════════════════════════════════
+// GESTIÓN DE GRUPOS E ISOBARAS
+// ════════════════════════════════════════════════════════════
+function toggleGrp(g){
+  activeGrp[g]=document.getElementById(`sh-${g}`).checked;
+  const gr=getGRP();grpIso=[];let ci=0;
+  ['low','mid','high','vhigh'].forEach(k=>{
+    if(!activeGrp[k])return;
+    gr[k].forEach(P=>{grpIso.push({P,c:PAL_ISO[ci%PAL_ISO.length]});ci++;});
+  });rebuild();
+}
+
+function getGRP_T(){return units==='SI'?GRP_T_SI:GRP_T_ENG;}
+function getGRP_H(){return units==='SI'?GRP_H_SI:GRP_H_ENG;}
+function getGRP_S(){return units==='SI'?GRP_S_SI:GRP_S_ENG;}
+
+function toggleGrpT(g){
+  activeGrpT[g]=document.getElementById(`st-${g}`).checked;
+  const gr=getGRP_T();grpTIso=[];let ci=0;
+  ['low','mid','high','vhigh'].forEach(k=>{
+    if(!activeGrpT[k])return;
+    gr[k].forEach(T=>{grpTIso.push({T,c:PAL_ISO[(ci*5+2)%PAL_ISO.length]});ci++;});
+  });rebuild();
+}
+
+function toggleGrpH(g){
+  activeGrpH[g]=document.getElementById(`sh-h-${g}`).checked;
+  const gr=getGRP_H();grpHIso=[];let ci=0;
+  ['low','mid','high','vhigh'].forEach(k=>{
+    if(!activeGrpH[k])return;
+    gr[k].forEach(h=>{grpHIso.push({h,c:PAL_ISO[(ci*7+5)%PAL_ISO.length]});ci++;});
+  });rebuild();
+}
+
+function toggleGrpS(g){
+  activeGrpS[g]=document.getElementById(`sh-s-${g}`).checked;
+  const gr=getGRP_S();grpSIso=[];let ci=0;
+  ['low','mid','high','vhigh'].forEach(k=>{
+    if(!activeGrpS[k])return;
+    gr[k].forEach(s=>{grpSIso.push({s,c:PAL_ISO[(ci*11+8)%PAL_ISO.length]});ci++;});
+  });rebuild();
+}
+
+function toggleQx(){
+  qxOn=!qxOn;
+  document.getElementById('tog-qx').classList.toggle('active',qxOn);
+  rebuild();
+}
+
+function updLabels(){
+  const g=getGRP(),gt=getGRP_T(),gh=getGRP_H(),gs=getGRP_S();
+  const pU=units==='SI'?'bar':'psia';
+  const tU=units==='SI'?'°C':'°F';
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  document.getElementById('lbl-low').textContent  =`Bajas (${g.low[0]}–${g.low[g.low.length-1]} ${pU})`;
+  document.getElementById('lbl-mid').textContent  =`Medias (${g.mid[0]}–${g.mid[g.mid.length-1]} ${pU})`;
+  document.getElementById('lbl-high').textContent =`Altas (${g.high[0]}–${g.high[g.high.length-1]} ${pU})`;
+  document.getElementById('lbl-vhigh').textContent=`Muy altas (${g.vhigh[0]}–${g.vhigh[g.vhigh.length-1]} ${pU})`;
+  document.getElementById('lbl-tlow').textContent  =`Bajas (${gt.low[0]}–${gt.low[gt.low.length-1]} ${tU})`;
+  document.getElementById('lbl-tmid').textContent  =`Medias (${gt.mid[0]}–${gt.mid[gt.mid.length-1]} ${tU})`;
+  document.getElementById('lbl-thigh').textContent =`Altas (${gt.high[0]}–${gt.high[gt.high.length-1]} ${tU})`;
+  document.getElementById('lbl-tvhigh').textContent=`Muy altas (${gt.vhigh[0]}–${gt.vhigh[gt.vhigh.length-1]} ${tU})`;
+  document.getElementById('lbl-hlow').textContent  =`Bajas (${gh.low[0]}–${gh.low[gh.low.length-1]} ${hU})`;
+  document.getElementById('lbl-hmid').textContent  =`Medias (${gh.mid[0]}–${gh.mid[gh.mid.length-1]} ${hU})`;
+  document.getElementById('lbl-hhigh').textContent =`Altas (${gh.high[0]}–${gh.high[gh.high.length-1]} ${hU})`;
+  document.getElementById('lbl-hvhigh').textContent=`Muy altas (${gh.vhigh[0]}–${gh.vhigh[gh.vhigh.length-1]} ${hU})`;
+  document.getElementById('lbl-slow').textContent  =`Bajas (${gs.low[0]}–${gs.low[gs.low.length-1]} ${sU})`;
+  document.getElementById('lbl-smid').textContent  =`Medias (${gs.mid[0]}–${gs.mid[gs.mid.length-1]} ${sU})`;
+  document.getElementById('lbl-shigh').textContent =`Altas (${gs.high[0]}–${gs.high[gs.high.length-1]} ${sU})`;
+  document.getElementById('lbl-svhigh').textContent=`Muy altas (${gs.vhigh[0]}–${gs.vhigh[gs.vhigh.length-1]} ${sU})`;
+}
+
+function populateSels(){
+  const sel=document.getElementById('sel-single'),sh=getSH();
+  const prev=parseFloat(sel.value);sel.innerHTML='';
+  const pU=units==='SI'?'bar':'psia';
+  sh.forEach(iso=>{
+    const o=document.createElement('option');
+    o.value=iso.P;o.textContent=`${iso.P} ${pU}`;
+    if(Math.abs(iso.P-prev)<0.001)o.selected=true;
+    sel.appendChild(o);
+  });
+  const selT=document.getElementById('sel-singleT');
+  const prevT=parseFloat(selT.value);selT.innerHTML='';
+  const tU=units==='SI'?'°C':'°F';
+  const gt=getGRP_T();
+  const allT=[...new Set([...gt.low,...gt.mid,...gt.high,...gt.vhigh])].sort((a,b)=>a-b);
+  allT.forEach(T=>{
+    const o=document.createElement('option');
+    o.value=T;o.textContent=`${T} ${tU}`;
+    if(Math.abs(T-prevT)<0.001)o.selected=true;
+    selT.appendChild(o);
+  });
+  const selH=document.getElementById('sel-singleH');
+  const prevH=parseFloat(selH.value);selH.innerHTML='';
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const gh=getGRP_H();
+  const allH=[...new Set([...gh.low,...gh.mid,...gh.high,...gh.vhigh])].sort((a,b)=>a-b);
+  allH.forEach(h=>{
+    const o=document.createElement('option');
+    o.value=h;o.textContent=`${h} ${hU}`;
+    if(Math.abs(h-prevH)<0.001)o.selected=true;
+    selH.appendChild(o);
+  });
+  const selS=document.getElementById('sel-singleS');
+  const prevS=parseFloat(selS.value);selS.innerHTML='';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const gs=getGRP_S();
+  const allS=[...new Set([...gs.low,...gs.mid,...gs.high,...gs.vhigh])].sort((a,b)=>a-b);
+  allS.forEach(s=>{
+    const o=document.createElement('option');
+    o.value=s;o.textContent=`${s.toFixed(2)} ${sU}`;
+    if(Math.abs(s-prevS)<0.001)o.selected=true;
+    selS.appendChild(o);
+  });
+}
+
+function addSingle(){
+  const P=parseFloat(document.getElementById('sel-single').value);
+  if(singles.find(i=>i.P===P))return;
+  singles.push({P,c:PAL_ISO[(singles.length*3)%PAL_ISO.length],id:++singleId});
+  renderSingles();rebuild();
+}
+function rmSingle(id){singles=singles.filter(i=>i.id!==id);renderSingles();rebuild();}
+function clearSingles(){singles=[];renderSingles();rebuild();}
+function renderSingles(){
+  const l=document.getElementById('list-single');if(!l)return;l.innerHTML='';
+  const pU=units==='SI'?'bar':'psia';
+  singles.forEach(i=>l.appendChild(mkIsoRow(`${i.P} ${pU}`,i.c,()=>rmSingle(i.id))));
+}
+function addSingleT(){
+  const T=parseFloat(document.getElementById('sel-singleT').value);
+  if(singlesT.find(i=>i.T===T))return;
+  singlesT.push({T,c:PAL_ISO[(singlesT.length*5+3)%PAL_ISO.length],id:++singleTId});
+  renderSinglesT();rebuild();
+}
+function rmSingleT(id){singlesT=singlesT.filter(i=>i.id!==id);renderSinglesT();rebuild();}
+function clearSinglesT(){singlesT=[];renderSinglesT();rebuild();}
+function renderSinglesT(){
+  const l=document.getElementById('list-singleT');if(!l)return;l.innerHTML='';
+  const tU=units==='SI'?'°C':'°F';
+  singlesT.forEach(i=>l.appendChild(mkIsoRow(`${i.T} ${tU}`,i.c,()=>rmSingleT(i.id))));
+}
+function addSingleH(){
+  const h=parseFloat(document.getElementById('sel-singleH').value);
+  if(isNaN(h)||singlesH.find(i=>i.h===h))return;
+  singlesH.push({h,c:PAL_ISO[(singlesH.length*7+1)%PAL_ISO.length],id:++singleHId});
+  renderSinglesH();rebuild();
+}
+function rmSingleH(id){singlesH=singlesH.filter(i=>i.id!==id);renderSinglesH();rebuild();}
+function clearSinglesH(){singlesH=[];renderSinglesH();rebuild();}
+function renderSinglesH(){
+  const l=document.getElementById('list-singleH');if(!l)return;l.innerHTML='';
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  singlesH.forEach(i=>l.appendChild(mkIsoRow(`${i.h} ${hU}`,i.c,()=>rmSingleH(i.id))));
+}
+function addSingleS(){
+  const s=parseFloat(document.getElementById('sel-singleS').value);
+  if(isNaN(s)||singlesS.find(i=>i.s===s))return;
+  singlesS.push({s,c:PAL_ISO[(singlesS.length*11+4)%PAL_ISO.length],id:++singleSId});
+  renderSinglesS();rebuild();
+}
+function rmSingleS(id){singlesS=singlesS.filter(i=>i.id!==id);renderSinglesS();rebuild();}
+function clearSinglesS(){singlesS=[];renderSinglesS();rebuild();}
+function renderSinglesS(){
+  const l=document.getElementById('list-singleS');if(!l)return;l.innerHTML='';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  singlesS.forEach(i=>l.appendChild(mkIsoRow(`${i.s} ${sU}`,i.c,()=>rmSingleS(i.id))));
+}
+
+function addCustomQX(){
+  const inp=document.getElementById('inp-customQX');
+  const msg=document.getElementById('msg-customQX');
+  const x=parseFloat(inp.value);
+  msg.textContent='';
+  if(isNaN(x)){msg.textContent='Ingresa un número.';return;}
+  if(x<=0||x>=1){msg.textContent='Debe cumplir 0 < x < 1.';return;}
+  if(customsQX.some(c=>Math.abs(c.x-x)<1e-4)){msg.textContent='Valor ya graficado.';return;}
+  customsQX.push({x,c:PAL_ISO[(customQXCI*3+2)%PAL_ISO.length],id:++customQXId});
+  customQXCI++;inp.value='';renderCustomsQX();rebuild();
+}
+function rmCustomQX(id){customsQX=customsQX.filter(c=>c.id!==id);renderCustomsQX();rebuild();}
+function clearCustomsQX(){customsQX=[];customQXCI=0;const msg=document.getElementById('msg-customQX');if(msg)msg.textContent='';renderCustomsQX();rebuild();}
+function renderCustomsQX(){
+  const l=document.getElementById('list-customQX');if(!l)return;l.innerHTML='';
+  customsQX.forEach(i=>{const lbl=i.x.toFixed(4).replace(/0+$/,'').replace(/\.$/,'');l.appendChild(mkIsoRow(`x = ${lbl}`,i.c,()=>rmCustomQX(i.id)));});
+}
+
+function getCustomPRangeNative(){const sh=getSH();const ps=sh.map(r=>r.P).sort((a,b)=>a-b);return[ps[0],ps[ps.length-1]];}
+function addCustomP(){
+  const inp=document.getElementById('inp-customP');
+  const msg=document.getElementById('msg-customP');
+  const Pn=parseFloat(inp.value);msg.textContent='';
+  if(isNaN(Pn)){msg.textContent='Ingresa un número.';return;}
+  const r=getCustomPRangeNative();const pU=units==='SI'?'bar':'psia';
+  if(Pn<r[0]||Pn>r[1]){msg.textContent=`Fuera de rango (${r[0]}–${r[1]} ${pU}).`;return;}
+  const Psi=units==='SI'?Pn:Pn/14.5038;
+  if(customsP.some(c=>Math.abs(c.Psi-Psi)/Math.max(Psi,1e-3)<5e-3)){msg.textContent='Valor ya graficado.';return;}
+  const test=buildCustomIsobar(Pn,'#000');
+  if(test.length===0){msg.textContent='No interpolable con la tabla.';return;}
+  customsP.push({Psi,c:PAL_ISO[(customPCI*9+4)%PAL_ISO.length],id:++customPId});customPCI++;inp.value='';renderCustomsP();rebuild();
+}
+function rmCustomP(id){customsP=customsP.filter(c=>c.id!==id);renderCustomsP();rebuild();}
+function clearCustomsP(){customsP=[];customPCI=0;const m=document.getElementById('msg-customP');if(m)m.textContent='';renderCustomsP();rebuild();}
+function renderCustomsP(){
+  const l=document.getElementById('list-customP');if(!l)return;l.innerHTML='';
+  const pU=units==='SI'?'bar':'psia';
+  customsP.forEach(i=>{const Pdisp=units==='SI'?i.Psi:i.Psi*14.5038;l.appendChild(mkIsoRow(`${(+Pdisp.toFixed(4))} ${pU}`,i.c,()=>rmCustomP(i.id)));});
+}
+
+function getCustomTRangeNative(){const sh=getSH();let mn=Infinity,mx=-Infinity;sh.forEach(iso=>iso.pts.forEach(p=>{if(p[0]<mn)mn=p[0];if(p[0]>mx)mx=p[0];}));return[mn,mx];}
+function addCustomT(){
+  const inp=document.getElementById('inp-customT');const msg=document.getElementById('msg-customT');
+  const Tn=parseFloat(inp.value);msg.textContent='';
+  if(isNaN(Tn)){msg.textContent='Ingresa un número.';return;}
+  const r=getCustomTRangeNative();const tU=units==='SI'?'°C':'°F';
+  if(Tn<r[0]||Tn>r[1]){msg.textContent=`Fuera de rango (${r[0]}–${r[1]} ${tU}).`;return;}
+  const Tsi=units==='SI'?Tn:(Tn-32)*5/9;
+  if(customsT.some(c=>Math.abs(c.Tsi-Tsi)<0.05)){msg.textContent='Valor ya graficado.';return;}
+  const test=buildCustomIsotherm(Tn,'#000');
+  if(test.length===0){msg.textContent='No interpolable con la tabla.';return;}
+  customsT.push({Tsi,c:PAL_ISO[(customTCI*13+7)%PAL_ISO.length],id:++customTId});customTCI++;inp.value='';renderCustomsT();rebuild();
+}
+function rmCustomT(id){customsT=customsT.filter(c=>c.id!==id);renderCustomsT();rebuild();}
+function clearCustomsT(){customsT=[];customTCI=0;const m=document.getElementById('msg-customT');if(m)m.textContent='';renderCustomsT();rebuild();}
+function renderCustomsT(){
+  const l=document.getElementById('list-customT');if(!l)return;l.innerHTML='';
+  const tU=units==='SI'?'°C':'°F';
+  customsT.forEach(i=>{const Tdisp=units==='SI'?i.Tsi:(i.Tsi*9/5+32);l.appendChild(mkIsoRow(`${(+Tdisp.toFixed(2))} ${tU}`,i.c,()=>rmCustomT(i.id)));});
+}
+
+const PT_MODE_CFG={
+  TP:{lbl:'(T, P)',a:{ph:'T',uSI:'°C',uENG:'°F'},b:{ph:'P',uSI:'bar',uENG:'psia'}},
+  Ts:{lbl:'(T, s)',a:{ph:'T',uSI:'°C',uENG:'°F'},b:{ph:'s',uSI:'kJ/(kg·K)',uENG:'Btu/(lbm·°R)'}},
+  Ps:{lbl:'(P, s)',a:{ph:'P',uSI:'bar',uENG:'psia'},b:{ph:'s',uSI:'kJ/(kg·K)',uENG:'Btu/(lbm·°R)'}}
+};
+function setPointMode(mode){
+  if(!PT_MODE_CFG[mode])return;pointMode=mode;
+  ['TP','Ts','Ps'].forEach(m=>{const b=document.getElementById('pm-'+m);if(b)b.classList.toggle('active',m===mode);});
+  refreshPointInputs();const m=document.getElementById('msg-tp');if(m)m.textContent='';
+}
+function refreshPointInputs(){
+  const cfg=PT_MODE_CFG[pointMode]||PT_MODE_CFG.TP;
+  const lb=document.getElementById('pt-mode-lb');if(lb)lb.textContent=cfg.lbl;
+  const ia=document.getElementById('inp-pt-a');const ib=document.getElementById('inp-pt-b');
+  const ua=document.getElementById('unit-pt-a');const ub=document.getElementById('unit-pt-b');
+  if(ia){ia.placeholder=cfg.a.ph;ia.value='';}if(ib){ib.placeholder=cfg.b.ph;ib.value='';}
+  if(ua)ua.textContent=units==='SI'?cfg.a.uSI:cfg.a.uENG;
+  if(ub)ub.textContent=units==='SI'?cfg.b.uSI:cfg.b.uENG;
+}
+
+function addPoint(){
+  const msg=document.getElementById('msg-tp');msg.textContent='';
+  const a=parseFloat(document.getElementById('inp-pt-a').value);
+  const b=parseFloat(document.getElementById('inp-pt-b').value);
+  if(isNaN(a)||isNaN(b)){msg.textContent='Captura ambos valores numéricos.';return;}
+  const tU=units==='SI'?'°C':'°F';const pU=units==='SI'?'bar':'psia';const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const rT=getCustomTRangeNative();const rP=getCustomPRangeNative();const rS=getCustomSRangeNative();
+  let Tn=null,Pn=null,sn=null,hRes=null;
+  if(pointMode==='TP'){
+    Tn=a;Pn=b;
+    if(Tn<rT[0]||Tn>rT[1]){msg.textContent=`T fuera de rango (${rT[0]}–${rT[1]} ${tU}).`;return;}
+    if(Pn<rP[0]||Pn>rP[1]){msg.textContent=`P fuera de rango (${rP[0]}–${rP[1]} ${pU}).`;return;}
+    const r=interpHSatTP(Tn,Pn);
+    if(!r){msg.textContent='Estado fuera del dominio interpolable.';return;}
+    if(r.error==='two-phase'){msg.textContent=`Estado bifásico: T < T_sat = ${r.Tsat.toFixed(2)} ${tU}.`;return;}
+    hRes=r.h;sn=r.s;
+  }else if(pointMode==='Ts'){
+    Tn=a;sn=b;
+    if(Tn<rT[0]||Tn>rT[1]){msg.textContent=`T fuera de rango (${rT[0]}–${rT[1]} ${tU}).`;return;}
+    if(sn<rS[0]||sn>rS[1]){msg.textContent=`s fuera de rango (${rS[0]}–${rS[1]} ${sU}).`;return;}
+    const r=interpHSatTs(Tn,sn);
+    if(!r){msg.textContent='Estado fuera del dominio interpolable.';return;}
+    if(r.error==='two-phase'){msg.textContent=`Bifásico a T=${r.Tsat.toFixed(2)} ${tU}: s∈[${r.sf.toFixed(4)},${r.sg.toFixed(4)}].`;return;}
+    if(r.error==='liquid'){msg.textContent=`Líquido subenfriado (s < s_f=${r.sf.toFixed(4)} a T=${r.Tsat.toFixed(2)} ${tU}).`;return;}
+    hRes=r.h;Pn=r.P;
+  }else if(pointMode==='Ps'){
+    Pn=a;sn=b;
+    if(Pn<rP[0]||Pn>rP[1]){msg.textContent=`P fuera de rango (${rP[0]}–${rP[1]} ${pU}).`;return;}
+    if(sn<rS[0]||sn>rS[1]){msg.textContent=`s fuera de rango (${rS[0]}–${rS[1]} ${sU}).`;return;}
+    const r=interpHSatPs(Pn,sn);
+    if(!r){msg.textContent='Estado fuera del dominio interpolable.';return;}
+    if(r.error==='two-phase'){msg.textContent=`Bifásico a P=${Pn} ${pU}: s∈[${r.sf.toFixed(4)},${r.sg.toFixed(4)}], T_sat=${r.Tsat.toFixed(2)} ${tU}.`;return;}
+    if(r.error==='liquid'){msg.textContent=`Líquido subenfriado (s < s_f=${r.sf.toFixed(4)} a T_sat=${r.Tsat.toFixed(2)} ${tU}).`;return;}
+    hRes=r.h;Tn=r.T;
+  }else{msg.textContent='Modo no reconocido.';return;}
+  const Tsi=units==='SI'?Tn:(Tn-32)*5/9;
+  const Psi=units==='SI'?Pn:Pn/14.5038;
+  const hSi=units==='SI'?hRes:hRes/CH;
+  const sSi=units==='SI'?sn:sn/CS;
+  tpPoints.push({Tsi,Psi,hSi,sSi,mode:pointMode,c:'#7b1fa2',id:++tpPointId});
+  tpPointCI++;refreshPointInputs();renderTPPoints();rebuild();
+}
+function addTPPoint(){return addPoint();}
+function rmTPPoint(id){tpPoints=tpPoints.filter(p=>p.id!==id);renderTPPoints();rebuild();}
+function clearTPPoints(){tpPoints=[];tpPointCI=0;const m=document.getElementById('msg-tp');if(m)m.textContent='';renderTPPoints();rebuild();}
+function renderTPPoints(){
+  const l=document.getElementById('list-tp');if(!l)return;l.innerHTML='';
+  const tU=units==='SI'?'°C':'°F';const pU=units==='SI'?'bar':'psia';
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const MODE_LBL={TP:'(T,P)',Ts:'(T,s)',Ps:'(P,s)'};
+  tpPoints.forEach((p,i)=>{
+    const Tdisp=units==='SI'?p.Tsi:(p.Tsi*9/5+32);
+    const Pdisp=units==='SI'?p.Psi:p.Psi*14.5038;
+    const hDisp=units==='SI'?p.hSi:p.hSi*CH;
+    const sDisp=units==='SI'?p.sSi:p.sSi*CS;
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:6px;padding:5px 8px;background:#faf4fc;border:1px solid #e1bee7;border-radius:5px';
+    const idx=document.createElement('div');
+    idx.style.cssText='display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:2.6em';
+    const idxN=document.createElement('div');idxN.style.cssText='font-weight:700;color:#4a148c;font-size:.78rem;line-height:1';idxN.textContent=`T${i+1}`;
+    const idxM=document.createElement('div');idxM.style.cssText="font-family:'IBM Plex Mono',monospace;font-size:.58rem;color:#7b1fa2;letter-spacing:.02em;margin-top:1px";idxM.textContent=MODE_LBL[p.mode||'TP'];
+    idx.appendChild(idxN);idx.appendChild(idxM);
+    const coord=document.createElement('div');
+    coord.style.cssText="flex:1;font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:#311b92;line-height:1.35";
+    coord.innerHTML=`T = ${(+Tdisp.toFixed(2))} ${tU} · P = ${(+Pdisp.toFixed(3))} ${pU}<br>h = ${hDisp.toFixed(1)} ${hU}<br>s = ${sDisp.toFixed(4)} ${sU}`;
+    const btn=document.createElement('button');btn.textContent='✕';btn.title='Eliminar';
+    btn.style.cssText='border:none;background:none;color:#6b7a99;cursor:pointer;font-size:.82rem;padding:2px 4px';
+    btn.onclick=()=>rmTPPoint(p.id);
+    row.appendChild(idx);row.appendChild(coord);row.appendChild(btn);l.appendChild(row);
+  });
+}
+
+function getCustomHRangeNative(){return units==='SI'?[0,400]:[0,170];}
+function addCustomH(){
+  const inp=document.getElementById('inp-customH');const msg=document.getElementById('msg-customH');
+  const hn=parseFloat(inp.value);msg.textContent='';
+  if(isNaN(hn)){msg.textContent='Ingresa un número.';return;}
+  const r=getCustomHRangeNative();const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  if(hn<r[0]||hn>r[1]){msg.textContent=`Fuera de rango (${r[0]}–${r[1]} ${hU}).`;return;}
+  const hSi=units==='SI'?hn:hn/CH;
+  if(customsH.some(c=>Math.abs(c.hSi-hSi)<0.5)){msg.textContent='Valor ya graficado.';return;}
+  customsH.push({hSi,c:PAL_ISO[(customHCI*7+9)%PAL_ISO.length],id:++customHId});customHCI++;inp.value='';renderCustomsH();rebuild();
+}
+function rmCustomH(id){customsH=customsH.filter(c=>c.id!==id);renderCustomsH();rebuild();}
+function clearCustomsH(){customsH=[];customHCI=0;const m=document.getElementById('msg-customH');if(m)m.textContent='';renderCustomsH();rebuild();}
+function renderCustomsH(){
+  const l=document.getElementById('list-customH');if(!l)return;l.innerHTML='';const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  customsH.forEach(i=>{const hd=units==='SI'?i.hSi:i.hSi*CH;l.appendChild(mkIsoRow(`${(+hd.toFixed(2))} ${hU}`,i.c,()=>rmCustomH(i.id)));});
+}
+
+function getCustomSRangeNative(){return units==='SI'?[-0.05,1.40]:[-0.02,0.32];}
+function addCustomS(){
+  const inp=document.getElementById('inp-customS');const msg=document.getElementById('msg-customS');
+  const sn=parseFloat(inp.value);msg.textContent='';
+  if(isNaN(sn)){msg.textContent='Ingresa un número.';return;}
+  const r=getCustomSRangeNative();const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  if(sn<r[0]||sn>r[1]){msg.textContent=`Fuera de rango (${r[0]}–${r[1]} ${sU}).`;return;}
+  const sSi=units==='SI'?sn:sn/CS;
+  if(customsS.some(c=>Math.abs(c.sSi-sSi)<1e-3)){msg.textContent='Valor ya graficado.';return;}
+  customsS.push({sSi,c:PAL_ISO[(customSCI*11+6)%PAL_ISO.length],id:++customSId});customSCI++;inp.value='';renderCustomsS();rebuild();
+}
+function rmCustomS(id){customsS=customsS.filter(c=>c.id!==id);renderCustomsS();rebuild();}
+function clearCustomsS(){customsS=[];customSCI=0;const m=document.getElementById('msg-customS');if(m)m.textContent='';renderCustomsS();rebuild();}
+function renderCustomsS(){
+  const l=document.getElementById('list-customS');if(!l)return;l.innerHTML='';const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  customsS.forEach(i=>{const sd=units==='SI'?i.sSi:i.sSi*CS;l.appendChild(mkIsoRow(`${(+sd.toFixed(4))} ${sU}`,i.c,()=>rmCustomS(i.id)));});
+}
+
+function mkIsoRow(txt,color,onRm){
+  const r=document.createElement('div');
+  r.style.cssText='display:flex;align-items:center;gap:6px;padding:5px 8px;background:#f5f8fd;border:1px solid #d9e5f5;border-radius:5px;margin-top:4px';
+  const d=document.createElement('div');d.style.cssText=`width:9px;height:9px;border-radius:50%;background:${color};flex-shrink:0`;
+  const s=document.createElement('span');s.style.cssText='font-family:"IBM Plex Mono",monospace;font-size:.7rem;color:#1a2233;flex:1';s.textContent=txt;
+  const b=document.createElement('button');b.textContent='✕';b.style.cssText='border:none;background:none;color:#6b7a99;cursor:pointer;font-size:.75rem;padding:0';b.onclick=onRm;
+  r.appendChild(d);r.appendChild(s);r.appendChild(b);return r;
+}
+
+// ════════════════════════════════════════════════════════════
+// CAMBIO DE UNIDADES
+// ════════════════════════════════════════════════════════════
+function setUnits(sys){
+  if(sys===units)return;units=sys;
+  document.getElementById('btn-si').classList.toggle('active',sys==='SI');
+  document.getElementById('btn-ing').classList.toggle('active',sys==='ING');
+  grpIso=[];singles=[];grpTIso=[];singlesT=[];grpHIso=[];singlesH=[];grpSIso=[];singlesS=[];
+  Object.keys(activeGrp ).forEach(k=>{activeGrp [k]=false;document.getElementById(`sh-${k}`).checked=false;});
+  Object.keys(activeGrpT).forEach(k=>{activeGrpT[k]=false;document.getElementById(`st-${k}`).checked=false;});
+  Object.keys(activeGrpH).forEach(k=>{activeGrpH[k]=false;document.getElementById(`sh-h-${k}`).checked=false;});
+  Object.keys(activeGrpS).forEach(k=>{activeGrpS[k]=false;document.getElementById(`sh-s-${k}`).checked=false;});
+  const mcQ=document.getElementById('msg-customQX');if(mcQ)mcQ.textContent='';
+  const icQ=document.getElementById('inp-customQX');if(icQ)icQ.value='';
+  const mcP=document.getElementById('msg-customP');if(mcP)mcP.textContent='';
+  const icP=document.getElementById('inp-customP');if(icP)icP.value='';
+  const mcT=document.getElementById('msg-customT');if(mcT)mcT.textContent='';
+  const icT=document.getElementById('inp-customT');if(icT)icT.value='';
+  const mTP=document.getElementById('msg-tp');if(mTP)mTP.textContent='';
+  refreshPointInputs();
+  const uP=document.getElementById('unit-customP');if(uP)uP.textContent=units==='SI'?'bar':'psia';
+  const uT=document.getElementById('unit-customT');if(uT)uT.textContent=units==='SI'?'°C':'°F';
+  const mcH=document.getElementById('msg-customH');if(mcH)mcH.textContent='';
+  const icH=document.getElementById('inp-customH');if(icH)icH.value='';
+  const mcS=document.getElementById('msg-customS');if(mcS)mcS.textContent='';
+  const icS=document.getElementById('inp-customS');if(icS)icS.value='';
+  const uH=document.getElementById('unit-customH');if(uH)uH.textContent=units==='SI'?'kJ/kg':'Btu/lbm';
+  const uS=document.getElementById('unit-customS');if(uS)uS.textContent=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  updLabels();populateSels();renderSingles();renderSinglesT();renderSinglesH();renderSinglesS();renderCustomsQX();renderCustomsP();renderCustomsT();renderCustomsH();renderCustomsS();renderTPPoints();updFCLabels();updFCMarksCounter();rebuild();
+}
+function updFCLabels(){
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm',sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const fh=document.getElementById('fr-h'),fs=document.getElementById('fr-s');
+  if(fh&&fh.textContent.includes('—'))fh.textContent=`— ${hU}`;
+  if(fs&&fs.textContent.includes('—'))fs.textContent=`— ${sU}`;
+}
+
+// ════════════════════════════════════════════════════════════
+// SIDEBAR Y CURSOR LIBRE
+// ════════════════════════════════════════════════════════════
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
+
+const CD=document.getElementById('chart');
+function getSVG(){return CD.querySelector('svg.ch-ov');}
+
+function px2data(mx,my){
+  const la=CD._fullLayout;if(!la)return null;
+  const xa=la.xaxis,ya=la.yaxis;
+  const pL=la.margin.l,pR=la.width-la.margin.r,pT=la.margin.t,pB=la.height-la.margin.b;
+  if(mx<pL||mx>pR||my<pT||my>pB)return null;
+  const s=xa.range[0]+(mx-pL)/(pR-pL)*(xa.range[1]-xa.range[0]);
+  const h=ya.range[0]+(pB-my)/(pB-pT)*(ya.range[1]-ya.range[0]);
+  return{s,h};
+}
+
+function data2px(s,h){
+  const la=CD._fullLayout;if(!la)return null;
+  const xa=la.xaxis,ya=la.yaxis;
+  const xF=(s-xa.range[0])/(xa.range[1]-xa.range[0]);
+  const yF=(h-ya.range[0])/(ya.range[1]-ya.range[0]);
+  const pL=la.margin.l,pR=la.width-la.margin.r,pT=la.margin.t,pB=la.height-la.margin.b;
+  return{px:pL+xF*(pR-pL),py:pB-yF*(pB-pT)};
+}
+
+function moveCH(px,py,show,cpx,cpy,ct){
+  const svg=getSVG();const la=CD._fullLayout;if(!la||!svg)return;
+  const pL=la.margin.l,pR=la.width-la.margin.r,pT=la.margin.t,pB=la.height-la.margin.b;
+  const op=show?'0.85':'0',oc=(show&&cpx!=null)?'0.9':'0';
+  const q=id=>svg.querySelector('#'+id);
+  q('chvl').setAttribute('x1',px);q('chvl').setAttribute('x2',px);q('chvl').setAttribute('y1',pT);q('chvl').setAttribute('y2',pB);q('chvl').setAttribute('opacity',op);
+  q('chhl').setAttribute('x1',pL);q('chhl').setAttribute('x2',pR);q('chhl').setAttribute('y1',py);q('chhl').setAttribute('y2',py);q('chhl').setAttribute('opacity',op);
+  q('chdt').setAttribute('cx',px);q('chdt').setAttribute('cy',py);q('chdt').setAttribute('opacity',op);
+  if(cpx!=null){
+    q('chcd').setAttribute('cx',cpx);q('chcd').setAttribute('cy',cpy);q('chcd').setAttribute('opacity',oc);
+    q('chcl').setAttribute('x1',cpx);q('chcl').setAttribute('x2',cpx);q('chcl').setAttribute('y1',py);q('chcl').setAttribute('y2',cpy);q('chcl').setAttribute('opacity',oc);
+    const t=q('chct');const gR=(cpx+130<pR);
+    t.setAttribute('x',cpx+(gR?10:-10));t.setAttribute('y',cpy-8);t.setAttribute('text-anchor',gR?'start':'end');t.textContent=ct;t.setAttribute('opacity',oc);
+    try{const bb=t.getBBox();const bg=q('chcb');bg.setAttribute('x',bb.x-4);bg.setAttribute('y',bb.y-2);bg.setAttribute('width',bb.width+8);bg.setAttribute('height',bb.height+4);bg.setAttribute('opacity',oc);}catch(e){}
+  }else{['chcd','chcl','chct','chcb'].forEach(id=>{const el=q(id);if(el)el.setAttribute('opacity','0');});}
+}
+
+function hideFCLines(){
+  const svg=getSVG();if(!svg)return;
+  ['fcvl','fchl','fcdt','fclb','fclbbg'].forEach(id=>{const el=svg.querySelector('#'+id);if(el)el.setAttribute('opacity','0');});
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm',sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const fh=document.getElementById('fr-h'),fs=document.getElementById('fr-s');
+  if(fh)fh.textContent=`— ${hU}`;if(fs)fs.textContent=`— ${sU}`;
+}
+
+function toggleFC(){
+  fcOn=!fcOn;
+  document.getElementById('tog-fc').classList.toggle('active',fcOn);
+  document.getElementById('fc-panel').style.display=fcOn?'flex':'none';
+  if(!fcOn)hideFCLines();
+}
+
+function buildFCPath(){
+  if(fcMarks.length===0)return{trace:null,annotations:[]};
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const xs=fcMarks.map(m=>units==='SI'?m.s:m.s*CS);
+  const ys=fcMarks.map(m=>units==='SI'?m.h:m.h*CH);
+  const labels=fcMarks.map((m,i)=>`${i+1}`);
+  const isPath=fcMode==='path';
+  const traceName=isPath?'Trayectoria':'Puntos';
+  const hoverLabel=isPath?'Punto':'Marca';
+  const trace={x:xs,y:ys,mode:'markers+text',meta:'fcmark',name:traceName,
+    marker:{size:12,color:'#e65100',symbol:'circle',line:{color:'#fff',width:2}},
+    text:labels.map(l=>`<b>${l}</b>`),textposition:'top right',
+    textfont:{size:12,color:'#bf360c',family:"'IBM Plex Sans',sans-serif",weight:700},
+    customdata:labels,showlegend:false,
+    hovertemplate:`<b>${hoverLabel} %{customdata}</b><br>h = %{y:.2f} ${hU}<br>s = %{x:.4f} ${sU}<extra></extra>`};
+  const annotations=[];
+  if(isPath){
+    for(let i=1;i<xs.length;i++){
+      annotations.push({
+        x:xs[i],y:ys[i],xref:'x',yref:'y',
+        ax:xs[i-1],ay:ys[i-1],axref:'x',ayref:'y',
+        showarrow:true,arrowhead:3,arrowsize:1.5,arrowwidth:2.4,
+        arrowcolor:'#e65100',standoff:8,startstandoff:8,opacity:0.95,text:''
+      });
+    }
+  }
+  return{trace,annotations};
+}
+
+function toggleInfo(key){
+  const box=document.getElementById(`info-${key}`);const btn=document.getElementById(`info-${key}-btn`);
+  if(!box||!btn)return;const open=box.classList.toggle('open');btn.classList.toggle('active',open);
+}
+
+function setFCMode(mode){
+  if(mode!=='path'&&mode!=='points')return;if(mode===fcMode)return;fcMode=mode;
+  document.getElementById('fcm-path').classList.toggle('active',mode==='path');
+  document.getElementById('fcm-points').classList.toggle('active',mode==='points');
+  const lb=document.getElementById('fc-mode-lb');if(lb)lb.textContent=mode==='path'?'Trayectoria':'Puntos';
+  updFCMarksCounter();rebuild();
+}
+
+function updFCMarksCounter(){
+  const el=document.getElementById('fr-nmk');const ml=document.getElementById('fr-mlist');
+  if(!el)return;const n=fcMarks.length;
+  const suffix=(fcMode==='path'&&n>1)?` · ${n-1} segmento${n-1===1?'':'s'}`:'';
+  el.textContent=n===0?'0 puntos':n===1?'1 punto':`${n} puntos${suffix}`;
+  if(!ml)return;ml.innerHTML='';
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm';const sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  fcMarks.forEach((m,i)=>{
+    const sDisp=units==='SI'?m.s:m.s*CS;const hDisp=units==='SI'?m.h:m.h*CH;
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:6px;padding:5px 8px;background:#fff8f0;border:1px solid #ffcc80;border-radius:5px';
+    const idx=document.createElement('div');idx.style.cssText='font-weight:700;color:#bf360c;font-size:.78rem;min-width:1.3em;text-align:center';idx.textContent=String(i+1);
+    const coord=document.createElement('div');coord.style.cssText="flex:1;font-family:'IBM Plex Mono',monospace;font-size:.65rem;color:#4a148c;line-height:1.35";
+    coord.innerHTML=`h = ${hDisp.toFixed(1)} ${hU}<br>s = ${sDisp.toFixed(4)} ${sU}`;
+    const btn=document.createElement('button');btn.textContent='✕';btn.title='Eliminar este punto';
+    btn.style.cssText='border:none;background:none;color:#6b7a99;cursor:pointer;font-size:.82rem;padding:2px 4px';
+    btn.onmouseover=()=>{btn.style.color='#e53935';};btn.onmouseout=()=>{btn.style.color='#6b7a99';};
+    btn.onclick=()=>removeFCMark(i);
+    row.appendChild(idx);row.appendChild(coord);row.appendChild(btn);ml.appendChild(row);
+  });
+}
+
+function addFCMark(sDisp,hDisp){
+  const sSI=units==='SI'?sDisp:sDisp/CS;const hSI=units==='SI'?hDisp:hDisp/CH;
+  fcMarks.push({s:sSI,h:hSI});updFCMarksCounter();rebuild();
+}
+function undoFCMark(){if(fcMarks.length===0)return;fcMarks.pop();updFCMarksCounter();rebuild();}
+function clearFCMarks(){fcMarks=[];updFCMarksCounter();rebuild();}
+function removeFCMark(idx){if(idx<0||idx>=fcMarks.length)return;fcMarks.splice(idx,1);updFCMarksCounter();rebuild();}
+
+CD.addEventListener('mousemove',function(e){
+  if(!fcOn||overTrace)return;
+  const la=CD._fullLayout;if(!la)return;
+  const rect=CD.getBoundingClientRect();
+  const mx=e.clientX-rect.left,my=e.clientY-rect.top;
+  const coords=px2data(mx,my);if(!coords){hideFCLines();return;}
+  const{s,h}=coords;
+  const svg=getSVG();if(!svg)return;
+  const q=id=>svg.querySelector('#'+id);if(!q('fcvl'))return;
+  const pL=la.margin.l,pR=la.width-la.margin.r,pT=la.margin.t,pB=la.height-la.margin.b;
+  q('fcvl').setAttribute('x1',mx);q('fcvl').setAttribute('x2',mx);q('fcvl').setAttribute('y1',pT);q('fcvl').setAttribute('y2',pB);q('fcvl').setAttribute('opacity','0.75');
+  q('fchl').setAttribute('x1',pL);q('fchl').setAttribute('x2',pR);q('fchl').setAttribute('y1',my);q('fchl').setAttribute('y2',my);q('fchl').setAttribute('opacity','0.75');
+  q('fcdt').setAttribute('cx',mx);q('fcdt').setAttribute('cy',my);q('fcdt').setAttribute('opacity','0.95');
+  const hU=units==='SI'?'kJ/kg':'Btu/lbm',sU=units==='SI'?'kJ/(kg·K)':'Btu/(lbm·°R)';
+  const hStr=h.toFixed(1),sStr=s.toFixed(4);
+  const lbTxt=`h = ${hStr} ${hU}   s = ${sStr} ${sU}`;
+  const lb=q('fclb'),lbbg=q('fclbbg');const gR=(mx+260<pR);
+  lb.setAttribute('x',mx+(gR?14:-14));lb.setAttribute('y',my-12);
+  lb.setAttribute('text-anchor',gR?'start':'end');lb.textContent=lbTxt;lb.setAttribute('opacity','1');
+  try{const bb=lb.getBBox();lbbg.setAttribute('x',bb.x-5);lbbg.setAttribute('y',bb.y-3);lbbg.setAttribute('width',bb.width+10);lbbg.setAttribute('height',bb.height+6);lbbg.setAttribute('opacity','0.92');}catch(err){}
+  document.getElementById('fr-h').textContent=`${hStr} ${hU}`;
+  document.getElementById('fr-s').textContent=`${sStr} ${sU}`;
+  fcSSI=units==='SI'?s:s/CS;fcHSI=units==='SI'?h:h/CH;
+});
+
+CD.addEventListener('mouseleave',function(){
+  moveCH(0,0,false,null,null,'');if(fcOn)hideFCLines();fcSSI=null;fcHSI=null;
+});
+
+let _fcmdX=null,_fcmdY=null;
+CD.addEventListener('mousedown',function(e){if(!fcOn)return;if(e.button!==0)return;_fcmdX=e.clientX;_fcmdY=e.clientY;},true);
+document.addEventListener('mouseup',function(e){
+  if(!fcOn||_fcmdX==null)return;if(e.button!==0){_fcmdX=null;_fcmdY=null;return;}
+  const dx=Math.abs(e.clientX-_fcmdX),dy=Math.abs(e.clientY-_fcmdY);_fcmdX=null;_fcmdY=null;
+  if(dx>3||dy>3)return;if(overTrace)return;
+  const rect=CD.getBoundingClientRect();const mx=e.clientX-rect.left,my=e.clientY-rect.top;
+  const la=CD._fullLayout;if(!la)return;
+  const pL=la.margin.l,pR=la.width-la.margin.r,pT=la.margin.t,pB=la.height-la.margin.b;
+  if(mx<pL||mx>pR||my<pT||my>pB)return;
+  const c=px2data(mx,my);if(!c)return;addFCMark(c.s,c.h);
+},true);
+
+let axHandles=[];let isDraggingHandle=false;
+function posAxHandles(){
+  const la=CD._fullLayout;if(!la||axHandles.length!==4)return;
+  const W=CD.clientWidth,H=CD.clientHeight;
+  const mL=la.margin.l,mT=la.margin.t,mR=la.margin.r||30,mB=la.margin.b;
+  const pR=W-mR,pB=H-mB;const xLen=pR-mL,yLen=pB-mT;
+  const s=(h,x,y)=>{h.style.left=(x-13)+'px';h.style.top=(y-13)+'px';};
+  s(axHandles[0],mL+xLen*0.10,pB+28);s(axHandles[1],mL-52,mT+yLen*0.82);
+  s(axHandles[2],mL+xLen*0.90,pB+28);s(axHandles[3],mL-52,mT+yLen*0.18);
+}
+
+function buildAxHandles(){
+  axHandles.forEach(h=>h.remove());axHandles=[];
+  const SPECS=[
+    {sym:'↔',ax:'x',type:'zoom',cur:'ew-resize',clr:'#1976d2',tip:'Escalar X'},
+    {sym:'↕',ax:'y',type:'zoom',cur:'ns-resize',clr:'#7b1fa2',tip:'Escalar Y'},
+    {sym:'↔',ax:'x',type:'pan', cur:'ew-resize',clr:'#1976d2',round:true,tip:'Pan X'},
+    {sym:'↕',ax:'y',type:'pan', cur:'ns-resize',clr:'#7b1fa2',round:true,tip:'Pan Y'},
+  ];
+  SPECS.forEach(({sym,ax,type,cur,clr,tip,round})=>{
+    const h=document.createElement('div');
+    h.className='ax-drag-handle'+(round?' round':'');
+    const isPan=type==='pan';const bgDefault=isPan?'rgba(25,118,210,0.16)':'rgba(255,255,255,0.95)';
+    h.style.cssText+=`;border:2.5px solid ${clr};color:${clr};cursor:${cur};background:${bgDefault}`;
+    h.textContent=sym;h.title=tip;
+    let dragging=false,startMouse=0,startRange=[0,0],startHalf=0;
+    h.addEventListener('mousedown',function(ev){
+      dragging=true;isDraggingHandle=true;
+      const axObj=CD._fullLayout[ax==='x'?'xaxis':'yaxis'];
+      startRange=[axObj.range[0],axObj.range[1]];startHalf=(axObj.range[1]-axObj.range[0])/2;
+      startMouse=ax==='x'?ev.clientX:ev.clientY;ev.preventDefault();ev.stopPropagation();
+      h.style.transform='scale(1.25)';
+      function onMove(ev2){
+        if(!dragging)return;const la=CD._fullLayout;
+        const W2=CD.clientWidth,H2=CD.clientHeight;
+        const mL2=la.margin.l,mT2=la.margin.t,mR2=la.margin.r||30,mB2=la.margin.b;
+        const plotPx=ax==='x'?(W2-mR2-mL2):(H2-mT2-mB2);
+        const delta=ax==='x'?(ev2.clientX-startMouse):-(ev2.clientY-startMouse);
+        let nr;
+        if(type==='zoom'){
+          const center=(startRange[0]+startRange[1])/2;const factor=Math.pow(1.003,-delta);
+          const newHalf=Math.max(startHalf*factor,startHalf*0.02);nr=[center-newHalf,center+newHalf];
+        }else{
+          const span=startRange[1]-startRange[0];const dv=delta*span/plotPx;nr=[startRange[0]-dv,startRange[1]-dv];
+        }
+        const upd={};upd[ax==='x'?'xaxis.range':'yaxis.range']=nr;Plotly.relayout('chart',upd);
+      }
+      function onUp(){dragging=false;isDraggingHandle=false;h.style.transform='scale(1)';document.removeEventListener('mousemove',onMove);document.removeEventListener('mouseup',onUp);posAxHandles();}
+      document.addEventListener('mousemove',onMove);document.addEventListener('mouseup',onUp);
+    });
+    h.addEventListener('mouseenter',()=>{if(!dragging)h.style.background=ax==='x'?'rgba(25,118,210,0.30)':'rgba(123,31,162,0.22)';});
+    h.addEventListener('mouseleave',()=>{if(!dragging)h.style.background=bgDefault;});
+    CD.appendChild(h);axHandles.push(h);
+  });
+  posAxHandles();
+}
+
+(function init(){
+  CD.style.position='relative';
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.classList.add('ch-ov');
+  svg.style.cssText='position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10';
+  function mkL(id,stroke,sw,dash){const l=document.createElementNS('http://www.w3.org/2000/svg','line');l.id=id;l.setAttribute('stroke',stroke);l.setAttribute('stroke-width',sw);if(dash)l.setAttribute('stroke-dasharray',dash);l.setAttribute('opacity','0');svg.appendChild(l);}
+  function mkC(id,r,fill,stroke,sw){const c=document.createElementNS('http://www.w3.org/2000/svg','circle');c.id=id;c.setAttribute('r',r);c.setAttribute('fill',fill);c.setAttribute('stroke',stroke);c.setAttribute('stroke-width',sw);c.setAttribute('opacity','0');svg.appendChild(c);}
+  function mkR(id,fill,stroke){const r=document.createElementNS('http://www.w3.org/2000/svg','rect');r.id=id;r.setAttribute('fill',fill);r.setAttribute('stroke',stroke);r.setAttribute('stroke-width','1');r.setAttribute('rx','3');r.setAttribute('opacity','0');svg.appendChild(r);}
+  function mkT(id,fill,size,weight){const t=document.createElementNS('http://www.w3.org/2000/svg','text');t.id=id;t.setAttribute('font-family','IBM Plex Mono,monospace');t.setAttribute('font-size',size||'11');if(weight)t.setAttribute('font-weight',weight);t.setAttribute('fill',fill);t.setAttribute('opacity','0');svg.appendChild(t);}
+  mkL('chvl','#1976d2','1.5','5,4');mkL('chhl','#1976d2','1.5','5,4');
+  mkC('chdt','5','#fff','#1976d2','2');
+  mkC('chcd','6','#fff8e1','#f57c00','2');mkL('chcl','#f57c00','1.2','3,3');
+  mkR('chcb','#fff','#f57c00');mkT('chct','#f57c00');
+  mkL('fcvl','#e65100','1.2','4,3');mkL('fchl','#e65100','1.2','4,3');
+  mkC('fcdt','4','#fff3e0','#e65100','2');
+  mkR('fclbbg','#fff3e0','#e65100');mkT('fclb','#bf360c','11','500');
+  CD.appendChild(svg);
+
+  populateSels();updLabels();updFCMarksCounter();refreshPointInputs();
+
+  // Pre-activar grupo "mid" de isobaras al iniciar
+  const _midCb=document.getElementById('sh-mid');
+  if(_midCb){_midCb.checked=true;toggleGrp('mid');}else{rebuild();}
+
+  CD.on('plotly_hover',function(data){
+    const pt=data.points[0],meta=pt.data.meta;
+    const isSat=meta==='sat';
+    const isOverlay=['isobar','isotherm','quality','hline','sline','fcmark','tppoint'].indexOf(meta)>=0;
+    if(fcOn&&(isSat||isOverlay)){overTrace=true;hideFCLines();return;}
+    overTrace=false;if(!isSat)return;
+    const sat=getSat();const idx=pt.pointIndex;
+    const sH=sat[idx].sg,hH=sat[idx].hg;
+    const co=data2px(sH,hH);if(!co)return;
+    const pU=units==='SI'?'bar':'psia';const tU=units==='SI'?'°C':'°F';
+    const ct=`P=${sat[idx].P} ${pU}  T<sub>sat</sub>=${sat[idx].T.toFixed(2)} ${tU}`;
+    moveCH(co.px,co.py,true,null,null,ct);
+  });
+  CD.on('plotly_unhover',function(){overTrace=false;moveCH(0,0,false,null,null,'');});
+  CD.on('plotly_relayout',function(){if(!isDraggingHandle)posAxHandles();});
+  window.addEventListener('resize',function(){setTimeout(posAxHandles,120);});
+})();
+</script>
+</body>

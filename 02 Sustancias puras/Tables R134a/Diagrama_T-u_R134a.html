@@ -1,0 +1,1301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Tabla A · Diagrama T–u · R-134a</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.27.0/plotly.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f5f7fa;--surface:#fff;--border:#dde3ec;--text:#1a2233;--muted:#6b7a99;
+  --accent:#1976d2;--dome:#7b1fa2;--critical:#f57c00;
+  --hdr:linear-gradient(90deg,#1565c0 0%,#1976d2 60%,#1e88e5 100%)}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 0 40px}
+.topbar{width:100%;background:var(--hdr);display:flex;align-items:center;
+  justify-content:space-between;gap:14px;padding:0 28px;height:66px;
+  box-shadow:0 2px 8px rgba(21,101,192,.18);margin-bottom:24px;flex-shrink:0;
+  position:relative;overflow:hidden}
+.topbar::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 280px 100px at 50% 140%,rgba(255,179,0,.22),transparent 70%);
+  opacity:.9;z-index:0}
+.topbar-brand{display:flex;align-items:center;gap:10px;
+  font-family:'IBM Plex Sans',sans-serif;font-weight:700;
+  font-size:1.45rem;letter-spacing:-.01em;color:#fff;line-height:1;
+  position:relative;z-index:2;text-shadow:0 1px 2px rgba(0,0,0,.20);flex-shrink:0}
+.topbar-brand .t-name{display:flex;align-items:baseline;gap:3px}
+.topbar-logo{width:38px;height:38px;flex-shrink:0;
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,.22))
+         drop-shadow(0 0 6px rgba(255,179,0,.28))}
+.topbar-logo .ring{transform-origin:center;
+  animation:brand-rot 18s linear infinite}
+.topbar-logo .spark{transform-origin:center;
+  animation:brand-pulse 2.4s ease-in-out infinite}
+@keyframes brand-rot{to{transform:rotate(360deg)}}
+@keyframes brand-pulse{0%,100%{opacity:.55;transform:scale(.9)}
+  50%{opacity:1;transform:scale(1.08)}}
+.topbar-brand .t-sep{color:rgba(255,224,178,.85);font-weight:400;padding:0 2px}
+.topbar-brand .t-ia{background:linear-gradient(135deg,#ffeb3b 0%,#ffb300 45%,#ff5722 80%,#ef5350 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  font-weight:900;letter-spacing:.01em;
+  filter:drop-shadow(0 0 6px rgba(255,152,0,.35))}
+.topbar-center{position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);display:flex;align-items:center;gap:12px;z-index:1}
+.topbar-icon{width:46px;height:46px;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.12);border-radius:10px;
+  box-shadow:inset 0 0 0 1px rgba(255,236,179,.30),
+             0 0 14px rgba(255,152,0,.30),
+             0 1px 3px rgba(0,0,0,.15)}
+.topbar-icon svg{width:28px;height:40px;display:block;overflow:visible}
+.th-glow{transform-origin:16px 46px;animation:th-pulse 2.2s ease-in-out infinite}
+.th-bulb{transform-origin:16px 46px;animation:th-bulb 2.2s ease-in-out infinite}
+.th-col{transform-origin:16px 51px;animation:th-rise 3.8s ease-in-out infinite}
+@keyframes th-pulse{0%,100%{opacity:.55;transform:scale(.80)}
+  50%{opacity:1;transform:scale(1.20)}}
+@keyframes th-bulb{0%,100%{filter:brightness(1) saturate(1)}
+  50%{filter:brightness(1.18) saturate(1.25)}}
+@keyframes th-rise{0%,100%{transform:scaleY(.94)}
+  50%{transform:scaleY(1.03)}}
+.topbar-text h1{font-size:1rem;font-weight:700;color:#fff;letter-spacing:.04em;
+  text-transform:uppercase;line-height:1.1}
+.topbar-text h1 .lc{text-transform:lowercase;font-weight:800;letter-spacing:.01em}
+.topbar-text p{font-size:.72rem;color:rgba(255,255,255,.78);font-weight:300;margin-top:1px}
+.topbar-spacer{visibility:hidden;pointer-events:none}
+.main-wrapper{width:100%;max-width:1140px;padding:0 20px 0 54px;display:flex;flex-direction:column;gap:0}
+.subtitle-bar{display:flex;align-items:center;gap:10px;padding:10px 18px;background:#fff;
+  border:1px solid var(--border);border-radius:8px 8px 0 0;border-bottom:none}
+.subtitle-bar .ci{font-size:1rem;color:var(--accent)}
+.subtitle-bar .ct{font-size:.95rem;font-weight:600;color:var(--text)}
+.unit-toggle{margin-left:auto;display:flex;border:1.5px solid var(--accent);border-radius:6px;overflow:hidden}
+.unit-btn{padding:4px 14px;font-size:.78rem;font-weight:600;background:#fff;color:var(--accent);
+  border:none;cursor:pointer;transition:background .18s,color .18s;letter-spacing:.04em}
+.unit-btn:first-child{border-right:1.5px solid var(--accent)}
+.unit-btn.active{background:var(--accent);color:#fff}
+.unit-btn:not(.active):hover{background:#e3edf9}
+#chart{width:100%;height:630px;background:#fff;border:1px solid var(--border);
+  border-radius:0 0 8px 8px;overflow:visible;box-shadow:0 2px 12px rgba(25,118,210,.07)}
+.ax-drag-handle{position:absolute;width:26px;height:26px;background:rgba(255,255,255,0.95);
+  border-radius:5px;display:flex;align-items:center;justify-content:center;
+  z-index:25;user-select:none;font-size:14px;font-weight:700;
+  box-shadow:0 2px 6px rgba(0,0,0,0.20);transition:background 0.15s,transform 0.12s;
+  pointer-events:all}
+.ax-drag-handle.round{border-radius:50%}
+.ax-drag-handle:hover{transform:scale(1.18)}
+.sidebar{position:fixed;top:50%;left:0;transform:translateY(-50%);display:flex;align-items:center;z-index:100}
+.sidebar-tab{writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);
+  background:var(--accent);color:#fff;font-size:.68rem;font-weight:600;letter-spacing:.07em;
+  text-transform:uppercase;padding:14px 8px;border-radius:6px 0 0 6px;cursor:pointer;
+  user-select:none;white-space:nowrap;transition:background .2s;display:flex;align-items:center;
+  gap:6px;box-shadow:2px 0 8px rgba(25,118,210,.15)}
+.sidebar-tab:hover{background:#1565c0}
+.sidebar-tab .arrow{display:inline-block;font-size:.65rem;transition:transform .35s;writing-mode:horizontal-tb}
+.sidebar.open .sidebar-tab .arrow{transform:rotate(180deg)}
+.sidebar-panel{width:0;overflow:hidden;transition:width .35s cubic-bezier(.4,0,.2,1);background:#fff;
+  border:1px solid var(--border);border-left:none;border-radius:0 8px 8px 0;
+  box-shadow:4px 0 16px rgba(25,118,210,.10)}
+.sidebar.open .sidebar-panel{width:238px}
+.spi{padding:18px 16px;width:238px;display:flex;flex-direction:column;gap:10px;overflow-y:auto;max-height:85vh}
+.sb-sub{font-size:.68rem;font-weight:700;color:var(--dome);letter-spacing:.07em;text-transform:uppercase;
+  border-bottom:1px solid var(--border);padding-bottom:5px;margin-top:2px;
+  display:flex;align-items:center;justify-content:space-between;gap:6px}
+.info-btn{display:inline-flex;align-items:center;justify-content:center;
+  width:15px;height:15px;border-radius:50%;border:1px solid var(--accent);
+  background:#fff;color:var(--accent);font-family:Georgia,serif;
+  font-size:.64rem;font-weight:700;font-style:italic;line-height:1;
+  cursor:pointer;transition:background .15s,color .15s;user-select:none;
+  text-transform:none;letter-spacing:0}
+.info-btn:hover{background:var(--accent);color:#fff}
+.info-btn.active{background:var(--accent);color:#fff}
+.info-box{font-size:.68rem;color:#6b7a99;line-height:1.35;
+  background:#f5f8fd;border:1px solid #d9e5f5;border-radius:5px;
+  padding:7px 9px;margin-bottom:4px;display:none}
+.info-box.open{display:block}
+.fc-mode{display:flex;gap:4px;margin:4px 0}
+.fc-mode-btn{flex:1;padding:5px 4px;font-size:.68rem;font-weight:600;
+  color:#bf360c;background:#fff3e0;border:1px solid #ffb74d;
+  border-radius:5px;cursor:pointer;transition:all .15s;text-align:center}
+.fc-mode-btn.active{background:#e65100;color:#fff;border-color:#e65100}
+.fc-mode-btn:hover:not(.active){background:#ffe0b2}
+.brand{display:flex;align-items:center;gap:10px;
+  padding:12px 10px 14px;margin:-8px -4px 6px;
+  background:linear-gradient(135deg,#f5f8fd 0%,#fff4ee 100%);
+  border:1px solid #e3edf9;border-radius:8px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),
+             0 1px 3px rgba(25,118,210,.08)}
+.brand-logo{width:42px;height:42px;flex-shrink:0;
+  filter:drop-shadow(0 1px 2px rgba(25,118,210,.25))}
+.brand-logo .ring{transform-origin:center;
+  animation:brand-rot 18s linear infinite}
+.brand-logo .spark{transform-origin:center;
+  animation:brand-pulse 2.4s ease-in-out infinite}
+.brand-text{display:flex;flex-direction:column;line-height:1.02;
+  font-family:'IBM Plex Sans',sans-serif}
+.brand-top{font-size:.92rem;font-weight:700;letter-spacing:-.01em;
+  color:#0d47a1;display:flex;align-items:baseline;gap:3px}
+.brand-top .sep{color:#b39ddb;font-weight:400;padding:0 1px}
+.brand-top .ia{background:linear-gradient(135deg,#1976d2 0%,#7b1fa2 60%,#e65100 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  font-weight:800;letter-spacing:.01em}
+.brand-bot{font-size:.72rem;font-weight:500;color:#4a148c;
+  letter-spacing:.02em;font-style:italic;margin-top:1px}
+.rtog{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;
+  background:#f5f8fd;border:1px solid #d9e5f5;border-radius:6px;cursor:pointer;transition:background .15s;user-select:none}
+.rtog:hover{background:#e8f0fc}
+.rtog .rl{font-size:.78rem;color:var(--text);display:flex;align-items:center;gap:7px}
+.rtog .rd{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.sw{width:32px;height:17px;background:#c8d6e8;border-radius:999px;position:relative;transition:background .2s;flex-shrink:0}
+.sw::after{content:'';position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#8fa8c8;transition:transform .2s,background .2s}
+.rtog.active .sw{background:rgba(25,118,210,.25);border:1px solid var(--accent)}
+.rtog.active .sw::after{transform:translateX(15px);background:var(--accent)}
+.ctrl{display:flex;gap:6px;align-items:center}
+.sel{flex:1;font-size:.74rem;color:var(--text);background:#f5f8fd;border:1px solid #d9e5f5;
+  border-radius:5px;padding:5px 6px;cursor:pointer;outline:none}
+.sel:focus{border-color:var(--accent)}
+.addbtn{flex-shrink:0;background:var(--accent);color:#fff;border:none;border-radius:5px;
+  padding:5px 10px;font-size:.74rem;font-weight:600;cursor:pointer;transition:background .18s;white-space:nowrap}
+.addbtn:hover{background:#1565c0}
+.sg{display:flex;flex-direction:column;gap:5px}
+.sr{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:#f5f8fd;border:1px solid #d9e5f5;border-radius:6px}
+.sl{font-size:.73rem;color:var(--text);cursor:pointer;user-select:none}
+.ss{position:relative;display:inline-block;width:34px;height:18px;flex-shrink:0}
+.ss input{opacity:0;width:0;height:0}
+.ss-knob{position:absolute;inset:0;background:#c8d6e8;border-radius:999px;cursor:pointer;transition:background .2s}
+.ss-knob::before{content:'';position:absolute;width:13px;height:13px;left:2px;top:2.5px;background:#8fa8c8;border-radius:50%;transition:transform .2s,background .2s}
+.ss input:checked+.ss-knob{background:rgba(25,118,210,.28);border:1px solid var(--accent)}
+.ss input:checked+.ss-knob::before{transform:translateX(16px);background:var(--accent)}
+.ic{background:#f5f8fd;border:1px solid #d9e5f5;border-radius:6px;padding:10px 12px}
+.ic .lb{font-size:.62rem;font-family:'IBM Plex Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.ic .vl{font-size:.88rem;font-weight:600;color:var(--text)}
+#chart .xtick text, #chart .ytick text, #chart .y2tick text{font-weight:600 !important}
+#chart .xtitle, #chart .ytitle, #chart .y2title{font-weight:700 !important}
+#chart .scatterlayer .textpoint text, #chart g.scatter text{font-weight:700 !important;
+  paint-order:stroke fill;stroke:#fff;stroke-width:2.5px;stroke-linejoin:round}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-brand" aria-label="TermoIA Dinámica">
+    <svg class="topbar-logo" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="tg-top" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%"  stop-color="#64b5f6"/>
+          <stop offset="55%" stop-color="#1565c0"/>
+          <stop offset="100%" stop-color="#0d47a1"/>
+        </linearGradient>
+        <linearGradient id="dg-top" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%"  stop-color="#ffeb3b"/>
+          <stop offset="55%" stop-color="#ff9800"/>
+          <stop offset="100%" stop-color="#e65100"/>
+        </linearGradient>
+        <radialGradient id="sg-top" cx="50%" cy="50%" r="50%">
+          <stop offset="0%"  stop-color="#fff59d"/>
+          <stop offset="60%" stop-color="#ffb300"/>
+          <stop offset="100%" stop-color="#e65100"/>
+        </radialGradient>
+      </defs>
+      <g class="ring">
+        <circle cx="32" cy="32" r="24" fill="none" stroke="url(#tg-top)" stroke-width="4"
+                stroke-linecap="round" stroke-dasharray="110 40"/>
+      </g>
+      <path d="M20 38 Q26 20 32 30 Q38 40 44 26" fill="none" stroke="url(#dg-top)"
+            stroke-width="3.2" stroke-linecap="round"/>
+      <circle class="spark" cx="48" cy="18" r="3.2" fill="url(#sg-top)"/>
+      <circle cx="32" cy="32" r="2.6" fill="#fff"/>
+    </svg>
+    <div class="t-name">
+      <span>Termo</span><span class="t-sep">·</span><span class="t-ia">IA</span><span class="t-sep">·</span><span>Dinámica</span>
+    </div>
+  </div>
+  <div class="topbar-center">
+    <div class="topbar-icon" aria-hidden="true">
+      <svg viewBox="0 0 32 56" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="th-merc" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0%"   stop-color="#1565c0"/>
+            <stop offset="25%"  stop-color="#ef5350"/>
+            <stop offset="60%"  stop-color="#ff9800"/>
+            <stop offset="85%"  stop-color="#ffeb3b"/>
+            <stop offset="100%" stop-color="#fffde7"/>
+          </linearGradient>
+          <radialGradient id="th-bulb" cx=".5" cy=".55" r=".55">
+            <stop offset="0%"   stop-color="#fff59d"/>
+            <stop offset="45%"  stop-color="#ff9800"/>
+            <stop offset="100%" stop-color="#bf360c"/>
+          </radialGradient>
+          <radialGradient id="th-glow" cx=".5" cy=".5" r=".5">
+            <stop offset="0%"   stop-color="#ffeb3b" stop-opacity=".85"/>
+            <stop offset="55%"  stop-color="#ff7043" stop-opacity=".35"/>
+            <stop offset="100%" stop-color="#e65100" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <circle class="th-glow" cx="16" cy="46" r="12" fill="url(#th-glow)"/>
+        <path d="M12 6 Q12 2.5 16 2.5 Q20 2.5 20 6 L20 36 Q23.5 38.5 23.5 43.5 Q23.5 52.5 16 52.5 Q8.5 52.5 8.5 43.5 Q8.5 38.5 12 36 Z"
+              fill="rgba(255,255,255,.16)" stroke="#e3f2fd" stroke-width="1.4"
+              stroke-linejoin="round"/>
+        <g class="th-col">
+          <path d="M14.2 7.5 L17.8 7.5 L17.8 38 Q20 39.8 20 42.5 Q20 46.5 16 46.5 Q12 46.5 12 42.5 Q12 39.8 14.2 38 Z"
+                fill="url(#th-merc)"/>
+        </g>
+        <circle class="th-bulb" cx="16" cy="46" r="5.2" fill="url(#th-bulb)"
+                stroke="#ffecb3" stroke-width=".6" opacity=".96"/>
+        <g stroke="#fff3e0" stroke-width=".85" stroke-linecap="round" opacity=".80">
+          <line x1="20.5" y1="12" x2="23.5" y2="12"/>
+          <line x1="20.5" y1="18" x2="22.3" y2="18"/>
+          <line x1="20.5" y1="24" x2="23.5" y2="24"/>
+          <line x1="20.5" y1="30" x2="22.3" y2="30"/>
+        </g>
+        <path d="M13.2 10 L13.2 34" stroke="#ffffff" stroke-width=".9"
+              stroke-linecap="round" opacity=".45"/>
+      </svg>
+    </div>
+    <div class="topbar-text">
+      <h1>Tabla A &nbsp;·&nbsp; Diagrama T – <span class="lc">u</span></h1>
+      <p>R-134a Saturado y Vapor Sobrecalentado</p>
+    </div>
+  </div>
+  <div class="topbar-spacer topbar-brand" aria-hidden="true">
+    <span style="display:inline-block;width:38px;height:38px"></span>
+    <div class="t-name">
+      <span>Termo</span><span class="t-sep">·</span><span class="t-ia">IA</span><span class="t-sep">·</span><span>Dinámica</span>
+    </div>
+  </div>
+</div>
+<div class="main-wrapper">
+<div class="subtitle-bar">
+  <span class="ci">📈</span>
+  <span class="ct">Diagrama Temperatura – Energía Interna Específica · R-134a</span>
+  <div class="unit-toggle">
+    <button id="btn-si" class="unit-btn active" onclick="setUnits('SI')">SI</button>
+    <button id="btn-ing" class="unit-btn" onclick="setUnits('ING')">Inglés</button>
+  </div>
+</div>
+<div id="chart"></div>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-panel"><div class="spi">
+    <div class="brand" role="banner" aria-label="TermoIA Dinámica">
+      <svg class="brand-logo" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"
+           aria-hidden="true" focusable="false">
+        <defs>
+          <linearGradient id="tg" x1="0" y1="1" x2="1" y2="0">
+            <stop offset="0%"   stop-color="#0d47a1"/>
+            <stop offset="35%"  stop-color="#1976d2"/>
+            <stop offset="60%"  stop-color="#7b1fa2"/>
+            <stop offset="85%"  stop-color="#e65100"/>
+            <stop offset="100%" stop-color="#ffb300"/>
+          </linearGradient>
+          <linearGradient id="dg" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0%"  stop-color="#1976d2" stop-opacity=".18"/>
+            <stop offset="100%" stop-color="#7b1fa2" stop-opacity=".06"/>
+          </linearGradient>
+          <radialGradient id="sg" cx=".5" cy=".5" r=".5">
+            <stop offset="0%"  stop-color="#fff8e1"/>
+            <stop offset="60%" stop-color="#ffb300"/>
+            <stop offset="100%" stop-color="#e65100" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <g class="ring">
+          <circle cx="32" cy="32" r="28" fill="none"
+                  stroke="url(#tg)" stroke-width="3" stroke-linecap="round"
+                  stroke-dasharray="138 38"/>
+        </g>
+        <circle cx="32" cy="32" r="24" fill="#ffffff" opacity=".8"/>
+        <path d="M10 48 Q18 16 32 16 Q46 16 54 48 Z"
+              fill="url(#dg)" stroke="none"/>
+        <path d="M10 48 Q18 16 32 16 Q46 16 54 48"
+              fill="none" stroke="#1976d2" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M13 44 Q22 32 32 28 Q44 25 52 30"
+              fill="none" stroke="#7b1fa2" stroke-width="1.2"
+              stroke-linecap="round" stroke-dasharray="3 2" opacity=".75"/>
+        <g stroke="#0d47a1" stroke-width=".9" fill="#fff">
+          <line x1="24" y1="34" x2="40" y2="34" stroke-opacity=".55"/>
+          <line x1="24" y1="34" x2="32" y2="22" stroke-opacity=".55"/>
+          <line x1="40" y1="34" x2="32" y2="22" stroke-opacity=".55"/>
+          <circle cx="32" cy="22" r="2.6" fill="#1976d2"/>
+          <circle cx="24" cy="34" r="2.2" fill="#7b1fa2"/>
+          <circle cx="40" cy="34" r="2.2" fill="#e65100"/>
+        </g>
+        <circle class="spark" cx="32" cy="40" r="3.2" fill="url(#sg)"/>
+        <circle cx="32" cy="16" r="1.6" fill="#bf360c"/>
+      </svg>
+      <div class="brand-text">
+        <div class="brand-top">
+          <span>Termo</span><span class="sep">·</span><span class="ia">IA</span><span class="sep">·</span><span>Dinámica</span>
+        </div>
+        <div class="brand-bot">Diagramas interactivos del R-134a</div>
+      </div>
+    </div>
+    <div class="sb-sub"><span>Intervalo de Isobaras</span></div>
+    <div class="sg">
+      <div class="sr"><label class="sl" id="lbl-low">Bajas P</label>
+        <label class="ss"><input type="checkbox" id="sh-low" onchange="toggleGrp('low')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-mid">Medias P</label>
+        <label class="ss"><input type="checkbox" id="sh-mid" onchange="toggleGrp('mid')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-high">Altas P</label>
+        <label class="ss"><input type="checkbox" id="sh-high" onchange="toggleGrp('high')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-vhigh">Muy altas P</label>
+        <label class="ss"><input type="checkbox" id="sh-vhigh" onchange="toggleGrp('vhigh')"><span class="ss-knob"></span></label></div>
+    </div>
+    <div class="ctrl" style="margin-top:4px">
+      <select id="sel-single" class="sel"></select>
+      <button class="addbtn" onclick="addSingle()">+ Ver</button>
+      <button class="addbtn" onclick="clearSingles()" style="background:#e53935">Limpiar todo</button>
+    </div>
+    <div id="list-single"></div>
+
+    <div class="sb-sub" style="margin-top:6px">
+      <span>Isobara de P</span>
+      <span class="info-btn" id="info-custom-btn" onclick="toggleInfo('custom')" title="Ayuda">i</span>
+    </div>
+    <div class="info-box" id="info-custom">
+      Ingresa cualquier valor de presión. Si coincide con la tabla se traza directamente; de lo contrario se interpola logarítmicamente en P entre isobaras tabulares cercanas (línea discontinua).
+    </div>
+    <div class="ctrl">
+      <input type="number" id="inp-custom" class="sel" style="flex:1" placeholder="Valor P" step="any" min="0">
+      <span id="unit-custom" style="font-size:.72rem;color:#6b7a99;min-width:30px">bar</span>
+    </div>
+    <div id="msg-custom" style="font-size:.68rem;color:#e53935;min-height:.9rem;line-height:1.2"></div>
+    <div class="ctrl" style="margin-top:2px">
+      <button class="addbtn" onclick="addCustom()" style="flex:1">+ Ver</button>
+      <button class="addbtn" onclick="clearCustoms()" style="background:#e53935;flex:1">Limpiar todo</button>
+    </div>
+    <div id="list-custom"></div>
+
+    <div class="sb-sub">Cursor</div>
+    <div class="rtog" id="tog-fc" onclick="toggleFC()">
+      <div class="rl"><div class="rd" style="background:#e65100"></div>Libre</div>
+      <div class="sw"></div>
+    </div>
+    <div id="fc-panel" style="display:none;flex-direction:column;gap:6px">
+      <div class="ic"><div class="lb">Temperatura T</div><div class="vl" id="fr-T" style="color:#e65100">— °C</div></div>
+      <div class="ic"><div class="lb">En. Int. u</div><div class="vl" id="fr-u" style="color:#e65100">— kJ/kg</div></div>
+      <div class="ic" style="background:#fff3e0;border-color:#ffb74d">
+        <div class="lb" style="color:#bf360c;display:flex;align-items:center;justify-content:space-between;gap:6px">
+          <span id="fc-mode-lb">Trayectoria</span>
+          <span class="info-btn" id="info-fc-btn" onclick="toggleInfo('fc')" title="Ayuda"
+                style="border-color:#e65100;color:#e65100">i</span>
+        </div>
+        <div class="info-box" id="info-fc" style="background:#fff8f0;border-color:#ffcc80;color:#6b5a4a">
+          Clic en el plano para marcar un punto. En modo <b>Trayectoria</b> cada segmento se une al siguiente con una flecha; en modo <b>Puntos</b> los marcadores son independientes.
+        </div>
+        <div class="fc-mode">
+          <div class="fc-mode-btn active" id="fcm-path" onclick="setFCMode('path')">Trayectoria</div>
+          <div class="fc-mode-btn" id="fcm-points" onclick="setFCMode('points')">Puntos</div>
+        </div>
+        <div class="vl" id="fr-nmk" style="color:#bf360c;font-size:.82rem">0 puntos</div>
+        <div id="fr-mlist" style="display:flex;flex-direction:column;gap:4px;margin-top:6px;max-height:220px;overflow-y:auto"></div>
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <button class="addbtn" onclick="undoFCMark()" style="background:#fb8c00;flex:1">Deshacer</button>
+          <button class="addbtn" onclick="clearFCMarks()" style="background:#e53935;flex:1">Limpiar</button>
+        </div>
+      </div>
+    </div>
+  </div></div>
+  <div class="sidebar-tab" onclick="toggleSidebar()"><span class="arrow">&#9660;</span>Visualizar</div>
+</div>
+</div>
+<script>
+// ════════════════════════════════════════════════════════════
+// TABLA A-11 (SI) — R-134a Saturación por Presión
+// P(bar), T_sat(°C), uf(kJ/kg), ug(kJ/kg)
+// Fuente: Moran & Shapiro 7e
+// ════════════════════════════════════════════════════════════
+const satSI=[
+  {P:0.6,  T:-37.07,uf:3.41,  ug:206.12},
+  {P:1.0,  T:-26.43,uf:16.22, ug:212.18},
+  {P:1.4,  T:-18.80,uf:25.66, ug:216.52},
+  {P:1.8,  T:-12.73,uf:33.31, ug:219.94},
+  {P:2.0,  T:-10.09,uf:36.69, ug:221.43},
+  {P:2.4,  T:-5.37, uf:42.77, ug:224.07},
+  {P:2.8,  T:-1.23, uf:48.18, ug:226.38},
+  {P:3.2,  T:2.48,  uf:53.06, ug:228.43},
+  {P:4.0,  T:8.93,  uf:61.69, ug:231.97},
+  {P:5.0,  T:15.74, uf:70.93, ug:235.64},
+  {P:6.0,  T:21.58, uf:78.99, ug:238.74},
+  {P:7.0,  T:26.72, uf:86.19, ug:241.42},
+  {P:8.0,  T:31.33, uf:92.75, ug:243.78},
+  {P:9.0,  T:35.53, uf:98.79, ug:245.88},
+  {P:10.0, T:39.39, uf:104.42,ug:247.77},
+  {P:12.0, T:46.32, uf:114.69,ug:251.03},
+  {P:14.0, T:52.43, uf:123.98,ug:253.74},
+  {P:16.0, T:57.92, uf:132.52,ug:256.00},
+  {P:18.0, T:62.91, uf:140.49,ug:257.88},
+  {P:20.0, T:67.49, uf:147.99,ug:259.41},
+  {P:24.0, T:75.66, uf:161.95,ug:261.39},
+  {P:28.0, T:82.83, uf:174.92,ug:262.06},
+  {P:32.0, T:89.27, uf:187.32,ug:261.55},
+  {P:36.0, T:95.16, uf:199.69,ug:259.27},
+  {P:40.0, T:100.69,uf:226.32,ug:243.81},
+  {P:40.59,T:101.06,uf:233.55,ug:233.55},
+];
+
+// ════════════════════════════════════════════════════════════
+// TABLA A-12 (SI) — R-134a Vapor Sobrecalentado
+// {P(bar), pts:[[T(°C), u(kJ/kg)],...]}
+// Fuente: Moran & Shapiro 7e
+// ════════════════════════════════════════════════════════════
+const shSI=[
+  {P:0.6, pts:[[-37.07,206.12],[-20,217.86],[0,232.24],[20,247.32],[40,263.10],[60,279.58],[80,296.75],[90,305.58]]},
+  {P:1.0, pts:[[-26.43,212.18],[-20,216.77],[0,231.41],[20,246.67],[40,262.58],[60,279.16],[80,296.40],[90,305.27]]},
+  {P:1.4, pts:[[-18.80,216.52],[-10,223.03],[0,230.55],[20,246.01],[40,262.06],[60,278.74],[80,296.06],[90,304.95]]},
+  {P:2.0, pts:[[-10.09,221.43],[0,229.23],[20,244.99],[40,261.26],[60,278.10],[80,295.53],[90,304.47]]},
+  {P:2.4, pts:[[-5.37,224.07],[0,228.31],[20,244.30],[40,260.72],[60,277.67],[80,295.18],[90,304.15]]},
+  {P:2.8, pts:[[-1.23,226.38],[10,235.44],[20,243.59],[40,260.17],[60,277.23],[80,294.82],[90,303.83]]},
+  {P:3.2, pts:[[2.48,228.43],[10,234.61],[20,242.87],[40,259.61],[60,276.79],[80,294.46],[90,303.50]]},
+  {P:4.0, pts:[[8.93,231.97],[10,232.87],[20,241.37],[40,258.47],[60,275.89],[80,293.77],[90,302.90]]},
+  {P:5.0, pts:[[15.74,235.64],[20,239.40],[30,248.20],[40,256.99],[60,274.73],[80,292.80],[100,311.31]]},
+  {P:6.0, pts:[[21.58,238.74],[30,246.41],[40,255.45],[60,273.54],[80,291.86],[100,310.53]]},
+  {P:7.0, pts:[[26.72,241.42],[30,244.51],[40,253.83],[60,272.31],[80,290.88],[100,309.74]]},
+  {P:8.0, pts:[[31.33,243.78],[40,252.13],[50,261.62],[60,271.04],[80,289.89],[100,308.93],[110,318.57]]},
+  {P:10.0,pts:[[39.39,247.77],[40,248.39],[50,258.48],[60,268.35],[80,287.82],[100,307.27],[120,326.93]]},
+  {P:12.0,pts:[[46.32,251.03],[50,254.98],[60,265.42],[80,285.62],[100,305.54],[120,325.51],[140,345.73]]},
+  {P:14.0,pts:[[52.43,253.74],[60,262.17],[70,272.87],[80,283.29],[100,303.73],[120,324.05],[140,344.50]]},
+  {P:16.0,pts:[[57.92,256.00],[60,258.48],[70,269.89],[80,280.78],[100,301.84],[120,322.53],[140,343.24]]},
+  {P:18.0,pts:[[62.91,257.88],[70,267.04],[80,278.20],[100,299.84],[120,320.93],[140,341.91]]},
+  {P:20.0,pts:[[67.49,259.41],[80,276.31],[100,297.81],[120,319.21],[140,340.45]]},
+  {P:24.0,pts:[[75.66,261.39],[80,262.20],[100,294.92],[120,316.06],[140,337.83]]},
+  {P:28.0,pts:[[82.83,262.06],[90,267.65],[100,287.65],[120,310.94],[140,333.40]]},
+  {P:32.0,pts:[[89.27,261.55],[100,278.92],[120,304.74],[140,328.32]]},
+  {P:36.0,pts:[[95.16,259.27],[100,265.05],[120,295.40],[140,321.28]]},
+  {P:40.0,pts:[[100.69,243.81],[110,265.83],[120,291.40],[130,310.46],[140,326.96]]},
+];
+
+// ════════════════════════════════════════════════════════════
+// TABLA A-11E — R-134a Saturación por Presión (Inglés)
+// P(psia), T_sat(°F), uf(Btu/lbm), ug(Btu/lbm)
+// Fuente: Moran & Shapiro 7e
+// ════════════════════════════════════════════════════════════
+const satENG=[
+  {P:10,   T:-29.71,uf:6.50, ug:91.41},
+  {P:20,   T:-2.48, uf:13.97,ug:96.13},
+  {P:30,   T:15.38, uf:18.74,ug:98.81},
+  {P:40,   T:29.04, uf:22.41,ug:100.79},
+  {P:50,   T:40.27, uf:25.50,ug:102.30},
+  {P:60,   T:49.89, uf:28.16,ug:103.50},
+  {P:80,   T:65.93, uf:32.69,ug:105.31},
+  {P:100,  T:79.17, uf:36.59,ug:106.62},
+  {P:120,  T:90.54, uf:40.01,ug:107.59},
+  {P:140,  T:100.56,uf:43.08,ug:108.31},
+  {P:160,  T:109.55,uf:45.85,ug:108.83},
+  {P:180,  T:117.74,uf:48.43,ug:109.20},
+  {P:200,  T:125.28,uf:50.83,ug:109.45},
+  {P:240,  T:138.79,uf:55.27,ug:109.71},
+  {P:280,  T:150.70,uf:59.31,ug:109.65},
+  {P:300,  T:156.17,uf:61.25,ug:109.50},
+  {P:350,  T:168.72,uf:65.86,ug:108.99},
+  {P:400,  T:179.95,uf:70.29,ug:108.04},
+  {P:500,  T:199.38,uf:79.00,ug:104.65},
+  {P:588.75,T:213.91,uf:91.85,ug:91.85},
+];
+
+// ════════════════════════════════════════════════════════════
+// TABLA A-12E — R-134a Vapor Sobrecalentado (Inglés)
+// {P(psia), pts:[[T(°F), u(Btu/lbm)],...]}
+// Fuente: Moran & Shapiro 7e
+// ════════════════════════════════════════════════════════════
+const shENG=[
+  {P:10,  pts:[[-29.71,91.41],[0,95.67],[20,98.86],[40,102.06],[60,105.28],[80,108.55],[100,111.86],[120,115.23]]},
+  {P:20,  pts:[[-2.48,96.13],[20,99.45],[40,102.86],[60,106.27],[80,109.69],[100,113.15],[120,116.66],[140,120.21]]},
+  {P:40,  pts:[[29.04,100.79],[40,102.34],[60,105.95],[80,109.51],[100,113.04],[120,116.58],[140,120.12]]},
+  {P:60,  pts:[[49.89,103.50],[60,104.96],[80,108.65],[100,112.28],[120,115.86],[140,119.43]]},
+  {P:80,  pts:[[65.93,105.31],[80,107.65],[100,111.49],[120,115.21],[140,118.86]]},
+  {P:100, pts:[[79.17,106.62],[100,110.49],[120,114.42],[140,118.21],[160,121.91]]},
+  {P:120, pts:[[90.54,107.59],[100,108.81],[120,113.39],[140,117.34],[160,121.13]]},
+  {P:140, pts:[[100.56,108.31],[120,112.20],[140,116.32],[160,120.19],[180,123.94]]},
+  {P:160, pts:[[109.55,108.83],[120,110.83],[140,115.18],[160,119.18],[180,123.01]]},
+  {P:200, pts:[[125.28,109.45],[140,112.71],[160,117.06],[180,121.05],[200,124.84]]},
+  {P:240, pts:[[138.79,109.71],[160,113.21],[180,117.74],[200,121.96],[220,125.96]]},
+  {P:280, pts:[[150.70,109.65],[180,114.11],[200,118.84],[220,123.10],[240,127.10]]},
+  {P:300, pts:[[156.17,109.50],[180,112.81],[200,117.30],[220,121.62],[240,125.71]]},
+  {P:350, pts:[[168.72,108.99],[200,114.96],[220,119.84],[240,124.20]]},
+  {P:400, pts:[[179.95,108.04],[200,109.40],[220,116.83],[240,121.74]]},
+  {P:500, pts:[[199.38,104.65],[220,109.95],[240,116.79],[260,121.78]]},
+];
+
+// ════════════════════════════════════════════════════════════
+// PALETA  Material Design 700/800 + A700
+// ════════════════════════════════════════════════════════════
+const PAL_ISO=['#d50000','#ff3d00','#ff6d00','#e65100','#bf360c',
+  '#c51162','#ad1457','#aa00ff','#6200ea','#4527a0','#311b92',
+  '#2962ff','#0091ea','#0277bd','#1565c0','#283593','#00838f',
+  '#00695c','#004d40','#2e7d32','#33691e','#7b1fa2'];
+
+// ── Grupos de isobaras por presión ──────────────────────────
+const GRP_SI={
+  low:  [0.6,1.0,1.4,1.8,2.0],
+  mid:  [2.4,2.8,3.2,4.0,5.0],
+  high: [6.0,8.0,10.0,12.0,14.0,16.0],
+  vhigh:[18.0,20.0,24.0,28.0,32.0,36.0,40.0]
+};
+const GRP_ENG={
+  low:  [10,20,30,40],
+  mid:  [50,60,80,100],
+  high: [120,140,160,180,200],
+  vhigh:[240,280,300,350,400,500]
+};
+const activeGrp={low:false,mid:false,high:false,vhigh:false};
+
+// ════════════════════════════════════════════════════════════
+// ESTADO
+// ════════════════════════════════════════════════════════════
+let units='SI';
+let grpIso=[],singles=[];
+let singleId=0,singleCI=0;
+let fcOn=false,overTrace=false;
+let fcUSI=null,fcTSI=null;
+// Puntos marcados — siempre en SI: {u(kJ/kg), T(°C)}
+let fcMarks=[];
+// Isobaras personalizadas
+let customs=[],customId=0,customCI=0;
+// Modo cursor libre
+let fcMode='path';
+
+// ── Conversiones ─────────────────────────────────────────────
+const CU=0.429923; // kJ/kg → Btu/lbm
+function getSat(){return units==='SI'?satSI:satENG;}
+function getSH() {return units==='SI'?shSI:shENG;}
+function getGRP(){return units==='SI'?GRP_SI:GRP_ENG;}
+
+// ── Interpolación saturación por P ──────────────────────────
+function satAtP(P){
+  const s=getSat();
+  if(P<=s[0].P)return{...s[0]};
+  if(P>=s[s.length-1].P)return{...s[s.length-1]};
+  for(let i=0;i<s.length-1;i++){
+    if(s[i].P<=P&&P<=s[i+1].P){
+      const f=(P-s[i].P)/(s[i+1].P-s[i].P);
+      return{P,T:s[i].T+f*(s[i+1].T-s[i].T),
+        uf:s[i].uf+f*(s[i+1].uf-s[i].uf),
+        ug:s[i].ug+f*(s[i+1].ug-s[i].ug)};
+    }
+  }
+  return{...s[s.length-1]};
+}
+
+// ── u(P_tab, T) interpolado linealmente en T ────────────────
+function uAtPT_tabular(P_tab,T){
+  const sh=getSH();
+  const iso=sh.find(x=>Math.abs(x.P-P_tab)<1e-6);
+  if(!iso)return null;
+  const pts=iso.pts.slice().sort((a,b)=>a[0]-b[0]);
+  if(T<pts[0][0]-0.01||T>pts[pts.length-1][0]+0.01)return null;
+  if(T<=pts[0][0])return pts[0][1];
+  if(T>=pts[pts.length-1][0])return pts[pts.length-1][1];
+  for(let i=0;i<pts.length-1;i++){
+    if(pts[i][0]<=T&&T<=pts[i+1][0]){
+      const f=(T-pts[i][0])/(pts[i+1][0]-pts[i][0]);
+      return pts[i][1]+f*(pts[i+1][1]-pts[i][1]);
+    }
+  }
+  return null;
+}
+
+// ── u(P,T) interpolado log en P, lineal en T ───────────────
+function uAtPT_interp(P,T){
+  const sh=getSH();
+  const Ps=sh.map(x=>x.P).slice().sort((a,b)=>a-b);
+  const exact=Ps.find(p=>Math.abs(p-P)<Math.max(P,1)*0.002);
+  if(exact!==undefined)return uAtPT_tabular(exact,T);
+  if(P<Ps[0]||P>Ps[Ps.length-1])return null;
+  let P1=null,P2=null;
+  for(let i=0;i<Ps.length-1;i++){
+    if(Ps[i]<P&&P<Ps[i+1]){P1=Ps[i];P2=Ps[i+1];break;}
+  }
+  if(P1===null)return null;
+  const u1=uAtPT_tabular(P1,T);
+  const u2=uAtPT_tabular(P2,T);
+  if(u1===null||u2===null)return null;
+  const f=Math.log(P/P1)/Math.log(P2/P1);
+  return u1+f*(u2-u1);
+}
+
+// ── Rango de presiones de la tabla ──────────────────────────
+function pressureRange(){
+  const sh=getSH();
+  const Ps=sh.map(x=>x.P);
+  return{min:Math.min(...Ps),max:Math.max(...Ps)};
+}
+
+// ── ¿Coincide P con una isobara tabulada? ───────────────────
+function isTabularP(P){
+  const sh=getSH();
+  return sh.some(x=>Math.abs(x.P-P)<Math.max(P,1)*0.002);
+}
+
+// ════════════════════════════════════════════════════════════
+// CONSTRUCCIÓN DE ISOBARA EN DIAGRAMA T-u
+// Eje X = u (lineal), Eje Y = T (lineal)
+// ════════════════════════════════════════════════════════════
+function buildIsobar(P_native,color){
+  const sat=getSat(),sh=getSH();
+  const Pcrit=sat[sat.length-1].P;
+  const tU=units==='SI'?'°C':'°F';
+  const uU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const pU=units==='SI'?'bar':'psia';
+  const Plbl=`${(P_native>=100?P_native.toFixed(1):P_native>=10?P_native.toFixed(2):P_native.toFixed(3)).replace(/\.?0+$/,'')} ${pU}`;
+
+  const shEntry=sh.find(iso=>Math.abs(iso.P-P_native)<Math.max(P_native,1)*0.002);
+  const isInterp=!shEntry;
+  if(isInterp){
+    const Ps=sh.map(x=>x.P).sort((a,b)=>a-b);
+    if(P_native<Ps[0]||P_native>Ps[Ps.length-1])return[];
+  }
+
+  const isSub=P_native<Pcrit*0.9999;
+  let Tsat=null,ufS=null,ugS=null;
+  if(isSub){
+    const s=satAtP(P_native);
+    Tsat=s.T;ufS=s.uf;ugS=s.ug;
+  }
+
+  let supPts;
+  if(!isInterp){
+    supPts=shEntry.pts.map(([T,u])=>({T,u})).sort((a,b)=>a.T-b.T);
+  }else{
+    const Ps=sh.map(x=>x.P).sort((a,b)=>a-b);
+    let P1=Ps[0],P2=Ps[Ps.length-1];
+    for(let i=0;i<Ps.length-1;i++){
+      if(Ps[i]<P_native&&P_native<Ps[i+1]){P1=Ps[i];P2=Ps[i+1];break;}
+    }
+    const iso1=sh.find(x=>Math.abs(x.P-P1)<1e-6);
+    const iso2=sh.find(x=>Math.abs(x.P-P2)<1e-6);
+    const Tset=new Set();
+    iso1.pts.forEach(([T,_])=>Tset.add(T));
+    iso2.pts.forEach(([T,_])=>Tset.add(T));
+    if(Tsat!==null)Tset.add(Tsat);
+    supPts=[...Tset].sort((a,b)=>a-b)
+      .map(T=>({T,u:uAtPT_interp(P_native,T)}))
+      .filter(p=>p.u!==null&&isFinite(p.u));
+  }
+
+  // Tramo bifásico: horizontal a Tsat de (uf,Tsat) a (ug,Tsat)
+  const bipX=[],bipY=[];
+  if(isSub&&Tsat!==null&&ufS!==null&&ugS!==null){
+    const n=40;
+    for(let k=0;k<=n;k++){bipX.push(ufS+(ugS-ufS)*k/n);bipY.push(Tsat);}
+  }
+
+  // Tramo sobrecalentado: anclado en vapor saturado para continuidad
+  const supX=[],supY=[];
+  if(isSub&&ugS!==null&&Tsat!==null){
+    if(supPts.length>0&&Math.abs(supPts[0].T-Tsat)>0.5){
+      supX.push(ugS);supY.push(Tsat);
+    }
+  }
+  supPts.forEach(pt=>{
+    if(Tsat===null||pt.T>=Tsat-0.5){supX.push(pt.u);supY.push(pt.T);}
+  });
+
+  const xAll=bipX.length>0?[...bipX,...supX]:[...supX];
+  const yAll=bipY.length>0?[...bipY,...supY]:[...supY];
+
+  const lineStyle={color,width:2.2,shape:'spline',smoothing:0.6};
+  if(isInterp)lineStyle.dash='8,4';
+  const interpTag=isInterp?'  <i>(interp)</i>':'';
+  const lblText=isInterp?`${Plbl}*`:Plbl;
+  const main={x:xAll,y:yAll,mode:'lines',meta:'isobar',name:Plbl,
+    line:lineStyle,showlegend:false,connectgaps:false,
+    hovertemplate:`<b>P = ${Plbl}</b>${interpTag}<br>T = %{y:.1f} ${tU}<br>u = %{x:.2f} ${uU}<extra></extra>`};
+
+  const lx=supX.length>0?supX[supX.length-1]:(bipX[0]||0);
+  const ly=supY.length>0?supY[supY.length-1]:(bipY[0]||0);
+  const lbl={x:[lx],y:[ly],mode:'text',text:[`<b>${lblText}</b>`],
+    textposition:'top right',
+    textfont:{color,size:10.5,family:'IBM Plex Sans, sans-serif',weight:700,style:isInterp?'italic':'normal'},
+    showlegend:false,hoverinfo:'skip'};
+  return[main,lbl];
+}
+
+// ════════════════════════════════════════════════════════════
+// TRAZAS DE SATURACIÓN  (X = u, Y = T)
+// ════════════════════════════════════════════════════════════
+const trLiq={mode:'lines+markers',name:'Líquido saturado',meta:'satL',
+  line:{color:'#1976d2',width:2.5},marker:{size:4,color:'#1976d2'},showlegend:false,
+  hoverlabel:{bgcolor:'#fff',bordercolor:'#1976d2',
+    font:{family:"'IBM Plex Mono',monospace",size:12,color:'#1976d2'}}};
+const trVap={mode:'lines+markers',name:'Vapor saturado',meta:'satV',
+  line:{color:'#2e7d32',width:2.5},marker:{size:4,color:'#2e7d32'},showlegend:false,
+  hoverlabel:{bgcolor:'#fff',bordercolor:'#2e7d32',
+    font:{family:"'IBM Plex Mono',monospace",size:12,color:'#2e7d32'}}};
+
+// ════════════════════════════════════════════════════════════
+// LAYOUT — X lineal (u), Y lineal (T)
+// ════════════════════════════════════════════════════════════
+const layout={
+  paper_bgcolor:'#fff',plot_bgcolor:'#fafcff',
+  font:{family:"'IBM Plex Sans',sans-serif",color:'#1a2233',size:11.5},
+  margin:{l:90,r:92,t:40,b:75},
+  xaxis:{type:'linear',showgrid:true,gridcolor:'#e3edf9',zeroline:false,
+    showline:true,linecolor:'#1976d2',linewidth:2.5,tickcolor:'#1976d2',
+    tickwidth:2,ticklen:7,mirror:'ticks',
+    tickfont:{size:11.5,color:'#0d3b66',family:"'IBM Plex Sans',sans-serif"},
+    minor:{showgrid:true,gridcolor:'#eef4fb',tickcolor:'#90b8e0',ticklen:4}},
+  yaxis:{type:'linear',showgrid:true,gridcolor:'#e3edf9',zeroline:false,
+    showline:true,linecolor:'#7b1fa2',linewidth:2.5,tickcolor:'#7b1fa2',
+    tickwidth:2,ticklen:7,side:'left',
+    tickfont:{size:11.5,color:'#4a148c',family:"'IBM Plex Sans',sans-serif"},
+    minor:{showgrid:true,gridcolor:'#eef4fb',tickcolor:'#b39ddb',ticklen:4}},
+  yaxis2:{type:'linear',overlaying:'y',side:'right',showgrid:false,zeroline:false,
+    showline:true,linecolor:'#7b1fa2',linewidth:2.5,tickcolor:'#7b1fa2',
+    tickwidth:2,ticklen:7,matches:'y',
+    tickfont:{size:11.5,color:'#4a148c',family:"'IBM Plex Sans',sans-serif"}},
+  dragmode:'pan',showlegend:false,hovermode:'closest',
+  hoverlabel:{bgcolor:'#fff',bordercolor:'#1976d2',
+    font:{family:"'IBM Plex Mono',monospace",size:12,color:'#1a2233'}},
+  annotations:[],shapes:[]
+};
+const config={responsive:true,displayModeBar:true,scrollZoom:true,
+  modeBarButtonsToRemove:['lasso2d','select2d'],displaylogo:false,
+  toImageButtonOptions:{format:'png',filename:'diagrama_Tu_R134a',scale:2}};
+
+// ════════════════════════════════════════════════════════════
+// RENDERIZADO CENTRAL
+// ════════════════════════════════════════════════════════════
+function rebuild(){
+  const sat=getSat();
+  const Tvals=sat.map(d=>d.T);
+  const ufD=sat.map(d=>d.uf);
+  const ugD=sat.map(d=>d.ug);
+  const tUl=units==='SI'?'°C':'°F';
+  const uUl=units==='SI'?'kJ/kg':'Btu/lbm';
+  const pUl=units==='SI'?'bar':'psia';
+  const uU=units==='SI'?'(kJ/kg)':'(Btu/lbm)';
+  const tU=units==='SI'?'(°C)':'(°F)';
+  const xR=units==='SI'?[0,360]:[0,140];
+  const yR=units==='SI'?[-50,200]:[-60,400];
+
+  const hL=sat.map(d=>`<b>Líquido Saturado</b><br>T<sub>sat</sub>=${d.T.toFixed(2)} ${tUl}<br>P=${d.P.toFixed(3)} ${pUl}<br>u<sub>f</sub>=${d.uf.toFixed(2)} ${uUl}<extra></extra>`);
+  const hV=sat.map(d=>`<b>Vapor Saturado</b><br>T<sub>sat</sub>=${d.T.toFixed(2)} ${tUl}<br>P=${d.P.toFixed(3)} ${pUl}<br>u<sub>g</sub>=${d.ug.toFixed(2)} ${uUl}<extra></extra>`);
+
+  // Punto crítico R-134a
+  const crit=sat[sat.length-1];
+  const critPt={x:[crit.uf],y:[crit.T],mode:'markers+text',
+    text:['<b>Punto Crítico R-134a</b>'],textposition:'top right',
+    textfont:{size:11.5,color:'#bf360c',family:"'IBM Plex Sans',sans-serif",weight:700},
+    marker:{size:12,color:'#e65100',symbol:'star',line:{color:'#fff',width:2}},
+    showlegend:false,
+    hovertemplate:`<b>Punto Crítico R-134a</b><br>T = ${crit.T} ${tUl}<br>u = ${crit.uf.toFixed(2)} ${uUl}<br>P = ${crit.P} ${pUl}<extra></extra>`};
+
+  const gT=grpIso.flatMap(i=>buildIsobar(i.P,i.c));
+  const sT=singles.flatMap(i=>buildIsobar(i.P,i.c));
+  const cT=customs.flatMap(i=>buildIsobar(i.P,i.c));
+
+  // Traza ancla invisible para forzar el renderizado del yaxis2 (eje derecho)
+  const y2Anchor={x:[xR[0]],y:[yR[0]],yaxis:'y2',mode:'markers',
+    marker:{size:0.1,color:'rgba(0,0,0,0)'},showlegend:false,hoverinfo:'skip',meta:'axis2'};
+
+  const fcPath=buildFCPath();
+
+  Plotly.react('chart',[
+    y2Anchor,
+    {...trLiq,x:ufD,y:Tvals,hovertemplate:hL},
+    {...trVap,x:ugD,y:Tvals,hovertemplate:hV},
+    critPt,
+    ...gT,...sT,...cT,
+    ...(fcPath.trace?[fcPath.trace]:[])
+  ],{...layout,
+    annotations:fcPath.annotations,
+    xaxis:{...layout.xaxis,range:xR,
+      title:{text:`<b>Energía Interna Específica  u  ${uU}</b>`,
+        font:{size:14,color:'#0d47a1',family:"'IBM Plex Sans',sans-serif"},standoff:16}},
+    yaxis:{...layout.yaxis,range:yR,
+      title:{text:`<b>Temperatura  T  ${tU}</b>`,
+        font:{size:14,color:'#4a148c',family:"'IBM Plex Sans',sans-serif"},standoff:16}},
+    yaxis2:{...layout.yaxis2,range:yR,
+      title:{text:`<b>T  ${tU}</b>`,
+        font:{size:13,color:'#4a148c',family:"'IBM Plex Sans',sans-serif"},standoff:12}}
+  },config);
+  setTimeout(buildAxHandles,80);
+}
+
+// ════════════════════════════════════════════════════════════
+// GESTIÓN DE GRUPOS E ISOBARAS
+// ════════════════════════════════════════════════════════════
+function toggleGrp(g){
+  activeGrp[g]=document.getElementById(`sh-${g}`).checked;
+  const gr=getGRP();grpIso=[];let ci=0;
+  ['low','mid','high','vhigh'].forEach(k=>{
+    if(!activeGrp[k])return;
+    gr[k].forEach(P=>{grpIso.push({P,c:PAL_ISO[ci%PAL_ISO.length]});ci++;});
+  });rebuild();
+}
+
+function updLabels(){
+  const g=getGRP(),pU=units==='SI'?'bar':'psia';
+  document.getElementById('lbl-low').textContent  =`Bajas (${g.low[0]}–${g.low[g.low.length-1]} ${pU})`;
+  document.getElementById('lbl-mid').textContent  =`Medias (${g.mid[0]}–${g.mid[g.mid.length-1]} ${pU})`;
+  document.getElementById('lbl-high').textContent =`Altas (${g.high[0]}–${g.high[g.high.length-1]} ${pU})`;
+  document.getElementById('lbl-vhigh').textContent=`Muy altas (${g.vhigh[0]}–${g.vhigh[g.vhigh.length-1]} ${pU})`;
+}
+
+function populateSels(){
+  const sel=document.getElementById('sel-single'),sh=getSH();
+  const prev=parseFloat(sel.value);sel.innerHTML='';
+  const pU=units==='SI'?'bar':'psia';
+  sh.forEach(iso=>{
+    const o=document.createElement('option');
+    o.value=iso.P;o.textContent=`${iso.P} ${pU}`;
+    if(Math.abs(iso.P-prev)<0.001)o.selected=true;
+    sel.appendChild(o);
+  });
+}
+
+function addSingle(){
+  const P=parseFloat(document.getElementById('sel-single').value);
+  if(singles.find(i=>i.P===P))return;
+  singles.push({P,c:PAL_ISO[(singles.length*3)%PAL_ISO.length],id:++singleId});
+  renderSingles();rebuild();
+}
+function rmSingle(id){singles=singles.filter(i=>i.id!==id);renderSingles();rebuild();}
+function clearSingles(){singles=[];renderSingles();rebuild();}
+function renderSingles(){
+  const l=document.getElementById('list-single');if(!l)return;l.innerHTML='';
+  const pU=units==='SI'?'bar':'psia';
+  singles.forEach(i=>l.appendChild(mkIsoRow(`${i.P} ${pU}`,i.c,()=>rmSingle(i.id))));
+}
+
+// ── Isobaras personalizadas ──────────────────────────────────
+function updCustomPH(){
+  const inp=document.getElementById('inp-custom');if(!inp)return;
+  const r=pressureRange(),pU=units==='SI'?'bar':'psia';
+  inp.placeholder=`${r.min}–${r.max} ${pU}`;
+  const uc=document.getElementById('unit-custom');if(uc)uc.textContent=pU;
+}
+function addCustom(){
+  const inp=document.getElementById('inp-custom');
+  const msg=document.getElementById('msg-custom');
+  const P=parseFloat(inp.value);
+  const r=pressureRange();
+  const pU=units==='SI'?'bar':'psia';
+  msg.textContent='';
+  if(isNaN(P)||P<=0){msg.textContent='Ingresa un valor positivo.';return;}
+  if(P<r.min||P>r.max){msg.textContent=`Fuera de rango [${r.min} – ${r.max}] ${pU}.`;return;}
+  if(customs.some(c=>Math.abs(c.P-P)<Math.max(P,1)*0.002)){msg.textContent='Valor ya graficado.';return;}
+  const interp=!isTabularP(P);
+  customs.push({P,c:PAL_ISO[(customCI*5+2)%PAL_ISO.length],id:++customId,interp});
+  customCI++;inp.value='';renderCustoms();rebuild();
+}
+function rmCustom(id){customs=customs.filter(c=>c.id!==id);renderCustoms();rebuild();}
+function clearCustoms(){
+  customs=[];
+  const msg=document.getElementById('msg-custom');if(msg)msg.textContent='';
+  renderCustoms();rebuild();
+}
+function renderCustoms(){
+  const l=document.getElementById('list-custom');if(!l)return;l.innerHTML='';
+  const pU=units==='SI'?'bar':'psia';
+  customs.forEach(i=>{
+    const tag=i.interp?' (interp)':' (tab)';
+    l.appendChild(mkIsoRow(`${i.P} ${pU}${tag}`,i.c,()=>rmCustom(i.id)));
+  });
+}
+
+function mkIsoRow(txt,color,onRm){
+  const r=document.createElement('div');
+  r.style.cssText='display:flex;align-items:center;gap:6px;padding:5px 8px;background:#f5f8fd;border:1px solid #d9e5f5;border-radius:5px;margin-top:4px';
+  const d=document.createElement('div');d.style.cssText=`width:9px;height:9px;border-radius:50%;background:${color};flex-shrink:0`;
+  const s=document.createElement('span');s.style.cssText='font-family:"IBM Plex Mono",monospace;font-size:.7rem;color:#1a2233;flex:1';s.textContent=txt;
+  const b=document.createElement('button');b.textContent='✕';b.style.cssText='border:none;background:none;color:#6b7a99;cursor:pointer;font-size:.75rem;padding:0';b.onclick=onRm;
+  r.appendChild(d);r.appendChild(s);r.appendChild(b);return r;
+}
+
+// ════════════════════════════════════════════════════════════
+// CAMBIO DE UNIDADES
+// ════════════════════════════════════════════════════════════
+function setUnits(sys){
+  if(sys===units)return;units=sys;
+  document.getElementById('btn-si').classList.toggle('active',sys==='SI');
+  document.getElementById('btn-ing').classList.toggle('active',sys==='ING');
+  grpIso=[];singles=[];customs=[];customCI=0;
+  Object.keys(activeGrp).forEach(k=>{activeGrp[k]=false;document.getElementById(`sh-${k}`).checked=false;});
+  const uc=document.getElementById('unit-custom');if(uc)uc.textContent=sys==='SI'?'bar':'psia';
+  const mc=document.getElementById('msg-custom');if(mc)mc.textContent='';
+  const ic=document.getElementById('inp-custom');if(ic)ic.value='';
+  updLabels();populateSels();renderSingles();renderCustoms();updCustomPH();updFCLabels();updFCMarksCounter();rebuild();
+}
+function updFCLabels(){
+  const tU=units==='SI'?'°C':'°F',uU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const ft=document.getElementById('fr-T'),fu=document.getElementById('fr-u');
+  if(ft&&ft.textContent.includes('—'))ft.textContent=`— ${tU}`;
+  if(fu&&fu.textContent.includes('—'))fu.textContent=`— ${uU}`;
+}
+
+// ════════════════════════════════════════════════════════════
+// SIDEBAR Y CURSOR LIBRE
+// ════════════════════════════════════════════════════════════
+function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');}
+
+const CD=document.getElementById('chart');
+function getSVG(){return CD.querySelector('svg.ch-ov');}
+
+// Conversión pixel → coordenadas (X lineal u, Y lineal T)
+function px2data(mx,my){
+  const la=CD._fullLayout;if(!la)return null;
+  const xa=la.xaxis,ya=la.yaxis;
+  const pL=la.margin.l,pR=la.width-la.margin.r,pT=la.margin.t,pB=la.height-la.margin.b;
+  if(mx<pL||mx>pR||my<pT||my>pB)return null;
+  const u=xa.range[0]+(mx-pL)/(pR-pL)*(xa.range[1]-xa.range[0]);
+  const T=ya.range[0]+(pB-my)/(pB-pT)*(ya.range[1]-ya.range[0]);
+  return{u,T};
+}
+
+// Coordenadas → pixel (ambos ejes lineales)
+function data2px(u,T){
+  const la=CD._fullLayout;if(!la)return null;
+  const xa=la.xaxis,ya=la.yaxis;
+  const xF=(u-xa.range[0])/(xa.range[1]-xa.range[0]);
+  const yF=(T-ya.range[0])/(ya.range[1]-ya.range[0]);
+  const pL=la.margin.l,pR=la.width-la.margin.r,pT=la.margin.t,pB=la.height-la.margin.b;
+  return{px:pL+xF*(pR-pL),py:pB-yF*(pB-pT)};
+}
+
+function moveCH(px,py,show,cpx,cpy,ct){
+  const svg=getSVG();const la=CD._fullLayout;if(!la||!svg)return;
+  const pL=la.margin.l,pR=la.width-la.margin.r,pT=la.margin.t,pB=la.height-la.margin.b;
+  const op=show?'0.85':'0',oc=(show&&cpx!=null)?'0.9':'0';
+  const q=id=>svg.querySelector('#'+id);
+  q('chvl').setAttribute('x1',px);q('chvl').setAttribute('x2',px);q('chvl').setAttribute('y1',pT);q('chvl').setAttribute('y2',pB);q('chvl').setAttribute('opacity',op);
+  q('chhl').setAttribute('x1',pL);q('chhl').setAttribute('x2',pR);q('chhl').setAttribute('y1',py);q('chhl').setAttribute('y2',py);q('chhl').setAttribute('opacity',op);
+  q('chdt').setAttribute('cx',px);q('chdt').setAttribute('cy',py);q('chdt').setAttribute('opacity',op);
+  if(cpx!=null){
+    q('chcd').setAttribute('cx',cpx);q('chcd').setAttribute('cy',cpy);q('chcd').setAttribute('opacity',oc);
+    q('chcl').setAttribute('x1',cpx);q('chcl').setAttribute('x2',cpx);q('chcl').setAttribute('y1',py);q('chcl').setAttribute('y2',cpy);q('chcl').setAttribute('opacity',oc);
+    const t=q('chct');const gR=(cpx+130<pR);
+    t.setAttribute('x',cpx+(gR?10:-10));t.setAttribute('y',cpy-8);t.setAttribute('text-anchor',gR?'start':'end');t.textContent=ct;t.setAttribute('opacity',oc);
+    try{const bb=t.getBBox();const bg=q('chcb');bg.setAttribute('x',bb.x-4);bg.setAttribute('y',bb.y-2);bg.setAttribute('width',bb.width+8);bg.setAttribute('height',bb.height+4);bg.setAttribute('opacity',oc);}catch(e){}
+  }else{['chcd','chcl','chct','chcb'].forEach(id=>{const el=q(id);if(el)el.setAttribute('opacity','0');});}
+}
+
+function hideFCLines(){
+  const svg=getSVG();if(!svg)return;
+  ['fcvl','fchl','fcdt','fclb','fclbbg'].forEach(id=>{const el=svg.querySelector('#'+id);if(el)el.setAttribute('opacity','0');});
+  const tU=units==='SI'?'°C':'°F',uU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const ft=document.getElementById('fr-T'),fu=document.getElementById('fr-u');
+  if(ft)ft.textContent=`— ${tU}`;if(fu)fu.textContent=`— ${uU}`;
+}
+
+function toggleFC(){
+  fcOn=!fcOn;
+  document.getElementById('tog-fc').classList.toggle('active',fcOn);
+  document.getElementById('fc-panel').style.display=fcOn?'flex':'none';
+  if(!fcOn)hideFCLines();
+}
+
+// ── Trayectoria libre: traza + anotaciones-flecha ─────────────
+// Ejes lineales: sin Math.log10 para las coordenadas de anotación
+function buildFCPath(){
+  if(fcMarks.length===0)return{trace:null,annotations:[]};
+  const tU=units==='SI'?'°C':'°F';
+  const uU=units==='SI'?'kJ/kg':'Btu/lbm';
+  const xs=fcMarks.map(m=>units==='SI'?m.u:m.u*CU);
+  const ys=fcMarks.map(m=>units==='SI'?m.T:(m.T*9/5+32));
+  const labels=fcMarks.map((m,i)=>`${i+1}`);
+  const isPath=fcMode==='path';
+  const traceName=isPath?'Trayectoria':'Puntos';
+  const hoverLabel=isPath?'Punto':'Marca';
+  const trace={x:xs,y:ys,mode:'markers+text',meta:'fcmark',name:traceName,
+    marker:{size:12,color:'#e65100',symbol:'circle',line:{color:'#fff',width:2}},
+    text:labels.map(l=>`<b>${l}</b>`),textposition:'top right',
+    textfont:{size:12,color:'#bf360c',family:"'IBM Plex Sans',sans-serif",weight:700},
+    customdata:labels,showlegend:false,
+    hovertemplate:`<b>${hoverLabel} %{customdata}</b><br>T = %{y:.1f} ${tU}<br>u = %{x:.2f} ${uU}<extra></extra>`};
+  const annotations=[];
+  if(isPath){
+    for(let i=1;i<xs.length;i++){
+      annotations.push({
+        x:xs[i],y:ys[i],xref:'x',yref:'y',
+        ax:xs[i-1],ay:ys[i-1],axref:'x',ayref:'y',
+        showarrow:true,arrowhead:3,arrowsize:1.5,arrowwidth:2.4,
+        arrowcolor:'#e65100',standoff:8,startstandoff:8,
+        opacity:0.95,text:''
+      });
+    }
+  }
+  return{trace,annotations};
+}
+
+// ── Toggle info colapsable ────────────────────────────────────
+function toggleInfo(key){
+  const box=document.getElementById(`info-${key}`);
+  const btn=document.getElementById(`info-${key}-btn`);
+  if(!box||!btn)return;
+  const open=box.classList.toggle('open');
+  btn.classList.toggle('active',open);
+}
+
+// ── Cambio de modo cursor libre ────────────────────────────────
+function setFCMode(mode){
+  if(mode!=='path'&&mode!=='points')return;
+  if(mode===fcMode)return;
+  fcMode=mode;
+  document.getElementById('fcm-path').classList.toggle('active',mode==='path');
+  document.getElementById('fcm-points').classList.toggle('active',mode==='points');
+  const lb=document.getElementById('fc-mode-lb');
+  if(lb)lb.textContent=mode==='path'?'Trayectoria':'Puntos';
+  updFCMarksCounter();rebuild();
+}
+
+function updFCMarksCounter(){
+  const el=document.getElementById('fr-nmk');
+  const ml=document.getElementById('fr-mlist');
+  if(!el)return;
+  const n=fcMarks.length;
+  const suffix=(fcMode==='path'&&n>1)?` · ${n-1} segmento${n-1===1?'':'s'}`:'';
+  el.textContent=n===0?'0 puntos':n===1?'1 punto':`${n} puntos${suffix}`;
+  if(!ml)return;
+  ml.innerHTML='';
+  const tU=units==='SI'?'°C':'°F';
+  const uU=units==='SI'?'kJ/kg':'Btu/lbm';
+  fcMarks.forEach((m,i)=>{
+    const uDisp=units==='SI'?m.u:m.u*CU;
+    const TDisp=units==='SI'?m.T:(m.T*9/5+32);
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:6px;padding:5px 8px;background:#fff8f0;border:1px solid #ffcc80;border-radius:5px';
+    const idx=document.createElement('div');
+    idx.style.cssText='font-weight:700;color:#bf360c;font-size:.78rem;min-width:1.3em;text-align:center';
+    idx.textContent=String(i+1);
+    const coord=document.createElement('div');
+    coord.style.cssText='flex:1;font-family:\'IBM Plex Mono\',monospace;font-size:.65rem;color:#4a148c;line-height:1.35';
+    coord.innerHTML=`T = ${TDisp.toFixed(1)} ${tU}<br>u = ${uDisp.toFixed(2)} ${uU}`;
+    const btn=document.createElement('button');
+    btn.textContent='✕';btn.title='Eliminar este punto';
+    btn.style.cssText='border:none;background:none;color:#6b7a99;cursor:pointer;font-size:.82rem;padding:2px 4px';
+    btn.onmouseover=()=>{btn.style.color='#e53935';};
+    btn.onmouseout=()=>{btn.style.color='#6b7a99';};
+    btn.onclick=()=>removeFCMark(i);
+    row.appendChild(idx);row.appendChild(coord);row.appendChild(btn);
+    ml.appendChild(row);
+  });
+}
+
+function addFCMark(uDisp,TDisp){
+  const uSI=units==='SI'?uDisp:uDisp/CU;
+  const TSI=units==='SI'?TDisp:(TDisp-32)*5/9;
+  fcMarks.push({u:uSI,T:TSI});
+  updFCMarksCounter();rebuild();
+}
+function undoFCMark(){if(fcMarks.length===0)return;fcMarks.pop();updFCMarksCounter();rebuild();}
+function clearFCMarks(){fcMarks=[];updFCMarksCounter();rebuild();}
+function removeFCMark(idx){if(idx<0||idx>=fcMarks.length)return;fcMarks.splice(idx,1);updFCMarksCounter();rebuild();}
+
+// ── Listeners de ratón para cursor libre ─────────────────────
+let _fcmdX=null,_fcmdY=null;
+CD.addEventListener('mousedown',function(e){
+  if(!fcOn)return;
+  if(e.button!==0)return;
+  _fcmdX=e.clientX;_fcmdY=e.clientY;
+},true);
+document.addEventListener('mouseup',function(e){
+  if(!fcOn||_fcmdX==null)return;
+  if(e.button!==0){_fcmdX=null;_fcmdY=null;return;}
+  const dx=Math.abs(e.clientX-_fcmdX),dy=Math.abs(e.clientY-_fcmdY);
+  _fcmdX=null;_fcmdY=null;
+  if(dx>3||dy>3)return;
+  if(overTrace)return;
+  const rect=CD.getBoundingClientRect();
+  const mx=e.clientX-rect.left,my=e.clientY-rect.top;
+  const la=CD._fullLayout;if(!la)return;
+  const pL=la.margin.l,pR=la.width-la.margin.r,pT=la.margin.t,pB=la.height-la.margin.b;
+  if(mx<pL||mx>pR||my<pT||my>pB)return;
+  const c=px2data(mx,my);if(!c)return;
+  addFCMark(c.u,c.T);
+},true);
+
+// ════════════════════════════════════════════════════════════
+// MANEJADORES DE RANGO DE EJES
+// ════════════════════════════════════════════════════════════
+let axHandles=[];
+let isDraggingHandle=false;
+
+function posAxHandles(){
+  const la=CD._fullLayout;if(!la||axHandles.length!==4)return;
+  const W=CD.clientWidth,H=CD.clientHeight;
+  const mL=la.margin.l,mT=la.margin.t,mR=la.margin.r||30,mB=la.margin.b;
+  const pR=W-mR,pB=H-mB;
+  const xLen=pR-mL,yLen=pB-mT;
+  const s=(h,x,y)=>{h.style.left=(x-13)+'px';h.style.top=(y-13)+'px';};
+  s(axHandles[0],mL+xLen*0.10,pB+28);
+  s(axHandles[1],mL-52,mT+yLen*0.82);
+  s(axHandles[2],mL+xLen*0.90,pB+28);
+  s(axHandles[3],mL-52,mT+yLen*0.18);
+}
+
+function buildAxHandles(){
+  axHandles.forEach(h=>h.remove());axHandles=[];
+  const SPECS=[
+    {sym:'↔',ax:'x',type:'zoom',cur:'ew-resize',clr:'#1976d2',
+     tip:'Arrastra ← → para escalar el eje X (zoom simétrico)'},
+    {sym:'↕',ax:'y',type:'zoom',cur:'ns-resize',clr:'#7b1fa2',
+     tip:'Arrastra ↑ ↓ para escalar el eje Y (zoom simétrico)'},
+    {sym:'↔',ax:'x',type:'pan', cur:'ew-resize',clr:'#1976d2',round:true,
+     tip:'Arrastra ← → para desplazar la vista en X'},
+    {sym:'↕',ax:'y',type:'pan', cur:'ns-resize',clr:'#7b1fa2',round:true,
+     tip:'Arrastra ↑ ↓ para desplazar la vista en Y'},
+  ];
+  SPECS.forEach(({sym,ax,type,cur,clr,tip,round})=>{
+    const h=document.createElement('div');
+    h.className='ax-drag-handle'+(round?' round':'');
+    const isPan=type==='pan';
+    const bgDefault=isPan?'rgba(25,118,210,0.16)':'rgba(255,255,255,0.95)';
+    h.style.cssText+=`;border:2.5px solid ${clr};color:${clr};cursor:${cur};background:${bgDefault}`;
+    h.textContent=sym;h.title=tip;
+
+    let dragging=false,startMouse=0,startRange=[0,0],startHalf=0;
+
+    h.addEventListener('mousedown',function(ev){
+      dragging=true;isDraggingHandle=true;
+      const axObj=CD._fullLayout[ax==='x'?'xaxis':'yaxis'];
+      startRange=[axObj.range[0],axObj.range[1]];
+      startHalf=(axObj.range[1]-axObj.range[0])/2;
+      startMouse=ax==='x'?ev.clientX:ev.clientY;
+      ev.preventDefault();ev.stopPropagation();
+      h.style.transform='scale(1.25)';
+
+      function onMove(ev2){
+        if(!dragging)return;
+        const la=CD._fullLayout;
+        const W2=CD.clientWidth,H2=CD.clientHeight;
+        const mL2=la.margin.l,mT2=la.margin.t,mR2=la.margin.r||30,mB2=la.margin.b;
+        const plotPx=ax==='x'?(W2-mR2-mL2):(H2-mT2-mB2);
+        const delta=ax==='x'?(ev2.clientX-startMouse):-(ev2.clientY-startMouse);
+        let nr;
+        if(type==='zoom'){
+          const center=(startRange[0]+startRange[1])/2;
+          const factor=Math.pow(1.003,-delta);
+          const newHalf=Math.max(startHalf*factor,startHalf*0.02);
+          nr=[center-newHalf,center+newHalf];
+        }else{
+          const span=startRange[1]-startRange[0];
+          const dv=delta*span/plotPx;
+          nr=[startRange[0]-dv,startRange[1]-dv];
+        }
+        const upd={};upd[ax==='x'?'xaxis.range':'yaxis.range']=nr;
+        Plotly.relayout('chart',upd);
+      }
+
+      function onUp(){
+        dragging=false;isDraggingHandle=false;
+        h.style.transform='scale(1)';
+        document.removeEventListener('mousemove',onMove);
+        document.removeEventListener('mouseup',onUp);
+        posAxHandles();
+      }
+      document.addEventListener('mousemove',onMove);
+      document.addEventListener('mouseup',onUp);
+    });
+
+    h.addEventListener('mouseenter',()=>{
+      if(!dragging)h.style.background=ax==='x'?'rgba(25,118,210,0.30)':'rgba(123,31,162,0.22)';
+    });
+    h.addEventListener('mouseleave',()=>{
+      if(!dragging)h.style.background=bgDefault;
+    });
+
+    CD.appendChild(h);axHandles.push(h);
+  });
+  posAxHandles();
+}
+
+// ════════════════════════════════════════════════════════════
+// INICIALIZACIÓN
+// ════════════════════════════════════════════════════════════
+(function init(){
+  CD.style.position='relative';
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.classList.add('ch-ov');
+  svg.style.cssText='position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:10';
+  function mkL(id,stroke,sw,dash){
+    const l=document.createElementNS('http://www.w3.org/2000/svg','line');
+    l.id=id;l.setAttribute('stroke',stroke);l.setAttribute('stroke-width',sw);
+    if(dash)l.setAttribute('stroke-dasharray',dash);l.setAttribute('opacity','0');svg.appendChild(l);}
+  function mkC(id,r,fill,stroke,sw){
+    const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.id=id;c.setAttribute('r',r);c.setAttribute('fill',fill);
+    c.setAttribute('stroke',stroke);c.setAttribute('stroke-width',sw);c.setAttribute('opacity','0');svg.appendChild(c);}
+  function mkR(id,fill,stroke){
+    const r=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    r.id=id;r.setAttribute('fill',fill);r.setAttribute('stroke',stroke);
+    r.setAttribute('stroke-width','1');r.setAttribute('rx','3');r.setAttribute('opacity','0');svg.appendChild(r);}
+  function mkT(id,fill,size,weight){
+    const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.id=id;t.setAttribute('font-family','IBM Plex Mono,monospace');
+    t.setAttribute('font-size',size||'11');if(weight)t.setAttribute('font-weight',weight);
+    t.setAttribute('fill',fill);t.setAttribute('opacity','0');svg.appendChild(t);}
+  // Crosshair de saturación (azul)
+  mkL('chvl','#1976d2','1.5','5,4');mkL('chhl','#1976d2','1.5','5,4');
+  mkC('chdt','5','#fff','#1976d2','2');
+  // Companion crosshair (naranja)
+  mkC('chcd','6','#fff8e1','#f57c00','2');mkL('chcl','#f57c00','1.2','3,3');
+  mkR('chcb','#fff','#f57c00');mkT('chct','#f57c00');
+  // Cursor libre (naranja intenso)
+  mkL('fcvl','#e65100','1.2','4,3');mkL('fchl','#e65100','1.2','4,3');
+  mkC('fcdt','4','#fff3e0','#e65100','2');
+  mkR('fclbbg','#fff3e0','#e65100');mkT('fclb','#bf360c','11','500');
+  CD.appendChild(svg);
+
+  populateSels();updLabels();renderCustoms();updCustomPH();updFCMarksCounter();rebuild();
+
+  CD.on('plotly_hover',function(data){
+    const pt=data.points[0],meta=pt.data.meta;
+    const isSat=meta==='satL'||meta==='satV';
+    const isOverlay=['isobar','fcmark'].indexOf(meta)>=0;
+    if(fcOn&&(isSat||isOverlay)){overTrace=true;hideFCLines();return;}
+    overTrace=false;if(!isSat)return;
+    const sat=getSat();const idx=pt.pointIndex;
+    if(!sat[idx])return;
+    const uH=(meta==='satL')?sat[idx].uf:sat[idx].ug,TH=sat[idx].T;
+    const co=data2px(uH,TH);if(!co)return;
+    const uU=units==='SI'?'kJ/kg':'Btu/lbm';
+    let cpx=null,cpy=null,ct='';
+    if(meta==='satL'){const r=data2px(sat[idx].ug,TH);if(r){cpx=r.px;cpy=r.py;}ct=`ug=${sat[idx].ug.toFixed(2)} ${uU}`;}
+    else{const r=data2px(sat[idx].uf,TH);if(r){cpx=r.px;cpy=r.py;}ct=`uf=${sat[idx].uf.toFixed(2)} ${uU}`;}
+    moveCH(co.px,co.py,true,cpx,cpy,ct);
+  });
+  CD.on('plotly_unhover',function(){overTrace=false;moveCH(0,0,false,null,null,'');});
+
+  CD.addEventListener('mousemove',function(e){
+    if(!fcOn||overTrace)return;
+    const la=CD._fullLayout;if(!la)return;
+    const rect=CD.getBoundingClientRect();
+    const mx=e.clientX-rect.left,my=e.clientY-rect.top;
+    const coords=px2data(mx,my);if(!coords){hideFCLines();return;}
+    const{u,T}=coords;
+    const svg=getSVG();if(!svg)return;
+    const q=id=>svg.querySelector('#'+id);
+    if(!q('fcvl'))return;
+    const pL=la.margin.l,pR=la.width-la.margin.r,pT=la.margin.t,pB=la.height-la.margin.b;
+    q('fcvl').setAttribute('x1',mx);q('fcvl').setAttribute('x2',mx);q('fcvl').setAttribute('y1',pT);q('fcvl').setAttribute('y2',pB);q('fcvl').setAttribute('opacity','0.75');
+    q('fchl').setAttribute('x1',pL);q('fchl').setAttribute('x2',pR);q('fchl').setAttribute('y1',my);q('fchl').setAttribute('y2',my);q('fchl').setAttribute('opacity','0.75');
+    q('fcdt').setAttribute('cx',mx);q('fcdt').setAttribute('cy',my);q('fcdt').setAttribute('opacity','0.95');
+    const tU=units==='SI'?'°C':'°F',uU=units==='SI'?'kJ/kg':'Btu/lbm';
+    const TStr=T.toFixed(1),uStr=u.toFixed(2);
+    const lbTxt=`T = ${TStr} ${tU}   u = ${uStr} ${uU}`;
+    const lb=q('fclb'),lbbg=q('fclbbg');
+    const gR=(mx+260<pR);
+    lb.setAttribute('x',mx+(gR?14:-14));lb.setAttribute('y',my-12);
+    lb.setAttribute('text-anchor',gR?'start':'end');lb.textContent=lbTxt;lb.setAttribute('opacity','1');
+    try{const bb=lb.getBBox();lbbg.setAttribute('x',bb.x-5);lbbg.setAttribute('y',bb.y-3);lbbg.setAttribute('width',bb.width+10);lbbg.setAttribute('height',bb.height+6);lbbg.setAttribute('opacity','0.92');}catch(err){}
+    document.getElementById('fr-T').textContent=`${TStr} ${tU}`;
+    document.getElementById('fr-u').textContent=`${uStr} ${uU}`;
+    fcUSI=units==='SI'?u:u/CU;
+    fcTSI=units==='SI'?T:(T-32)*5/9;
+  });
+
+  CD.addEventListener('mouseleave',function(){
+    moveCH(0,0,false,null,null,'');
+    if(fcOn)hideFCLines();
+    fcUSI=null;fcTSI=null;
+  });
+
+  CD.on('plotly_relayout',function(){
+    if(!isDraggingHandle)posAxHandles();
+  });
+  window.addEventListener('resize',function(){setTimeout(posAxHandles,120);});
+
+  // Pre-activar grupo Medias
+  const _midCb=document.getElementById('sh-mid');
+  if(_midCb){_midCb.checked=true;toggleGrp('mid');}
+})();
+</script>
+</body>
+</html>

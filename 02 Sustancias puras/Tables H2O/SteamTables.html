@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tablas de Vapor — Propiedades Termodinámicas del Agua</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&family=Roboto:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    /* ── Paleta Diagrama T-v ── */
+    --blue-deep:   #1565C0;   /* header              */
+    --blue-mid:    #1976D2;   /* botones, tabs activos, interactivos */
+    --blue-light:  #BBDEFB;   /* bordes suaves, grid  */
+    --blue-hover:  #1565C0;   /* hover botón principal */
+    --green-dark:  #2E7D32;   /* sobrecalentado, vapor */
+    --green-mid:   #388E3C;   /* hover green          */
+    --purple:      #7B1FA2;   /* etiquetas de sección  */
+    --orange:      #E65100;   /* comprimido            */
+    --red:         #C62828;   /* error                 */
+    --teal:        #00695C;   /* bifásico              */
+    /* Neutros */
+    --bg-page:     #ECEFF1;   /* fondo general         */
+    --bg-panel:    #FFFFFF;   /* paneles / tarjetas    */
+    --bg-row:      #F8F9FA;   /* filas alternas        */
+    --text-primary:#212121;
+    --text-sec:    #546E7A;
+    --text-hint:   #90A4AE;
+    --border:      #CFD8DC;
+    --border-focus:#1976D2;
+    --mono: 'Roboto Mono', monospace;
+    --sans: 'Roboto', sans-serif;
+  }
+
+  body {
+    background: var(--bg-page);
+    color: var(--text-primary);
+    font-family: var(--sans);
+    font-size: 14px;
+    min-height: 100vh;
+  }
+
+  /* ── Header ── */
+  .app-header {
+    background: var(--blue-deep);
+    padding: 0 20px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.24);
+  }
+  .app-logo {
+    width: 34px; height: 34px;
+    background: rgba(255,255,255,0.18);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px; color: #fff; font-weight: 700;
+    border: 1px solid rgba(255,255,255,0.25);
+    flex-shrink: 0;
+  }
+  .app-title {
+    font-size: 15px; font-weight: 500;
+    color: #fff; letter-spacing: 0.3px;
+  }
+  .app-sub {
+    font-size: 11px; color: rgba(255,255,255,0.72);
+    font-family: var(--mono); margin-top: 1px;
+  }
+
+  /* ── Tabs ── */
+  .tabs {
+    display: flex;
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--border);
+    padding: 0 20px;
+    gap: 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .tab-btn {
+    background: none; border: none;
+    color: var(--text-sec);
+    font-family: var(--sans); font-size: 13px; font-weight: 500;
+    padding: 12px 18px; cursor: pointer;
+    border-bottom: 3px solid transparent;
+    letter-spacing: 0.3px;
+    transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--blue-mid); }
+  .tab-btn.active {
+    color: var(--blue-mid);
+    border-bottom-color: var(--blue-mid);
+  }
+
+  /* ── Main layout ── */
+  .main { display: flex; height: calc(100vh - 97px); }
+  .panel { display: none; width: 100%; }
+  .panel.active { display: flex; }
+
+  /* ── Input zone ── */
+  .input-zone {
+    width: 272px; min-width: 252px;
+    background: var(--bg-panel);
+    border-right: 1px solid var(--border);
+    padding: 18px 16px;
+    display: flex; flex-direction: column; gap: 16px;
+    overflow-y: auto;
+    box-shadow: 2px 0 6px rgba(0,0,0,0.05);
+  }
+
+  .zone-label {
+    font-size: 10px; font-weight: 500; letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--purple);
+    margin-bottom: 4px;
+  }
+
+  .field-group { display: flex; flex-direction: column; gap: 7px; }
+  .field-row { display: flex; gap: 6px; align-items: stretch; }
+
+  select, input[type=number] {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 8px 10px;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    width: 100%;
+  }
+  select:focus, input[type=number]:focus {
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px rgba(25,118,210,0.12);
+  }
+  select {
+    cursor: pointer; appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23546E7A'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 10px center;
+    padding-right: 28px;
+  }
+
+  .radio-group { display: flex; gap: 6px; flex-wrap: wrap; }
+  .radio-btn {
+    flex: 1; min-width: 72px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-sec);
+    font-family: var(--sans); font-size: 12px; font-weight: 500;
+    padding: 7px 8px; cursor: pointer; text-align: center;
+    transition: all 0.15s;
+  }
+  .radio-btn:hover {
+    border-color: var(--blue-mid);
+    color: var(--blue-mid);
+    background: #E3F2FD;
+  }
+  .radio-btn.active {
+    background: #E3F2FD;
+    border-color: var(--blue-mid);
+    color: var(--blue-mid);
+    box-shadow: inset 0 0 0 1px var(--blue-mid);
+  }
+
+  .calc-btn {
+    background: var(--blue-mid);
+    border: none; border-radius: 4px;
+    color: #fff; font-family: var(--sans); font-size: 13px;
+    font-weight: 500; padding: 11px;
+    cursor: pointer; width: 100%;
+    letter-spacing: 0.4px;
+    box-shadow: 0 2px 4px rgba(21,101,192,0.30);
+    transition: background 0.15s, box-shadow 0.15s;
+  }
+  .calc-btn:hover {
+    background: var(--blue-hover);
+    box-shadow: 0 3px 8px rgba(21,101,192,0.38);
+  }
+  .calc-btn:active { background: #0D47A1; }
+
+  .separator {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2px 0;
+  }
+
+  /* ── Region badges ── */
+  .region-badge {
+    display: inline-block; font-size: 11px;
+    font-family: var(--mono); font-weight: 500;
+    padding: 4px 12px; border-radius: 12px;
+    margin-top: 4px; letter-spacing: 0.3px;
+  }
+  .r-sat   { background: #E3F2FD; color: #1565C0; border: 1px solid #90CAF9; }
+  .r-super { background: #E8F5E9; color: #1B5E20; border: 1px solid #A5D6A7; }
+  .r-comp  { background: #FFF3E0; color: #BF360C; border: 1px solid #FFCC80; }
+  .r-two   { background: #F3E5F5; color: #6A1B9A; border: 1px solid #CE93D8; }
+  .r-error { background: #FFEBEE; color: #B71C1C; border: 1px solid #EF9A9A; }
+  .r-crit  { background: #E0F7FA; color: #004D40; border: 1px solid #80CBC4; }
+  .msg-warning {
+    background: #FFF8E1; border: 1px solid #FFD54F;
+    border-radius: 4px; padding: 10px 16px;
+    color: #E65100; font-size: 12px; line-height: 1.5;
+    margin-bottom: 14px; display: flex; gap: 8px; align-items: flex-start;
+  }
+  .msg-warning .warn-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+  /* ── Output zone ── */
+  .output-zone {
+    flex: 1; padding: 20px;
+    overflow-y: auto;
+    background: var(--bg-page);
+  }
+
+  .output-table {
+    width: 100%; border-collapse: collapse;
+    font-family: var(--mono); font-size: 13px;
+    background: var(--bg-panel);
+    border-radius: 6px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+  }
+  .output-table th {
+    text-align: left; padding: 10px 16px;
+    background: var(--blue-deep);
+    color: rgba(255,255,255,0.92);
+    font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+    font-family: var(--sans); font-weight: 500;
+    border-bottom: none;
+    position: sticky; top: 0;
+  }
+  .output-table th:last-child { text-align: right; }
+  .output-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid #ECEFF1;
+    color: var(--text-primary);
+  }
+  .output-table td:first-child {
+    color: var(--text-sec);
+    font-family: var(--sans); font-size: 13px;
+    font-weight: 500;
+  }
+  .output-table td:last-child {
+    text-align: right;
+    color: var(--blue-mid);
+    font-weight: 500;
+  }
+  .output-table td.unit-col {
+    color: var(--text-hint); font-size: 11px; text-align: right;
+  }
+  .output-table tr:nth-child(even) td { background: var(--bg-row); }
+  .output-table tr:hover td { background: #E3F2FD; }
+
+  .empty-state {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    height: 100%; color: var(--text-hint);
+    gap: 12px; font-size: 13px;
+  }
+  .empty-icon {
+    font-size: 40px; opacity: 0.45;
+  }
+  .empty-state strong { color: var(--text-sec); }
+
+  .msg-error {
+    background: #FFEBEE; border: 1px solid #EF9A9A;
+    border-radius: 4px; padding: 11px 16px;
+    color: #B71C1C; font-size: 13px;
+    margin-bottom: 14px;
+  }
+
+  .section-title {
+    font-size: 11px; font-weight: 500; letter-spacing: 0.8px;
+    text-transform: uppercase; color: var(--text-sec);
+    margin-bottom: 10px; font-family: var(--sans);
+  }
+
+  .quality-row { display: flex; align-items: center; gap: 8px; }
+  .quality-row input[type=number] { width: 80px; }
+  .quality-hint { font-size: 11px; color: var(--text-hint); line-height: 1.4; }
+
+  /* ── Tabla dual saturado (f / g) ── */
+  .sat-both-table .th-f {
+    background: #1565C0;
+    color: #fff;
+    text-align: center;
+    font-style: normal;
+    letter-spacing: 0.5px;
+  }
+  .sat-both-table .th-g {
+    background: #2E7D32;
+    color: #fff;
+    text-align: center;
+    letter-spacing: 0.5px;
+  }
+  .sat-both-table .th-f em,
+  .sat-both-table .th-g em {
+    font-style: italic;
+    font-size: 13px;
+    font-weight: 700;
+    margin-left: 3px;
+    text-transform: none;
+  }
+  .sat-both-table .prop-col {
+    color: var(--text-sec);
+    font-family: var(--sans);
+    font-size: 13px;
+    font-weight: 500;
+    min-width: 130px;
+  }
+  .sat-both-table .val-f {
+    text-align: right;
+    font-family: var(--mono);
+    color: #1565C0;
+    font-weight: 500;
+    background: #EEF4FF;
+  }
+  .sat-both-table .val-g {
+    text-align: right;
+    font-family: var(--mono);
+    color: #1B5E20;
+    font-weight: 500;
+    background: #EDF7EE;
+  }
+  .sat-both-table .sat-shared-row td {
+    background: #F8F9FA;
+    border-bottom: 1px solid var(--border);
+  }
+  .sat-both-table .divider-row td {
+    height: 3px;
+    background: var(--border);
+    padding: 0;
+    border: none;
+  }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { opacity: 1; }
+
+  @media (max-width: 600px) {
+    .main { flex-direction: column; height: auto; }
+    .input-zone { width: 100%; min-width: 0; border-right: none; border-bottom: 1px solid var(--border); box-shadow: none; }
+    .output-zone { min-height: 300px; }
+  }
+
+  /* ── Unit toggle in header ── */
+  .unit-toggle { display:flex; gap:4px; margin-left:auto; }
+  .unit-btn {
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.35);
+    border-radius: 4px; color: rgba(255,255,255,0.85);
+    font-family: var(--sans); font-size: 12px; font-weight: 500;
+    padding: 5px 14px; cursor: pointer;
+    transition: all 0.15s; letter-spacing: 0.5px;
+  }
+  .unit-btn.active {
+    background: #fff; color: var(--blue-deep);
+    border-color: #fff;
+  }
+  .unit-btn:hover:not(.active) { background: rgba(255,255,255,0.25); }
+
+  /* ── Section divider ── */
+  .sect-divider {
+    border: none; border-top: 1px solid var(--border);
+    margin: 4px 0;
+  }
+
+  /* ── Sub-group indented ── */
+  .sub-group {
+    background: #F0F4FF;
+    border: 1px solid #C5CAE9;
+    border-radius: 4px; padding: 10px 10px 8px;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .sub-label {
+    font-size: 10px; font-weight: 500; letter-spacing: 1px;
+    text-transform: uppercase; color: #3949AB; margin-bottom: 2px;
+  }
+  /* ── Input with unit badge ── */
+  .input-wrap { position: relative; display: flex; }
+  .input-wrap input { padding-right: 52px; }
+  .input-unit {
+    position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+    font-size: 10px; color: var(--text-hint); font-family: var(--mono);
+    pointer-events: none; white-space: nowrap;
+  }
+  /* ── Result header card ── */
+  .result-header {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-radius: 6px; padding: 12px 16px;
+    margin-bottom: 14px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+  }
+  .result-header .rh-label { font-size: 11px; color: var(--text-hint); font-family: var(--sans); }
+  .result-header .rh-val { font-size: 13px; font-weight: 500; color: var(--text-primary); font-family: var(--mono); }
+  .result-header .rh-sep { width:1px; height: 32px; background: var(--border); }
+
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══════════════════════════════════════════════════ -->
+<header class="app-header">
+  <div class="app-logo">H₂O</div>
+  <div>
+    <div class="app-title">Propiedades Termodinámicas del Agua</div>
+  </div>
+  <div class="unit-toggle">
+    <button class="unit-btn active" id="btn-si" onclick="setUnits('SI')">SI</button>
+    <button class="unit-btn" id="btn-en" onclick="setUnits('EN')">Inglés</button>
+  </div>
+</header>
+
+<!-- ══ TABS ════════════════════════════════════════════════════ -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('sat')">Saturado</button>
+  <button class="tab-btn" onclick="switchTab('super')">Sobrecalentado / Comprimido</button>
+</div>
+
+<!-- ══════════ PANEL SATURADO ══════════════════════════════════ -->
+<div class="main panel active" id="panel-sat">
+
+  <div class="input-zone">
+
+    <!-- Tabla de -->
+    <div class="field-group">
+      <div class="zone-label">Tabla de:</div>
+      <div class="radio-group">
+        <div class="radio-btn active" id="sat-var-T" onclick="setSatVar('T')">Temperatura</div>
+        <div class="radio-btn"        id="sat-var-P" onclick="setSatVar('P')">Presión</div>
+      </div>
+    </div>
+
+    <!-- Valor de la variable -->
+    <div class="field-group">
+      <div class="zone-label" id="sat-var-label">Temperatura</div>
+      <div class="input-wrap">
+        <input type="number" id="sat-val" placeholder="ej. 100" step="any">
+        <span class="input-unit" id="sat-val-unit">°C</span>
+      </div>
+    </div>
+
+    <hr class="sect-divider">
+
+    <!-- Fase -->
+    <div class="field-group">
+      <div class="zone-label">Fase</div>
+      <div class="radio-group">
+        <div class="radio-btn active" id="phase-satboth" onclick="setPhase('satboth')">Vapor / Líquido</div>
+        <div class="radio-btn"        id="phase-two"     onclick="setPhase('twophase')">Dos Fases</div>
+      </div>
+    </div>
+
+    <!-- Calidad (solo bifásico) -->
+    <div class="sub-group" id="quality-group" style="display:none">
+      <div class="sub-label">Calidad de vapor · x</div>
+      <div class="input-wrap">
+        <input type="number" id="quality-val" placeholder="0.00 – 1.00"
+               min="0" max="1" step="0.01" value="0.5">
+        <span class="input-unit">—</span>
+      </div>
+      <div class="quality-hint">0 = líquido saturado &nbsp;·&nbsp; 1 = vapor saturado</div>
+    </div>
+
+    <hr class="sect-divider">
+
+    <button class="calc-btn" onclick="calcSat()">Calcular propiedades</button>
+    <div id="sat-region-badge"></div>
+
+  </div><!-- /input-zone -->
+
+  <div class="output-zone" id="sat-output">
+    <div class="empty-state">
+      <div class="empty-icon">⊙</div>
+      <div>Seleccione una variable, introduzca su valor y presione <strong>Calcular</strong></div>
+    </div>
+  </div>
+
+</div><!-- /panel-sat -->
+
+<!-- ══════════ PANEL SOBRECALENTADO / COMPRIMIDO ════════════════ -->
+<div class="main panel" id="panel-super">
+
+  <div class="input-zone">
+
+    <!-- Primera variable -->
+    <div class="field-group">
+      <div class="zone-label">Primera variable</div>
+      <select id="super-var1" onchange="onSuperVarChange()">
+        <option value="T">Temperatura</option>
+        <option value="P">Presión</option>
+        <option value="v">Volumen específico</option>
+        <option value="h">Entalpía</option>
+        <option value="u">Energía interna</option>
+        <option value="s">Entropía</option>
+      </select>
+      <div class="input-wrap" style="margin-top:4px">
+        <input type="number" id="super-val1" placeholder="valor" step="any">
+        <span class="input-unit" id="super-unit1">°C</span>
+      </div>
+    </div>
+
+    <hr class="sect-divider">
+
+    <!-- Segunda variable -->
+    <div class="field-group">
+      <div class="zone-label">Segunda variable</div>
+      <select id="super-var2" onchange="onSuperVarChange()">
+        <option value="P">Presión</option>
+        <option value="T">Temperatura</option>
+        <option value="v">Volumen específico</option>
+        <option value="h">Entalpía</option>
+        <option value="u">Energía interna</option>
+        <option value="s">Entropía</option>
+      </select>
+      <div class="input-wrap" style="margin-top:4px">
+        <input type="number" id="super-val2" placeholder="valor" step="any">
+        <span class="input-unit" id="super-unit2">bar</span>
+      </div>
+    </div>
+
+    <hr class="sect-divider">
+
+    <button class="calc-btn" onclick="calcSuper()">Calcular propiedades</button>
+    <div id="super-region-badge"></div>
+
+  </div><!-- /input-zone -->
+
+  <div class="output-zone" id="super-output">
+    <div class="empty-state">
+      <div class="empty-icon">⊙</div>
+      <div>Seleccione dos variables, introduzca sus valores y presione <strong>Calcular</strong></div>
+    </div>
+  </div>
+
+</div><!-- /panel-super -->
+
+<script>
+
+/* ════════════════════════════════════════════════════════════════
+   TABLAS TERMODINÁMICAS — Moran & Shapiro, 7ª ed. (Apéndice SI)
+   ════════════════════════════════════════════════════════════════ */
+
+/* ── TABLA A-2: Agua saturada — Tabla de temperatura
+   Columnas: [T(°C), P(bar), vf×1e3(m³/kg), vg(m³/kg),
+              uf(kJ/kg), ug(kJ/kg),
+              hf(kJ/kg), hfg(kJ/kg), hg(kJ/kg),
+              sf(kJ/kg·K), sg(kJ/kg·K)]                          */
+const A2 = [
+[0.01, 0.00611,1.0002,206.136, 0.00,  2375.3, 0.01,  2501.3,2501.4, 0.0000,9.1562],
+[4,    0.00813,1.0001,157.232,16.77,  2380.9,16.78,  2491.9,2508.7, 0.0610,9.0514],
+[5,    0.00872,1.0001,147.120,20.97,  2382.3,20.98,  2489.6,2510.6, 0.0761,9.0257],
+[6,    0.00935,1.0001,137.734,25.19,  2383.6,25.20,  2487.2,2512.4, 0.0912,9.0003],
+[8,    0.01072,1.0002,120.917,33.59,  2386.4,33.60,  2482.5,2516.1, 0.1212,8.9501],
+[10,   0.01228,1.0004,106.379,42.00,  2389.2,42.01,  2477.7,2519.8, 0.1510,8.9008],
+[11,   0.01312,1.0004, 99.857,46.20,  2390.5,46.20,  2475.4,2521.6, 0.1658,8.8765],
+[12,   0.01402,1.0005, 93.784,50.41,  2391.9,50.41,  2473.0,2523.4, 0.1806,8.8524],
+[13,   0.01497,1.0007, 88.124,54.60,  2393.3,54.60,  2470.7,2525.3, 0.1953,8.8285],
+[14,   0.01598,1.0008, 82.848,58.79,  2394.7,58.80,  2468.3,2527.1, 0.2099,8.8048],
+[15,   0.01705,1.0009, 77.926,62.99,  2396.1,62.99,  2465.9,2528.9, 0.2245,8.7814],
+[16,   0.01818,1.0011, 73.333,67.18,  2397.4,67.19,  2463.6,2530.8, 0.2390,8.7582],
+[17,   0.01938,1.0012, 69.044,71.38,  2398.8,71.38,  2461.2,2532.6, 0.2535,8.7351],
+[18,   0.02064,1.0014, 65.038,75.57,  2400.2,75.58,  2458.8,2534.4, 0.2679,8.7123],
+[19,   0.02198,1.0016, 61.293,79.76,  2401.6,79.77,  2456.5,2536.2, 0.2823,8.6897],
+[20,   0.02339,1.0018, 57.791,83.95,  2402.9,83.96,  2454.1,2538.1, 0.2966,8.6672],
+[21,   0.02487,1.0020, 54.514,88.14,  2404.3,88.14,  2451.8,2539.9, 0.3109,8.6450],
+[22,   0.02645,1.0022, 51.447,92.32,  2405.7,92.33,  2449.4,2541.7, 0.3251,8.6229],
+[23,   0.02810,1.0024, 48.574,96.51,  2407.0,96.52,  2447.0,2543.5, 0.3393,8.6011],
+[24,   0.02985,1.0027, 45.883,100.70, 2408.4,100.70, 2444.7,2545.4, 0.3534,8.5794],
+[25,   0.03169,1.0029, 43.360,104.88, 2409.8,104.89, 2442.3,2547.2, 0.3674,8.5580],
+[26,   0.03363,1.0032, 40.994,109.06, 2411.1,109.07, 2439.9,2549.0, 0.3814,8.5367],
+[27,   0.03567,1.0035, 38.774,113.25, 2412.5,113.25, 2437.6,2550.8, 0.3954,8.5156],
+[28,   0.03782,1.0037, 36.690,117.42, 2413.9,117.43, 2435.2,2552.6, 0.4093,8.4946],
+[29,   0.04008,1.0040, 34.733,121.60, 2415.2,121.61, 2432.8,2554.5, 0.4231,8.4739],
+[30,   0.04246,1.0043, 32.894,125.78, 2416.6,125.79, 2430.5,2556.3, 0.4369,8.4533],
+[31,   0.04496,1.0046, 31.165,129.96, 2418.0,129.97, 2428.1,2558.1, 0.4507,8.4329],
+[32,   0.04759,1.0050, 29.540,134.14, 2419.3,134.15, 2425.7,2559.9, 0.4644,8.4127],
+[33,   0.05034,1.0053, 28.011,138.32, 2420.7,138.33, 2423.4,2561.7, 0.4781,8.3927],
+[34,   0.05324,1.0056, 26.571,142.50, 2422.0,142.50, 2421.0,2563.5, 0.4917,8.3728],
+[35,   0.05628,1.0060, 25.216,146.67, 2423.4,146.68, 2418.6,2565.3, 0.5053,8.3531],
+[36,   0.05947,1.0063, 23.940,150.85, 2424.7,150.86, 2416.2,2567.1, 0.5188,8.3336],
+[38,   0.06632,1.0071, 21.602,159.20, 2427.4,159.21, 2411.5,2570.7, 0.5458,8.2950],
+[40,   0.07384,1.0078, 19.523,167.56, 2430.1,167.57, 2406.7,2574.3, 0.5725,8.2570],
+[45,   0.09593,1.0099, 15.258,188.44, 2436.8,188.45, 2394.8,2583.2, 0.6387,8.1648],
+[50,   0.1235, 1.0121, 12.032,209.32, 2443.5,209.33, 2382.7,2592.1, 0.7038,8.0763],
+[55,   0.1576, 1.0146,  9.568,230.21, 2450.1,230.23, 2370.7,2600.9, 0.7679,7.9913],
+[60,   0.1994, 1.0172,  7.671,251.11, 2456.6,251.13, 2358.5,2609.6, 0.8312,7.9096],
+[65,   0.2503, 1.0199,  6.197,272.02, 2463.1,272.06, 2346.2,2618.3, 0.8935,7.8310],
+[70,   0.3119, 1.0228,  5.042,292.95, 2469.6,292.98, 2333.8,2626.8, 0.9549,7.7553],
+[75,   0.3858, 1.0259,  4.131,313.90, 2475.9,313.93, 2321.4,2635.3, 1.0155,7.6824],
+[80,   0.4739, 1.0291,  3.407,334.86, 2482.2,334.91, 2308.8,2643.7, 1.0753,7.6122],
+[85,   0.5783, 1.0325,  2.828,355.84, 2488.4,355.90, 2296.0,2651.9, 1.1343,7.5445],
+[90,   0.7014, 1.0360,  2.361,376.85, 2494.5,376.92, 2283.2,2660.1, 1.1925,7.4791],
+[95,   0.8455, 1.0397,  1.982,397.88, 2500.6,397.96, 2270.2,2668.1, 1.2500,7.4159],
+[100,  1.014,  1.0435,  1.673,418.94, 2506.5,419.04, 2257.0,2676.1, 1.3069,7.3549],
+[110,  1.433,  1.0516,  1.210,461.14, 2518.1,461.30, 2230.2,2691.5, 1.4185,7.2387],
+[120,  1.985,  1.0603,  0.8919,503.50,2529.3,503.71, 2202.6,2706.3, 1.5276,7.1296],
+[130,  2.701,  1.0697,  0.6685,546.02,2539.9,546.31, 2174.2,2720.5, 1.6344,7.0269],
+[140,  3.613,  1.0797,  0.5089,588.74,2550.0,589.13, 2144.7,2733.9, 1.7391,6.9299],
+[150,  4.758,  1.0905,  0.3928,631.68,2559.5,632.20, 2114.3,2746.5, 1.8418,6.8379],
+[160,  6.178,  1.1020,  0.3071,674.86,2568.4,675.55, 2082.6,2758.1, 1.9427,6.7502],
+[170,  7.917,  1.1143,  0.2428,718.33,2576.5,719.21, 2049.5,2768.7, 2.0419,6.6663],
+[180, 10.02,   1.1274,  0.1941,762.09,2583.7,763.22, 2015.0,2778.2, 2.1396,6.5857],
+[190, 12.54,   1.1414,  0.1565,806.19,2590.0,807.62, 1978.8,2786.4, 2.2359,6.5079],
+[200, 15.54,   1.1565,  0.1274,850.65,2595.3,852.45, 1940.7,2793.2, 2.3309,6.4323],
+[210, 19.06,   1.1726,  0.1044,895.53,2599.5,897.76, 1900.7,2798.5, 2.4248,6.3585],
+[220, 23.18,   1.1900,  0.08619,940.87,2602.4,943.62,1858.5,2802.1, 2.5178,6.2861],
+[230, 27.95,   1.2088,  0.07158,986.74,2603.9,990.12,1813.8,2804.0, 2.6099,6.2146],
+[240, 33.44,   1.2291,  0.05976,1033.2,2604.0,1037.3,1766.5,2803.8, 2.7015,6.1437],
+[250, 39.73,   1.2512,  0.05013,1080.4,2602.4,1085.4,1716.2,2801.5, 2.7927,6.0730],
+[260, 46.88,   1.2755,  0.04221,1128.4,2599.0,1134.4,1662.5,2796.6, 2.8838,6.0019],
+[270, 54.99,   1.3023,  0.03564,1177.4,2593.7,1184.5,1605.2,2789.7, 2.9751,5.9301],
+[280, 64.12,   1.3321,  0.03017,1227.5,2586.1,1236.0,1543.6,2779.6, 3.0668,5.8571],
+[290, 74.36,   1.3656,  0.02557,1278.9,2576.0,1289.1,1477.1,2766.2, 3.1594,5.7821],
+[300, 85.81,   1.4036,  0.02167,1332.0,2563.0,1344.0,1404.9,2749.0, 3.2534,5.7045],
+[320, 112.7,   1.4988,  0.01549,1444.6,2525.5,1461.5,1238.6,2700.1, 3.4480,5.5362],
+[340, 145.9,   1.6379,  0.01080,1570.3,2464.6,1594.2,1027.9,2622.0, 3.6594,5.3357],
+[360, 186.5,   1.8925,  0.006945,1725.2,2351.5,1760.5,720.5,2481.0, 3.9147,5.0526],
+[374.14,220.9, 3.155,   0.003155,2029.6,2029.6,2099.3,0,2099.3,     4.4298,4.4298]
+];
+
+/* ── TABLA A-3: Agua saturada — Tabla de presión
+   Columnas iguales a A-2 pero ordenadas por P                    */
+const A3 = [
+[28.96, 0.04,  1.0040,34.800, 121.45,2415.2,121.46,2432.9,2554.4, 0.4226,8.4746],
+[36.16, 0.06,  1.0064,23.739, 151.53,2425.0,151.53,2415.9,2567.4, 0.5210,8.3304],
+[41.51, 0.08,  1.0084,18.103, 173.87,2432.2,173.88,2403.1,2577.0, 0.5926,8.2287],
+[45.81, 0.10,  1.0102,14.674, 191.82,2437.9,191.83,2392.8,2584.7, 0.6493,8.1502],
+[60.06, 0.20,  1.0172, 7.649, 251.38,2456.7,251.40,2358.3,2609.7, 0.8320,7.9085],
+[69.10, 0.30,  1.0223, 5.229, 289.20,2468.4,289.23,2336.1,2625.3, 0.9439,7.7686],
+[75.87, 0.40,  1.0265, 3.993, 317.53,2477.0,317.58,2319.2,2636.8, 1.0259,7.6700],
+[81.33, 0.50,  1.0300, 3.240, 340.44,2483.9,340.49,2305.4,2645.9, 1.0910,7.5939],
+[85.94, 0.60,  1.0331, 2.732, 359.79,2489.6,359.86,2293.6,2653.5, 1.1453,7.5320],
+[89.95, 0.70,  1.0360, 2.365, 376.63,2494.5,376.70,2283.3,2660.0, 1.1919,7.4797],
+[93.50, 0.80,  1.0380, 2.087, 391.58,2498.8,391.66,2274.1,2665.8, 1.2329,7.4346],
+[96.71, 0.90,  1.0410, 1.869, 405.06,2502.6,405.15,2265.7,2670.9, 1.2695,7.3949],
+[99.63, 1.00,  1.0432, 1.694, 417.36,2506.1,417.46,2258.0,2675.5, 1.3026,7.3594],
+[111.4, 1.50,  1.0528, 1.159, 466.94,2519.7,467.11,2226.5,2693.6, 1.4336,7.2233],
+[120.2, 2.00,  1.0605, 0.8857,504.49,2529.5,504.70,2201.9,2706.7, 1.5301,7.1271],
+[127.4, 2.50,  1.0672, 0.7187,535.10,2537.2,535.37,2181.5,2716.9, 1.6072,7.0527],
+[133.6, 3.00,  1.0732, 0.6058,561.15,2543.6,561.47,2163.8,2725.3, 1.6718,6.9919],
+[138.9, 3.50,  1.0786, 0.5243,583.95,2546.9,584.33,2148.1,2732.4, 1.7275,6.9405],
+[143.6, 4.00,  1.0836, 0.4625,604.31,2553.6,604.74,2133.8,2738.6, 1.7766,6.8959],
+[147.9, 4.50,  1.0882, 0.4140,622.25,2557.6,623.25,2120.7,2743.9, 1.8207,6.8565],
+[151.9, 5.00,  1.0926, 0.3749,639.68,2561.2,640.23,2108.5,2748.7, 1.8607,6.8212],
+[158.9, 6.00,  1.1006, 0.3157,669.90,2567.4,670.56,2086.3,2756.8, 1.9312,6.7600],
+[165.0, 7.00,  1.1080, 0.2729,696.44,2572.5,697.22,2066.3,2763.5, 1.9922,6.7080],
+[170.4, 8.00,  1.1148, 0.2404,720.22,2576.8,721.11,2048.0,2769.1, 2.0462,6.6628],
+[175.4, 9.00,  1.1212, 0.2150,741.83,2580.5,742.83,2031.1,2773.9, 2.0946,6.6226],
+[179.9, 10.0,  1.1273, 0.1944,761.68,2583.6,762.81,2015.3,2778.1, 2.1387,6.5863],
+[198.3, 15.0,  1.1539, 0.1318,843.16,2594.5,844.84,1947.3,2792.2, 2.3150,6.4448],
+[212.4, 20.0,  1.1767, 0.09963,906.44,2600.3,908.79,1890.7,2799.5,2.4474,6.3409],
+[224.0, 25.0,  1.1973, 0.07998,959.11,2603.1,962.11,1841.0,2803.1,2.5547,6.2575],
+[233.9, 30.0,  1.2165, 0.06668,1004.8,2604.1,1008.4,1795.7,2804.2,2.6457,6.1869],
+[242.6, 35.0,  1.2347, 0.05707,1045.4,2603.7,1049.8,1753.7,2803.4,2.7253,6.1253],
+[250.4, 40.0,  1.2522, 0.04978,1082.3,2602.3,1087.3,1714.1,2801.4,2.7964,6.0701],
+[257.5, 45.0,  1.2692, 0.04406,1116.2,2600.1,1121.9,1676.4,2798.3,2.8610,6.0199],
+[264.0, 50.0,  1.2859, 0.03944,1147.8,2597.1,1154.2,1640.1,2794.3,2.9202,5.9734],
+[275.6, 60.0,  1.3187, 0.03244,1205.4,2589.7,1213.4,1571.0,2784.3,3.0267,5.8892],
+[285.9, 70.0,  1.3513, 0.02737,1257.6,2580.5,1267.0,1505.1,2772.1,3.1211,5.8133],
+[295.1, 80.0,  1.3842, 0.02352,1305.6,2569.8,1316.6,1441.3,2758.0,3.2068,5.7432],
+[303.4, 90.0,  1.4178, 0.02048,1350.5,2557.8,1363.3,1378.9,2742.1,3.2858,5.6772],
+[311.1,100.0,  1.4524, 0.01803,1393.0,2544.4,1407.6,1317.1,2724.7,3.3596,5.6141],
+[318.2,110.0,  1.4886, 0.01599,1433.7,2529.8,1450.1,1255.5,2705.6,3.4295,5.5527],
+[324.8,120.0,  1.5267, 0.01426,1473.0,2513.7,1491.3,1193.6,2684.9,3.4962,5.4924],
+[330.9,130.0,  1.5671, 0.01278,1511.1,2496.1,1531.5,1130.7,2662.2,3.5606,5.4323],
+[336.8,140.0,  1.6107, 0.01149,1548.6,2476.8,1571.1,1066.5,2637.6,3.6232,5.3717],
+[342.2,150.0,  1.6581, 0.01034,1585.6,2455.5,1610.5,1000.0,2610.5,3.6848,5.3098],
+[347.4,160.0,  1.7107,0.009306,1622.7,2431.7,1650.1, 930.6,2580.6,3.7461,5.2455],
+[352.4,170.0,  1.7702,0.008364,1660.2,2405.0,1690.3, 856.9,2547.2,3.8079,5.1777],
+[357.1,180.0,  1.8397,0.007489,1698.9,2374.3,1732.0, 777.1,2509.1,3.8715,5.1044],
+[361.5,190.0,  1.9243,0.006657,1739.9,2338.1,1776.5, 688.0,2464.5,3.9388,5.0228],
+[365.8,200.0,  2.036, 0.005834,1785.6,2293.0,1826.3, 583.4,2409.7,4.0139,4.9269],
+[374.1,220.9,  3.155, 0.003155,2029.6,2029.6,2099.3,   0.0,2099.3,4.4298,4.4298]
+];
+
+/* ── TABLA A-4: Vapor de agua sobrecalentado
+   Estructura: { P_bar: { Tsat, data:[{T,v,u,h,s},...] } }
+   P en bar, T en °C, v en m³/kg, u/h en kJ/kg, s en kJ/kg·K   */
+const A4 = {
+0.06:{ Tsat:36.16, d:[
+  {T:'Sat',v:23.739,u:2425.0,h:2567.4,s:8.3304},
+  {T:80,   v:27.132,u:2487.3,h:2650.1,s:8.5804},
+  {T:120,  v:30.219,u:2544.7,h:2726.0,s:8.7840},
+  {T:160,  v:33.302,u:2602.7,h:2802.5,s:8.9693},
+  {T:200,  v:36.383,u:2661.4,h:2879.7,s:9.1398},
+  {T:240,  v:39.462,u:2721.0,h:2957.8,s:9.2982},
+  {T:280,  v:42.540,u:2781.5,h:3036.8,s:9.4464},
+  {T:320,  v:45.618,u:2843.0,h:3116.7,s:9.5859},
+  {T:360,  v:48.696,u:2905.5,h:3197.7,s:9.7180},
+  {T:400,  v:51.774,u:2969.0,h:3279.6,s:9.8435},
+  {T:440,  v:54.851,u:3033.5,h:3362.6,s:9.9633},
+  {T:500,  v:59.467,u:3132.3,h:3489.1,s:10.1336}]},
+0.35:{ Tsat:72.69, d:[
+  {T:'Sat',v:4.526, u:2473.0,h:2631.4,s:7.7158},
+  {T:80,   v:4.625, u:2483.7,h:2645.6,s:7.7564},
+  {T:120,  v:5.163, u:2542.4,h:2723.1,s:7.9644},
+  {T:160,  v:5.696, u:2601.2,h:2800.6,s:8.1519},
+  {T:200,  v:6.228, u:2660.4,h:2878.4,s:8.3237},
+  {T:240,  v:6.758, u:2720.3,h:2956.8,s:8.4828},
+  {T:280,  v:7.287, u:2780.9,h:3036.0,s:8.6314},
+  {T:320,  v:7.815, u:2842.5,h:3116.1,s:8.7712},
+  {T:360,  v:8.344, u:2905.1,h:3197.1,s:8.9034},
+  {T:400,  v:8.872, u:2968.6,h:3279.2,s:9.0291},
+  {T:440,  v:9.400, u:3033.2,h:3362.2,s:9.1490},
+  {T:500,  v:10.192,u:3132.1,h:3488.8,s:9.3194}]},
+0.70:{ Tsat:89.95, d:[
+  {T:'Sat',v:2.365, u:2494.5,h:2660.0,s:7.4797},
+  {T:100,  v:2.434, u:2509.7,h:2680.0,s:7.5341},
+  {T:120,  v:2.571, u:2539.7,h:2719.6,s:7.6375},
+  {T:160,  v:2.841, u:2599.4,h:2798.2,s:7.8279},
+  {T:200,  v:3.108, u:2659.1,h:2876.7,s:8.0012},
+  {T:240,  v:3.374, u:2719.3,h:2955.5,s:8.1611},
+  {T:280,  v:3.640, u:2780.2,h:3035.0,s:8.3162},
+  {T:320,  v:3.905, u:2842.0,h:3115.3,s:8.4504},
+  {T:360,  v:4.170, u:2904.6,h:3196.5,s:8.5828},
+  {T:400,  v:4.434, u:2968.2,h:3278.6,s:8.7086},
+  {T:440,  v:4.698, u:3032.9,h:3361.8,s:8.8286},
+  {T:500,  v:5.095, u:3131.8,h:3488.5,s:8.9991}]},
+1.0:{ Tsat:99.63, d:[
+  {T:'Sat',v:1.694, u:2506.1,h:2675.5,s:7.3594},
+  {T:100,  v:1.696, u:2506.7,h:2676.2,s:7.3614},
+  {T:120,  v:1.793, u:2537.3,h:2716.6,s:7.4668},
+  {T:160,  v:1.984, u:2597.8,h:2796.2,s:7.6597},
+  {T:200,  v:2.172, u:2658.1,h:2875.3,s:7.8343},
+  {T:240,  v:2.359, u:2718.5,h:2954.5,s:7.9949},
+  {T:280,  v:2.546, u:2779.6,h:3034.2,s:8.1445},
+  {T:320,  v:2.732, u:2841.5,h:3114.6,s:8.2849},
+  {T:360,  v:2.917, u:2904.2,h:3195.9,s:8.4175},
+  {T:400,  v:3.103, u:2967.9,h:3278.2,s:8.5435},
+  {T:440,  v:3.288, u:3032.6,h:3361.4,s:8.6636},
+  {T:500,  v:3.565, u:3131.6,h:3488.1,s:8.8342}]},
+1.5:{ Tsat:111.37, d:[
+  {T:'Sat',v:1.159, u:2519.7,h:2693.6,s:7.2233},
+  {T:120,  v:1.188, u:2533.3,h:2711.4,s:7.2693},
+  {T:160,  v:1.317, u:2595.2,h:2792.8,s:7.4665},
+  {T:200,  v:1.444, u:2656.2,h:2872.9,s:7.6433},
+  {T:240,  v:1.570, u:2717.2,h:2952.7,s:7.8052},
+  {T:280,  v:1.695, u:2778.6,h:3032.8,s:7.9555},
+  {T:320,  v:1.819, u:2840.6,h:3113.5,s:8.0964},
+  {T:360,  v:1.943, u:2903.5,h:3195.0,s:8.2293},
+  {T:400,  v:2.067, u:2967.3,h:3277.4,s:8.3555},
+  {T:440,  v:2.191, u:3032.1,h:3360.7,s:8.4757},
+  {T:500,  v:2.376, u:3131.2,h:3487.6,s:8.6466},
+  {T:600,  v:2.685, u:3301.7,h:3704.3,s:8.9101}]},
+3.0:{ Tsat:133.55, d:[
+  {T:'Sat',v:0.6058,u:2543.6,h:2725.3,s:6.9919},
+  {T:160,  v:0.6513,u:2587.1,h:2782.3,s:7.1276},
+  {T:200,  v:0.7163,u:2650.7,h:2865.5,s:7.3115},
+  {T:240,  v:0.7805,u:2713.1,h:2947.3,s:7.4774},
+  {T:280,  v:0.8438,u:2775.4,h:3028.6,s:7.6299},
+  {T:320,  v:0.9067,u:2838.1,h:3110.1,s:7.7722},
+  {T:360,  v:0.9685,u:2901.4,h:3192.2,s:7.9061},
+  {T:400,  v:1.032, u:2965.6,h:3275.0,s:8.0330},
+  {T:440,  v:1.094, u:3030.6,h:3358.7,s:8.1538},
+  {T:500,  v:1.187, u:3130.0,h:3486.0,s:8.3251},
+  {T:600,  v:1.341, u:3300.8,h:3703.2,s:8.5892}]},
+5.0:{ Tsat:151.86, d:[
+  {T:'Sat',v:0.3749,u:2561.2,h:2748.7,s:6.8213},
+  {T:180,  v:0.4045,u:2609.7,h:2812.0,s:6.9656},
+  {T:200,  v:0.4249,u:2642.9,h:2855.4,s:7.0592},
+  {T:240,  v:0.4646,u:2707.6,h:2939.9,s:7.2307},
+  {T:280,  v:0.5034,u:2771.2,h:3022.9,s:7.3865},
+  {T:320,  v:0.5416,u:2834.7,h:3105.6,s:7.5308},
+  {T:360,  v:0.5796,u:2898.7,h:3188.4,s:7.6660},
+  {T:400,  v:0.6173,u:2963.2,h:3271.9,s:7.7938},
+  {T:440,  v:0.6548,u:3028.6,h:3356.0,s:7.9152},
+  {T:500,  v:0.7109,u:3128.4,h:3483.9,s:8.0873},
+  {T:600,  v:0.8041,u:3299.6,h:3701.7,s:8.3522},
+  {T:700,  v:0.8969,u:3477.5,h:3925.9,s:8.5952}]},
+7.0:{ Tsat:164.97, d:[
+  {T:'Sat',v:0.2729,u:2572.5,h:2763.5,s:6.7080},
+  {T:180,  v:0.2847,u:2599.8,h:2799.1,s:6.7880},
+  {T:200,  v:0.2999,u:2634.8,h:2844.8,s:6.8865},
+  {T:240,  v:0.3292,u:2701.8,h:2932.2,s:7.0641},
+  {T:280,  v:0.3574,u:2766.9,h:3017.1,s:7.2233},
+  {T:320,  v:0.3852,u:2831.3,h:3100.9,s:7.3697},
+  {T:360,  v:0.4126,u:2895.8,h:3184.7,s:7.5063},
+  {T:400,  v:0.4397,u:2960.9,h:3268.7,s:7.6350},
+  {T:440,  v:0.4667,u:3026.6,h:3353.3,s:7.7571},
+  {T:500,  v:0.5070,u:3126.8,h:3481.7,s:7.9299},
+  {T:600,  v:0.5738,u:3298.5,h:3700.2,s:8.1956},
+  {T:700,  v:0.6403,u:3476.6,h:3924.8,s:8.4391}]},
+10.0:{ Tsat:179.91, d:[
+  {T:'Sat',v:0.1944,u:2583.6,h:2778.1,s:6.5865},
+  {T:200,  v:0.2060,u:2621.9,h:2827.9,s:6.6940},
+  {T:240,  v:0.2275,u:2692.9,h:2920.4,s:6.8817},
+  {T:280,  v:0.2480,u:2760.2,h:3008.2,s:7.0465},
+  {T:320,  v:0.2678,u:2826.1,h:3093.9,s:7.1962},
+  {T:360,  v:0.2873,u:2891.6,h:3178.9,s:7.3349},
+  {T:400,  v:0.3066,u:2957.3,h:3263.9,s:7.4651},
+  {T:440,  v:0.3257,u:3023.6,h:3349.3,s:7.5883},
+  {T:500,  v:0.3541,u:3124.4,h:3478.5,s:7.7622},
+  {T:540,  v:0.3729,u:3192.6,h:3565.6,s:7.8720},
+  {T:600,  v:0.4011,u:3296.8,h:3697.9,s:8.0290},
+  {T:640,  v:0.4198,u:3367.4,h:3787.2,s:8.1290}]},
+15.0:{ Tsat:198.32, d:[
+  {T:'Sat',v:0.1318,u:2594.5,h:2792.2,s:6.4448},
+  {T:200,  v:0.1325,u:2598.1,h:2796.8,s:6.4546},
+  {T:240,  v:0.1483,u:2676.9,h:2899.3,s:6.6628},
+  {T:280,  v:0.1627,u:2748.6,h:2992.7,s:6.8381},
+  {T:320,  v:0.1765,u:2817.1,h:3081.9,s:6.9938},
+  {T:360,  v:0.1899,u:2884.4,h:3169.2,s:7.1363},
+  {T:400,  v:0.2030,u:2951.3,h:3255.8,s:7.2690},
+  {T:440,  v:0.2160,u:3018.5,h:3342.5,s:7.3940},
+  {T:500,  v:0.2352,u:3120.3,h:3473.1,s:7.5698},
+  {T:540,  v:0.2478,u:3189.1,h:3560.9,s:7.6805},
+  {T:600,  v:0.2668,u:3293.9,h:3694.0,s:7.8385},
+  {T:640,  v:0.2793,u:3364.8,h:3783.8,s:7.9391}]},
+20.0:{ Tsat:212.42, d:[
+  {T:'Sat',v:0.09963,u:2600.3,h:2799.5,s:6.3409},
+  {T:240,  v:0.1085, u:2659.6,h:2876.5,s:6.4952},
+  {T:280,  v:0.1200, u:2736.4,h:2976.4,s:6.6828},
+  {T:320,  v:0.1308, u:2807.9,h:3069.5,s:6.8452},
+  {T:360,  v:0.1411, u:2877.0,h:3159.3,s:6.9917},
+  {T:400,  v:0.1512, u:2945.2,h:3247.6,s:7.1271},
+  {T:440,  v:0.1611, u:3013.4,h:3335.6,s:7.2540},
+  {T:500,  v:0.1757, u:3116.2,h:3467.6,s:7.4317},
+  {T:540,  v:0.1853, u:3185.6,h:3556.1,s:7.5434},
+  {T:600,  v:0.1996, u:3290.9,h:3690.1,s:7.7024},
+  {T:640,  v:0.2091, u:3362.2,h:3780.4,s:7.8035},
+  {T:700,  v:0.2232, u:3470.9,h:3917.4,s:7.9487}]},
+30.0:{ Tsat:233.90, d:[
+  {T:'Sat',v:0.06668,u:2604.1,h:2804.2,s:6.1869},
+  {T:240,  v:0.06821,u:2619.7,h:2824.3,s:6.2265},
+  {T:280,  v:0.07714,u:2709.9,h:2941.3,s:6.4462},
+  {T:320,  v:0.08501,u:2788.4,h:3043.4,s:6.6245},
+  {T:360,  v:0.09233,u:2861.7,h:3138.7,s:6.7801},
+  {T:400,  v:0.09938,u:2932.8,h:3230.9,s:6.9212},
+  {T:440,  v:0.1062, u:3002.9,h:3321.5,s:7.0520},
+  {T:500,  v:0.1162, u:3108.0,h:3456.5,s:7.2338},
+  {T:540,  v:0.1227, u:3178.4,h:3546.6,s:7.3474},
+  {T:600,  v:0.1324, u:3285.0,h:3682.3,s:7.5085},
+  {T:640,  v:0.1388, u:3357.0,h:3773.5,s:7.6106},
+  {T:700,  v:0.1484, u:3466.5,h:3911.7,s:7.7571}]},
+40.0:{ Tsat:250.40, d:[
+  {T:'Sat',v:0.04978,u:2602.3,h:2801.4,s:6.0701},
+  {T:280,  v:0.05546,u:2680.0,h:2901.8,s:6.2568},
+  {T:320,  v:0.06199,u:2767.4,h:3015.4,s:6.4553},
+  {T:360,  v:0.06788,u:2845.7,h:3117.2,s:6.6215},
+  {T:400,  v:0.07341,u:2919.9,h:3213.6,s:6.7690},
+  {T:440,  v:0.07872,u:2992.2,h:3307.1,s:6.9041},
+  {T:500,  v:0.08643,u:3099.5,h:3445.3,s:7.0901},
+  {T:540,  v:0.09145,u:3171.1,h:3536.9,s:7.2056},
+  {T:600,  v:0.09885,u:3279.1,h:3674.4,s:7.3688},
+  {T:640,  v:0.1037, u:3351.8,h:3766.6,s:7.4720},
+  {T:700,  v:0.1110, u:3462.1,h:3905.9,s:7.6198},
+  {T:740,  v:0.1157, u:3536.6,h:3999.6,s:7.7141}]},
+60.0:{ Tsat:275.64, d:[
+  {T:'Sat',v:0.03244,u:2589.7,h:2784.3,s:5.8892},
+  {T:320,  v:0.03876,u:2720.0,h:2952.6,s:6.1846},
+  {T:360,  v:0.04331,u:2811.2,h:3071.1,s:6.3782},
+  {T:400,  v:0.04739,u:2892.9,h:3177.2,s:6.5408},
+  {T:440,  v:0.05122,u:2970.0,h:3277.3,s:6.6853},
+  {T:500,  v:0.05665,u:3082.2,h:3422.2,s:6.8803},
+  {T:540,  v:0.06015,u:3156.1,h:3517.0,s:6.9999},
+  {T:600,  v:0.06525,u:3266.9,h:3658.4,s:7.1677},
+  {T:640,  v:0.06859,u:3341.0,h:3752.6,s:7.2731},
+  {T:700,  v:0.07352,u:3453.1,h:3894.1,s:7.4234},
+  {T:740,  v:0.07677,u:3528.3,h:3989.2,s:7.5190}]},
+80.0:{ Tsat:295.06, d:[
+  {T:'Sat',v:0.02352,u:2569.8,h:2758.0,s:5.7432},
+  {T:320,  v:0.02682,u:2662.7,h:2877.2,s:5.9489},
+  {T:360,  v:0.03089,u:2772.7,h:3019.8,s:6.1819},
+  {T:400,  v:0.03432,u:2863.8,h:3138.3,s:6.3634},
+  {T:440,  v:0.03742,u:2946.7,h:3246.1,s:6.5190},
+  {T:480,  v:0.04034,u:3025.7,h:3348.4,s:6.6586},
+  {T:520,  v:0.04313,u:3102.7,h:3447.7,s:6.7871},
+  {T:560,  v:0.04582,u:3178.7,h:3545.3,s:6.9072},
+  {T:600,  v:0.04845,u:3254.4,h:3642.0,s:7.0206},
+  {T:640,  v:0.05102,u:3330.1,h:3738.3,s:7.1283},
+  {T:700,  v:0.05481,u:3443.9,h:3882.4,s:7.2812},
+  {T:740,  v:0.05729,u:3520.4,h:3978.7,s:7.3782}]},
+100.0:{ Tsat:311.06, d:[
+  {T:'Sat',v:0.01803,u:2544.4,h:2724.7,s:5.6141},
+  {T:320,  v:0.01925,u:2588.8,h:2781.3,s:5.7103},
+  {T:360,  v:0.02331,u:2729.1,h:2962.1,s:6.0060},
+  {T:400,  v:0.02641,u:2832.4,h:3096.5,s:6.2120},
+  {T:440,  v:0.02911,u:2922.1,h:3213.2,s:6.3805},
+  {T:480,  v:0.03160,u:3005.4,h:3321.4,s:6.5282},
+  {T:520,  v:0.03394,u:3085.6,h:3425.1,s:6.6622},
+  {T:560,  v:0.03619,u:3164.1,h:3526.0,s:6.7864},
+  {T:600,  v:0.03837,u:3241.7,h:3625.3,s:6.9029},
+  {T:640,  v:0.04048,u:3318.9,h:3723.7,s:7.0131},
+  {T:700,  v:0.04358,u:3434.7,h:3870.5,s:7.1687},
+  {T:740,  v:0.04560,u:3512.1,h:3968.1,s:7.2670}]},
+120.0:{ Tsat:324.75, d:[
+  {T:'Sat',v:0.01426,u:2513.7,h:2684.9,s:5.4924},
+  {T:360,  v:0.01811,u:2678.4,h:2895.7,s:5.8361},
+  {T:400,  v:0.02108,u:2798.3,h:3051.3,s:6.0747},
+  {T:440,  v:0.02355,u:2896.1,h:3178.7,s:6.2586},
+  {T:480,  v:0.02576,u:2984.4,h:3293.5,s:6.4154},
+  {T:520,  v:0.02781,u:3068.0,h:3401.8,s:6.5555},
+  {T:560,  v:0.02977,u:3149.0,h:3506.2,s:6.6840},
+  {T:600,  v:0.03164,u:3228.7,h:3608.3,s:6.8037},
+  {T:640,  v:0.03345,u:3307.5,h:3709.0,s:6.9164},
+  {T:700,  v:0.03610,u:3425.2,h:3858.4,s:7.0749},
+  {T:740,  v:0.03781,u:3503.7,h:3957.4,s:7.1746}]},
+140.0:{ Tsat:336.75, d:[
+  {T:'Sat',v:0.01149,u:2476.8,h:2637.6,s:5.3717},
+  {T:360,  v:0.01422,u:2617.4,h:2816.5,s:5.6602},
+  {T:400,  v:0.01722,u:2760.9,h:3001.9,s:5.9448},
+  {T:440,  v:0.01954,u:2868.6,h:3142.2,s:6.1474},
+  {T:480,  v:0.02157,u:2962.5,h:3264.5,s:6.3143},
+  {T:520,  v:0.02343,u:3049.8,h:3377.8,s:6.4610},
+  {T:560,  v:0.02517,u:3133.6,h:3486.0,s:6.5941},
+  {T:600,  v:0.02683,u:3215.4,h:3591.1,s:6.7172},
+  {T:640,  v:0.02843,u:3296.0,h:3694.1,s:6.8326},
+  {T:700,  v:0.03075,u:3415.7,h:3846.2,s:6.9939},
+  {T:740,  v:0.03225,u:3495.2,h:3946.7,s:7.0952}]}
+};
+
+/* ── TABLA A-5: Agua líquida comprimida
+   Estructura: { P_bar: [{T,v,u,h,s},...] }
+   v en m³/kg (×10³ en tabla, aquí en m³/kg real)               */
+const A5 = {
+25:{ Tsat:223.99, d:[
+  {T:20,  v:1.0006e-3,u: 83.80,h: 86.30,s:0.2961},
+  {T:40,  v:1.0067e-3,u:167.25,h:169.77,s:0.5715},
+  {T:80,  v:1.0280e-3,u:334.29,h:336.86,s:1.0737},
+  {T:100, v:1.0423e-3,u:418.24,h:420.85,s:1.3050},
+  {T:140, v:1.0784e-3,u:587.82,h:590.52,s:1.7369},
+  {T:180, v:1.1261e-3,u:761.16,h:763.97,s:2.1375},
+  {T:200, v:1.1555e-3,u:849.9, h:852.8, s:2.3294},
+  {T:220, v:1.1898e-3,u:940.7, h:943.7, s:2.5174},
+  {T:'Sat',v:1.1973e-3,u:959.1,h:962.1,s:2.5546}]},
+50:{ Tsat:263.99, d:[
+  {T:20,  v:0.9995e-3,u: 83.65,h: 88.65,s:0.2956},
+  {T:40,  v:1.0056e-3,u:166.95,h:171.97,s:0.5705},
+  {T:80,  v:1.0268e-3,u:333.72,h:338.85,s:1.0720},
+  {T:100, v:1.0410e-3,u:417.52,h:422.72,s:1.3030},
+  {T:140, v:1.0768e-3,u:586.76,h:592.15,s:1.7343},
+  {T:180, v:1.1240e-3,u:759.63,h:765.25,s:2.1341},
+  {T:200, v:1.1530e-3,u:848.1, h:853.9, s:2.3255},
+  {T:220, v:1.1866e-3,u:938.4, h:944.4, s:2.5128},
+  {T:'Sat',v:1.2859e-3,u:1147.8,h:1154.2,s:2.9202}]},
+75:{ Tsat:290.59, d:[
+  {T:20,  v:0.9984e-3,u: 83.50,h: 90.99,s:0.2950},
+  {T:40,  v:1.0045e-3,u:166.64,h:174.18,s:0.5696},
+  {T:80,  v:1.0256e-3,u:333.15,h:340.84,s:1.0704},
+  {T:100, v:1.0397e-3,u:416.81,h:424.62,s:1.3011},
+  {T:140, v:1.0752e-3,u:585.72,h:593.78,s:1.7317},
+  {T:180, v:1.1219e-3,u:758.13,h:766.55,s:2.1308},
+  {T:220, v:1.1835e-3,u:936.2, h:945.1, s:2.5083},
+  {T:260, v:1.2696e-3,u:1124.4,h:1134.0,s:2.8763},
+  {T:'Sat',v:1.3677e-3,u:1282.0,h:1292.2,s:3.1649}]},
+100:{ Tsat:311.06, d:[
+  {T:20,  v:0.9972e-3,u: 83.36,h: 93.33,s:0.2945},
+  {T:40,  v:1.0034e-3,u:166.35,h:176.38,s:0.5686},
+  {T:80,  v:1.0245e-3,u:332.59,h:342.83,s:1.0688},
+  {T:100, v:1.0385e-3,u:416.12,h:426.50,s:1.2992},
+  {T:140, v:1.0737e-3,u:584.68,h:595.42,s:1.7292},
+  {T:180, v:1.1199e-3,u:756.65,h:767.84,s:2.1275},
+  {T:220, v:1.1805e-3,u:934.1, h:945.9, s:2.5039},
+  {T:260, v:1.2645e-3,u:1121.1,h:1133.7,s:2.8699},
+  {T:'Sat',v:1.4524e-3,u:1393.0,h:1407.6,s:3.3596}]},
+150:{ Tsat:342.24, d:[
+  {T:20,  v:0.9950e-3,u: 83.06,h: 97.99,s:0.2934},
+  {T:40,  v:1.0013e-3,u:165.76,h:180.78,s:0.5666},
+  {T:80,  v:1.0222e-3,u:331.48,h:346.81,s:1.0656},
+  {T:100, v:1.0361e-3,u:414.74,h:430.28,s:1.2955},
+  {T:140, v:1.0707e-3,u:582.66,h:598.72,s:1.7242},
+  {T:180, v:1.1159e-3,u:753.76,h:770.50,s:2.1210},
+  {T:220, v:1.1748e-3,u:929.9, h:947.5, s:2.4953},
+  {T:260, v:1.2550e-3,u:1114.6,h:1133.4,s:2.8576},
+  {T:300, v:1.3770e-3,u:1316.6,h:1337.3,s:3.2260},
+  {T:'Sat',v:1.6581e-3,u:1585.6,h:1610.5,s:3.6848}]},
+200:{ Tsat:365.81, d:[
+  {T:20,  v:0.9928e-3,u: 82.77,h:102.62,s:0.2923},
+  {T:40,  v:0.9992e-3,u:165.17,h:185.16,s:0.5646},
+  {T:80,  v:1.0199e-3,u:330.40,h:350.80,s:1.0624},
+  {T:100, v:1.0337e-3,u:413.39,h:434.06,s:1.2917},
+  {T:140, v:1.0678e-3,u:580.69,h:602.04,s:1.7193},
+  {T:180, v:1.1120e-3,u:750.95,h:773.20,s:2.1147},
+  {T:220, v:1.1693e-3,u:925.9, h:949.3, s:2.4870},
+  {T:260, v:1.2462e-3,u:1108.6,h:1133.5,s:2.8459},
+  {T:300, v:1.3596e-3,u:1306.1,h:1333.3,s:3.2071},
+  {T:'Sat',v:2.036e-3, u:1785.6,h:1826.3,s:4.0139}]},
+250:{ Tsat:null, d:[
+  {T:20,  v:0.9907e-3,u: 82.47,h:107.24,s:0.2911},
+  {T:40,  v:0.9971e-3,u:164.60,h:189.52,s:0.5626},
+  {T:100, v:1.0313e-3,u:412.08,h:437.85,s:1.2881},
+  {T:200, v:1.1344e-3,u:834.5, h:862.8, s:2.2961}]},
+300:{ Tsat:null, d:[
+  {T:20,  v:0.9886e-3,u: 82.17,h:111.84,s:0.2899},
+  {T:40,  v:0.9951e-3,u:164.04,h:193.89,s:0.5607},
+  {T:100, v:1.0290e-3,u:410.78,h:441.66,s:1.2844},
+  {T:200, v:1.1302e-3,u:831.4, h:865.3, s:2.2893},
+  {T:300, v:1.3304e-3,u:1287.9,h:1327.8,s:3.1741}]}
+};
+A5[250].Tsat = null;
+A5[300].Tsat = null;
+
+
+/* ══════════════════════════════════════════
+   SISTEMA DE UNIDADES
+   ══════════════════════════════════════════ */
+let SYS = 'SI'; // 'SI' | 'EN'
+
+const UNITS = {
+  SI: { T:'°C', P:'bar',  v:'m³/kg',   u:'kJ/kg',    h:'kJ/kg',    s:'kJ/kg·K' },
+  EN: { T:'°F', P:'psia', v:'ft³/lbm', u:'Btu/lbm',  h:'Btu/lbm',  s:'Btu/lbm·°R' }
+};
+
+// SI → EN display conversions
+function toEN(val, prop) {
+  if (val === undefined || val === null || isNaN(val)) return NaN;
+  switch(prop) {
+    case 'T': return val * 9/5 + 32;          // °C → °F
+    case 'P': return val * 14.5038;            // bar → psia
+    case 'v': return val * 16.0185;            // m³/kg → ft³/lbm
+    case 'u': case 'h': return val * 0.429923; // kJ/kg → Btu/lbm
+    case 's': return val * 0.238846;           // kJ/(kg·K) → Btu/(lbm·°R)
+    default: return val;
+  }
+}
+// EN → SI input conversions
+function toSI(val, prop) {
+  if (val === undefined || val === null || isNaN(val)) return NaN;
+  switch(prop) {
+    case 'T': return (val - 32) * 5/9;
+    case 'P': return val / 14.5038;
+    case 'v': return val / 16.0185;
+    case 'u': case 'h': return val / 0.429923;
+    case 's': return val / 0.238846;
+    default: return val;
+  }
+}
+// Convert value for display in current unit system
+function dispVal(val_si, prop) {
+  return SYS === 'SI' ? val_si : toEN(val_si, prop);
+}
+// Convert input value to SI for lookup
+function inputToSI(val_input, prop) {
+  return SYS === 'SI' ? val_input : toSI(val_input, prop);
+}
+function unitLabel(prop) { return UNITS[SYS][prop] || ''; }
+
+/* ══════════════════════════════════════════
+   MOTOR DE INTERPOLACIÓN
+   ══════════════════════════════════════════ */
+function lerp(x, x0, x1, y0, y1){ return y0 + (y1-y0)*(x-x0)/(x1-x0); }
+
+function interpArray(arr, keyFn, x){
+  if(x <= keyFn(arr[0])) return arr[0];
+  if(x >= keyFn(arr[arr.length-1])) return arr[arr.length-1];
+  for(let i=0;i<arr.length-1;i++){
+    const k0=keyFn(arr[i]), k1=keyFn(arr[i+1]);
+    if(x>=k0 && x<=k1){
+      const f=(x-k0)/(k1-k0);
+      const r={};
+      Object.keys(arr[i]).forEach(k=>{
+        if(typeof arr[i][k]==='number') r[k]=arr[i][k]+(arr[i+1][k]-arr[i][k])*f;
+        else r[k]=arr[i][k];
+      });
+      return r;
+    }
+  }
+  return arr[arr.length-1];
+}
+
+function satByT(T){
+  const rows=A2, n=rows.length;
+  if(T<rows[0][0]||T>rows[n-1][0]) return null;
+  return interpArray(rows, r=>r[0], T);
+}
+function unpackSatRow(r){
+  return {T:r[0],P:r[1],vf:r[2]*1e-3,vg:r[3],uf:r[4],ug:r[5],hf:r[6],hfg:r[7],hg:r[8],sf:r[9],sg:r[10]};
+}
+function satByP(P){
+  const rows=A3, n=rows.length;
+  if(P<rows[0][1]||P>rows[n-1][1]) return null;
+  return interpArray(rows, r=>r[1], P);
+}
+function unpackA3Row(r){
+  return {T:r[0],P:r[1],vf:r[2]*1e-3,vg:r[3],uf:r[4],ug:r[5],hf:r[6],hfg:r[7],hg:r[8],sf:r[9],sg:r[10]};
+}
+
+function getSatProps(varType, val_si, phase, x){
+  let row;
+  if(varType==='T'){
+    row=satByT(val_si);
+    if(!row) return {error:`Temperatura ${val_si.toFixed(2)}°C fuera del rango (0.01 – 374.14°C)`};
+    row=unpackSatRow(row);
+  } else {
+    row=satByP(val_si);
+    if(!row) return {error:`Presión ${val_si.toFixed(4)} bar fuera del rango (0.04 – 220.9 bar)`};
+    row=unpackA3Row(row);
+  }
+  const {T,P,vf,vg,uf,ug,hf,hfg,hg,sf,sg}=row;
+  // Modo combinado: retorna ambas fases saturadas
+  if(phase==='satboth') return {T,P,vf,vg,uf,ug,hf,hfg,hg,sf,sg,region:'sat_both'};
+  if(phase==='twophase'){
+    if(x<0||x>1) return {error:'La calidad x debe estar entre 0 y 1'};
+    return {T,P,x,v:vf+x*(vg-vf),u:uf+x*(ug-uf),h:hf+x*hfg,s:sf+x*(sg-sf),region:'twophase'};
+  }
+  return {error:'Fase no reconocida'};
+}
+
+const A4keys = Object.keys(A4).map(Number).sort((a,b)=>a-b);
+const A5keys = Object.keys(A5).map(Number).sort((a,b)=>a-b);
+
+function getA4BlockData(Pbar){
+  const block=A4[Pbar];
+  return block.d.map(row=>{
+    const T_num=(row.T==='Sat')? block.Tsat : row.T;
+    return {T:T_num, v:row.v, u:row.u, h:row.h, s:row.s};
+  });
+}
+function interpA4AtP(Pbar, T){
+  const data=getA4BlockData(Pbar);
+  return interpArray(data, r=>r.T, T);
+}
+function interpA4(T, Pbar){
+  const ps=A4keys;
+  if(Pbar<ps[0]||Pbar>ps[ps.length-1]) return null;
+  let i=0;
+  while(i<ps.length-1 && ps[i+1]<Pbar) i++;
+  if(i===ps.length-1) i--;
+  const P0=ps[i], P1=ps[i+1];
+  if(Math.abs(P0-Pbar)<1e-9) return interpA4AtP(P0,T);
+  if(Math.abs(P1-Pbar)<1e-9) return interpA4AtP(P1,T);
+  const r0=interpA4AtP(P0,T), r1=interpA4AtP(P1,T);
+  if(!r0||!r1) return null;
+  const f=(Pbar-P0)/(P1-P0);
+  return {T,v:r0.v+(r1.v-r0.v)*f,u:r0.u+(r1.u-r0.u)*f,h:r0.h+(r1.h-r0.h)*f,s:r0.s+(r1.s-r0.s)*f};
+}
+function getA5BlockData(Pbar){
+  return A5[Pbar].d.map(row=>{
+    const T_num=(row.T==='Sat')? A5[Pbar].Tsat : row.T;
+    return {T:T_num, v:row.v, u:row.u, h:row.h, s:row.s};
+  }).filter(r=>r.T!==null);
+}
+function interpA5(T, Pbar){
+  const ps=A5keys;
+  if(Pbar<ps[0]||Pbar>ps[ps.length-1]) return null;
+  let i=0;
+  while(i<ps.length-1 && ps[i+1]<Pbar) i++;
+  if(i===ps.length-1) i--;
+  const P0=ps[i], P1=ps[i+1];
+  const interpAtP=(P)=>{const data=getA5BlockData(P);return interpArray(data,r=>r.T,T);};
+  if(Math.abs(P0-Pbar)<1e-9) return interpAtP(P0);
+  if(Math.abs(P1-Pbar)<1e-9) return interpAtP(P1);
+  const r0=interpAtP(P0), r1=interpAtP(P1);
+  if(!r0||!r1) return null;
+  const f=(Pbar-P0)/(P1-P0);
+  return {T,v:r0.v+(r1.v-r0.v)*f,u:r0.u+(r1.u-r0.u)*f,h:r0.h+(r1.h-r0.h)*f,s:r0.s+(r1.s-r0.s)*f};
+}
+function TsatFromP(P){ const r=satByP(P); return r?r[0]:null; }
+function PsatFromT(T){ const r=satByT(T); return r?r[1]:null; }
+
+function getRegionTP(T, P){
+  const Tsat=TsatFromP(P);
+  if(Tsat===null) return P>220.9?'superheated':'superheated';
+  const tol=0.05;
+  if(Math.abs(T-Tsat)<tol) return 'saturated_boundary';
+  return T>Tsat ? 'superheated' : 'compressed';
+}
+function superByTP(T, P){
+  const region=getRegionTP(T,P);
+  if(region==='superheated'||region==='saturated_boundary'){
+    if(P>A4keys[A4keys.length-1]) return {error:`Presión ${P} bar supera el límite de la Tabla A-4 (${A4keys[A4keys.length-1]} bar)`};
+    if(P<A4keys[0]) return {error:`Presión ${P} bar inferior al límite de la Tabla A-4 (${A4keys[0]} bar)`};
+    const r=interpA4(T,P);
+    if(!r) return {error:'No se pudo interpolar en Tabla A-4'};
+    return {T,P,v:r.v,u:r.u,h:r.h,s:r.s,region:'superheated'};
+  }
+  if(P<A5keys[0]){
+    const sat=satByT(T);
+    if(!sat) return {error:`T=${T}°C fuera del rango`};
+    const s=unpackSatRow(sat);
+    return {T,P,v:s.vf,u:s.uf,h:s.hf+(P-s.P)*1e2*s.vf,s:s.sf,region:'compressed_approx'};
+  }
+  if(P>A5keys[A5keys.length-1]) return {error:`Presión ${P} bar supera el límite de la Tabla A-5 (${A5keys[A5keys.length-1]} bar)`};
+  const r=interpA5(T,P);
+  if(!r) return {error:'No se pudo interpolar en Tabla A-5'};
+  // Advertencia para tablas con datos escasos (≥ 250 bar)
+  const sparseWarn = P>=250
+    ? `Tabla A-5 a ${P.toFixed(0)} bar tiene resolución reducida (≤ 5 puntos de temperatura). Los valores interpolados pueden diferir ligeramente de tablas más completas.`
+    : undefined;
+  return {T,P,v:r.v,u:r.u,h:r.h,s:r.s,region:'compressed',warning:sparseWarn};
+}
+
+function inverseOneKnown(knownAxis, knownVal_si, unknownProp, unknownVal_si){
+  const scanPs=A4keys;
+  if(knownAxis==='T'){
+    const T=knownVal_si;
+    for(let i=0;i<scanPs.length-1;i++){
+      const P0=scanPs[i], P1=scanPs[i+1];
+      const r0=interpA4AtP(P0,T), r1=interpA4AtP(P1,T);
+      if(!r0||!r1) continue;
+      const v0=r0[unknownProp], v1=r1[unknownProp];
+      if((v0-unknownVal_si)*(v1-unknownVal_si)<=0){
+        const f=(unknownVal_si-v0)/(v1-v0);
+        const Pest=P0+(P1-P0)*f;
+        const res=interpA4(T,Pest);
+        return {T,P:Pest,v:res.v,u:res.u,h:res.h,s:res.s,region:'superheated'};
+      }
+    }
+    return {error:`Sin solución: T=${T.toFixed(1)}°C con ${unknownProp}=${unknownVal_si.toFixed(4)} en zona sobrecalentada`};
+  } else {
+    const P=knownVal_si;
+    const allTs=[...new Set(A4keys.flatMap(pk=>A4[pk].d.map(r=>r.T==='Sat'?A4[pk].Tsat:r.T)))].sort((a,b)=>a-b);
+    for(let i=0;i<allTs.length-1;i++){
+      const T0=allTs[i], T1=allTs[i+1];
+      const r0=interpA4(T0,P), r1=interpA4(T1,P);
+      if(!r0||!r1) continue;
+      const v0=r0[unknownProp], v1=r1[unknownProp];
+      if((v0-unknownVal_si)*(v1-unknownVal_si)<=0){
+        const f=(unknownVal_si-v0)/(v1-v0);
+        const Test=T0+(T1-T0)*f;
+        const res=interpA4(Test,P);
+        return {T:Test,P,v:res.v,u:res.u,h:res.h,s:res.s,region:'superheated'};
+      }
+    }
+    return {error:`Sin solución: P=${P.toFixed(2)} bar con ${unknownProp}=${unknownVal_si.toFixed(4)} en zona sobrecalentada`};
+  }
+}
+
+function inverseTwoProps(prop1, val1_si, prop2, val2_si){
+  const allPs=A4keys;
+  const allTs=[...new Set(allPs.flatMap(pk=>A4[pk].d.map(r=>r.T==='Sat'?A4[pk].Tsat:r.T)))].sort((a,b)=>a-b);
+  let bestErr=Infinity, bestT=null, bestP=null;
+  for(const P of allPs){
+    for(const T of allTs){
+      const r=interpA4(T,P);
+      if(!r) continue;
+      const v1=r[prop1], v2=r[prop2];
+      if(v1===undefined||v2===undefined) continue;
+      const err=Math.abs((v1-val1_si)/Math.max(Math.abs(val1_si),1))+Math.abs((v2-val2_si)/Math.max(Math.abs(val2_si),1));
+      if(err<bestErr){bestErr=err;bestT=T;bestP=P;}
+    }
+  }
+  // Rechazar si el error de arranque es inaceptablemente grande (valores fuera del dominio)
+  if(bestT===null||bestErr>2.0) return {error:`Los valores ${prop1}=${val1_si.toFixed(4)}, ${prop2}=${val2_si.toFixed(4)} parecen estar fuera del dominio de la Tabla A-4 (vapor sobrecalentado)`};
+  let T=bestT, P=bestP;
+  let converged=false;
+  for(let iter=0;iter<80;iter++){
+    const r=interpA4(T,P);
+    if(!r) break;
+    const dT=0.2, dP=0.2;
+    const rT=interpA4(T+dT,P), rP=interpA4(T,P+dP);
+    if(!rT||!rP) break;
+    const f1=r[prop1]-val1_si, f2=r[prop2]-val2_si;
+    const rel1=Math.abs(f1/Math.max(Math.abs(val1_si),1e-10));
+    const rel2=Math.abs(f2/Math.max(Math.abs(val2_si),1e-10));
+    if(rel1<1e-5&&rel2<1e-5){converged=true;break;}
+    const df1dT=(rT[prop1]-r[prop1])/dT, df1dP=(rP[prop1]-r[prop1])/dP;
+    const df2dT=(rT[prop2]-r[prop2])/dT, df2dP=(rP[prop2]-r[prop2])/dP;
+    const det=df1dT*df2dP-df1dP*df2dT;
+    if(Math.abs(det)<1e-12) break;
+    T -= (f1*df2dP-f2*df1dP)/det;
+    P -= (df1dT*f2-df2dT*f1)/det;
+    T=Math.max(allTs[0],Math.min(allTs[allTs.length-1],T));
+    P=Math.max(allPs[0],Math.min(allPs[allPs.length-1],P));
+  }
+  const r=interpA4(T,P);
+  if(!r) return {error:'Refinamiento iterativo fallido'};
+  // Verificar residuo final
+  const finalErr=Math.abs((r[prop1]-val1_si)/Math.max(Math.abs(val1_si),1e-10))
+                +Math.abs((r[prop2]-val2_si)/Math.max(Math.abs(val2_si),1e-10));
+  if(finalErr>0.05) return {error:`No se encontró convergencia para ${prop1}=${val1_si.toFixed(4)}, ${prop2}=${val2_si.toFixed(4)}. Verifique que el estado pertenece a la zona de vapor sobrecalentado.`};
+  // Advertencia si la solución quedó en el borde de la tabla
+  const atEdgeT = T<=allTs[0]+0.5||T>=allTs[allTs.length-1]-0.5;
+  const atEdgeP = P<=allPs[0]+0.01||P>=allPs[allPs.length-1]-0.01;
+  const edgeWarn = (!converged||atEdgeT||atEdgeP)
+    ? `Solución próxima al límite de la Tabla A-4 (T ≈ ${T.toFixed(1)} °C, P ≈ ${P.toFixed(2)} bar). Resultado orientativo; confirme con tablas extendidas.`
+    : undefined;
+  return {T,P,v:r.v,u:r.u,h:r.h,s:r.s,region:'superheated',warning:edgeWarn};
+}
+
+/* ══════════════════════════════════════════
+   INTERFAZ DE USUARIO
+   ══════════════════════════════════════════ */
+let satVarType='T', phaseType='satboth';
+// Estado del último cálculo (en SI) para re-renderizar al cambiar unidades
+let lastSatResult_si = null, lastSatPhase = null, lastSuperResult_si = null;
+
+const PROP_NAMES = {
+  T:'Temperatura', P:'Presión', v:'Vol. específico',
+  u:'Energía interna', h:'Entalpía', s:'Entropía', x:'Calidad de vapor'
+};
+const REGION_LABELS = {
+  sat_both:          ['Agua saturada · liq. + vap.',  'r-sat'],
+  vapor_sat:         ['Vapor saturado',                'r-sat'],
+  liquid_sat:        ['Líquido saturado',              'r-sat'],
+  twophase:          ['Mezcla líquido–vapor',          'r-two'],
+  superheated:       ['Vapor sobrecalentado',           'r-super'],
+  compressed:        ['Líquido comprimido',             'r-comp'],
+  compressed_approx: ['Líquido comprimido (aprox.)',    'r-comp'],
+  saturated_boundary:['Frontera de saturación',         'r-crit'],
+};
+
+/* ── Cambio de sistema de unidades ── */
+function setUnits(sys){
+  SYS = sys;
+  document.getElementById('btn-si').classList.toggle('active', sys==='SI');
+  document.getElementById('btn-en').classList.toggle('active', sys==='EN');
+  // Actualizar etiquetas de unidades visibles
+  updateSatUnitLabels();
+  updateSuperUnitLabels();
+  // Re-renderizar resultados existentes en el nuevo sistema de unidades
+  if(lastSatResult_si){
+    if(lastSatPhase==='satboth') renderSatBoth('sat-output', lastSatResult_si, 'sat-region-badge');
+    else renderResult('sat-output', lastSatResult_si, 'sat-region-badge');
+  }
+  if(lastSuperResult_si) renderResult('super-output', lastSuperResult_si, 'super-region-badge');
+}
+
+function updateSatUnitLabels(){
+  const isT = satVarType==='T';
+  document.getElementById('sat-val-unit').textContent = isT ? unitLabel('T') : unitLabel('P');
+}
+
+function updateSuperUnitLabels(){
+  const v1 = document.getElementById('super-var1').value;
+  const v2 = document.getElementById('super-var2').value;
+  document.getElementById('super-unit1').textContent = unitLabel(v1);
+  document.getElementById('super-unit2').textContent = unitLabel(v2);
+}
+
+/* ── Tab switching ── */
+function switchTab(id){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>{
+    b.classList.toggle('active',(i===0&&id==='sat')||(i===1&&id==='super'));
+  });
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+}
+
+/* ── Saturado: variable independiente ── */
+function setSatVar(v){
+  satVarType=v;
+  ['T','P'].forEach(k=>{
+    document.getElementById('sat-var-'+k).classList.toggle('active',k===v);
+  });
+  const label = v==='T' ? 'Temperatura' : 'Presión';
+  document.getElementById('sat-var-label').textContent = label;
+  document.getElementById('sat-val').placeholder = v==='T' ? 'ej. 100' : 'ej. 1.0';
+  updateSatUnitLabels();
+}
+
+/* ── Saturado: fase ── */
+function setPhase(p){
+  phaseType=p;
+  const phaseIdMap = {satboth:'phase-satboth', twophase:'phase-two'};
+  ['satboth','twophase'].forEach(k=>{
+    const el = document.getElementById(phaseIdMap[k]);
+    if(el) el.classList.toggle('active', k===p);
+  });
+  document.getElementById('quality-group').style.display = p==='twophase' ? 'flex' : 'none';
+}
+
+/* ── Superheated: variable change ── */
+function onSuperVarChange(){
+  const v1=document.getElementById('super-var1').value;
+  const v2=document.getElementById('super-var2').value;
+  if(v1===v2){
+    const opts=['T','P','v','h','u','s'];
+    document.getElementById('super-var2').value = opts.find(o=>o!==v1);
+  }
+  updateSuperUnitLabels();
+}
+
+/* ── Formateo de números ── */
+function fmt(v, prop){
+  if(v===undefined||v===null||isNaN(v)) return '—';
+  if(prop==='v') return v.toFixed(6);
+  if(prop==='s') return v.toFixed(4);
+  if(prop==='x') return v.toFixed(4);
+  if(prop==='P') return v.toFixed(4);
+  return v.toFixed(2);
+}
+
+/* ── Render resultado ── */
+function renderResult(containerId, result_si, badgeId){
+  const out = document.getElementById(containerId);
+  const badge = document.getElementById(badgeId);
+  if(result_si.error){
+    out.innerHTML=`<div class="msg-error">⚠ ${result_si.error}</div>`;
+    badge.innerHTML=`<span class="region-badge r-error">Error</span>`;
+    return;
+  }
+  const rl=REGION_LABELS[result_si.region]||['Desconocida','r-sat'];
+  badge.innerHTML=`<span class="region-badge ${rl[1]}">${rl[0]}</span>`;
+
+  const props=['T','P','v','u','h','s'];
+  if(result_si.x!==undefined) props.push('x');
+
+  let rows='';
+  props.forEach(k=>{
+    if(result_si[k]===undefined) return;
+    const val_disp = k==='x' ? result_si[k] : dispVal(result_si[k], k);
+    rows+=`<tr>
+      <td>${PROP_NAMES[k]}</td>
+      <td>${fmt(val_disp,k)}</td>
+      <td class="unit-col">${k==='x'?'—':unitLabel(k)}</td>
+    </tr>`;
+  });
+
+  const sysLabel = SYS==='SI' ? 'Sistema Internacional' : 'Sistema Inglés';
+  const warnHtml = result_si.warning
+    ? `<div class="msg-warning"><span class="warn-icon">⚠</span><span>${result_si.warning}</span></div>`
+    : '';
+  out.innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <span class="section-title" style="margin:0">Estado termodinámico</span>
+      <span style="font-size:11px;color:var(--text-hint);font-family:var(--mono)">${sysLabel}</span>
+    </div>
+    ${warnHtml}
+    <table class="output-table">
+      <thead><tr><th>Propiedad</th><th>Valor</th><th>Unidad</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+/* ── Render tabla combinada Vapor/Líquido saturado ── */
+function renderSatBoth(containerId, result_si, badgeId){
+  const out   = document.getElementById(containerId);
+  const badge = document.getElementById(badgeId);
+  if(result_si.error){
+    out.innerHTML=`<div class="msg-error">⚠ ${result_si.error}</div>`;
+    badge.innerHTML=`<span class="region-badge r-error">Error</span>`;
+    return;
+  }
+  const rl = REGION_LABELS['sat_both'];
+  badge.innerHTML=`<span class="region-badge ${rl[1]}">${rl[0]}</span>`;
+
+  const {T,P,vf,vg,uf,ug,hf,hfg,hg,sf,sg} = result_si;
+
+  // Filas compartidas (T y P iguales en ambas fases)
+  const shared = [
+    {label:'Temperatura', valf:T,  valg:T,  prop:'T'},
+    {label:'Presión',     valf:P,  valg:P,  prop:'P'},
+  ];
+  // Filas separadas por fase
+  const dual = [
+    {label:'Vol. específico', valf:vf, valg:vg, prop:'v'},
+    {label:'Energía interna', valf:uf, valg:ug, prop:'u'},
+    {label:'Entalpía',        valf:hf, valg:hg, prop:'h'},
+    {label:'Entalpía evap.',  valf:0,  valg:hfg, prop:'h', hideF:true, labelF:'—'},
+    {label:'Entropía',        valf:sf, valg:sg, prop:'s'},
+  ];
+
+  let sharedRows = shared.map(r=>{
+    const dF = dispVal(r.valf, r.prop);
+    return `<tr class="sat-shared-row">
+      <td class="prop-col">${r.label}</td>
+      <td colspan="2" style="text-align:center;color:var(--blue-mid);font-weight:500">${fmt(dF,r.prop)}</td>
+      <td class="unit-col">${unitLabel(r.prop)}</td>
+    </tr>`;
+  }).join('');
+
+  let dualRows = dual.map(r=>{
+    const dF = r.hideF ? '—' : fmt(dispVal(r.valf, r.prop), r.prop);
+    const dG = fmt(dispVal(r.valg, r.prop), r.prop);
+    return `<tr>
+      <td class="prop-col">${r.label}</td>
+      <td class="val-f">${dF}</td>
+      <td class="val-g">${dG}</td>
+      <td class="unit-col">${unitLabel(r.prop)}</td>
+    </tr>`;
+  }).join('');
+
+  const sysLabel = SYS==='SI' ? 'Sistema Internacional' : 'Sistema Inglés';
+  out.innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+      <span class="section-title" style="margin:0">Estado termodinámico saturado</span>
+      <span style="font-size:11px;color:var(--text-hint);font-family:var(--mono)">${sysLabel}</span>
+    </div>
+    <table class="output-table sat-both-table">
+      <thead>
+        <tr>
+          <th class="prop-col">Propiedad</th>
+          <th class="th-f">Líq sat. <em>f</em></th>
+          <th class="th-g">Vap sat. <em>g</em></th>
+          <th>Unidad</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${sharedRows}
+        <tr class="divider-row"><td colspan="4"></td></tr>
+        ${dualRows}
+      </tbody>
+    </table>`;
+}
+
+/* ── Calcular saturado ── */
+function calcSat(){
+  const rawVal = document.getElementById('sat-val').value.trim();
+  if(!rawVal){ alert('Ingrese un valor'); return; }
+  const val_input = parseFloat(rawVal);
+  const val_si = inputToSI(val_input, satVarType);
+  let x = undefined;
+  if(phaseType==='twophase'){
+    x = parseFloat(document.getElementById('quality-val').value);
+    if(isNaN(x)||x<0||x>1){ alert('Calidad x debe ser 0 – 1'); return; }
+  }
+  const result = getSatProps(satVarType, val_si, phaseType, x);
+  lastSatResult_si = result;
+  lastSatPhase = phaseType;
+  if(phaseType==='satboth'){
+    renderSatBoth('sat-output', result, 'sat-region-badge');
+  } else {
+    renderResult('sat-output', result, 'sat-region-badge');
+  }
+}
+
+/* ── Calcular sobrecalentado/comprimido ── */
+function calcSuper(){
+  const var1 = document.getElementById('super-var1').value;
+  const var2 = document.getElementById('super-var2').value;
+  const val1_input = parseFloat(document.getElementById('super-val1').value);
+  const val2_input = parseFloat(document.getElementById('super-val2').value);
+  if(isNaN(val1_input)||isNaN(val2_input)){ alert('Ingrese ambos valores'); return; }
+
+  // Convertir entradas a SI
+  const val1_si = inputToSI(val1_input, var1);
+  const val2_si = inputToSI(val2_input, var2);
+
+  let result;
+  if((var1==='T'&&var2==='P')||(var1==='P'&&var2==='T')){
+    const T_si = var1==='T' ? val1_si : val2_si;
+    const P_si = var1==='P' ? val1_si : val2_si;
+    result = superByTP(T_si, P_si);
+  } else if(var1==='T'||var1==='P'){
+    result = inverseOneKnown(var1, val1_si, var2, val2_si);
+  } else if(var2==='T'||var2==='P'){
+    result = inverseOneKnown(var2, val2_si, var1, val1_si);
+  } else {
+    result = inverseTwoProps(var1, val1_si, var2, val2_si);
+  }
+  lastSuperResult_si = result;
+  renderResult('super-output', result, 'super-region-badge');
+}
+
+// Inicializar
+onSuperVarChange();
+updateSatUnitLabels();
+</script>
+</body>
+</html>

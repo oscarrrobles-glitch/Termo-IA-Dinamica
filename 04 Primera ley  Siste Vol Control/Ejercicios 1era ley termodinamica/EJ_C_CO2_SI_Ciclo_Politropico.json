@@ -1,0 +1,26 @@
+{
+  "app": "TermoIA-PrimeraLey",
+  "version": "1.1",
+  "savedAt": "2026-06-16T00:00:00.000Z",
+  "title": "EJ-C · Ciclo con Proceso Politrópico — CO₂ (SI)",
+  "source": "Adaptado de Moran & Shapiro 7e — Prob. 3.70",
+  "description": "2 kg de CO₂ realizan un ciclo de tres procesos. Estado 1: T₁=27 °C, P₁=100 kPa. Proceso 1→2: calentamiento isocórico (v=cte) hasta T₂=326.85 °C (600 K). Proceso 2→3: expansión politrópica n=1.28 hasta P₃=100 kPa; usando PvⁿN=cte y gas ideal se obtiene T₃≈209.31 °C (482.46 K). Proceso 3→1: enfriamiento isobárico (P=cte, P=100 kPa) hasta T₁=27 °C. Verificar cierre de ciclo: el proceso isobárico a P=100 kPa lleva de T₃ a T₁, restaurando el estado inicial. Determinar: W_neto, Q_neto y verificar 1ª Ley en el ciclo.",
+  "config": {
+    "currentUnit": "SI",
+    "tempSubUnit": "C",
+    "pressSubUnit": "kPa",
+    "currentGas": "co2",
+    "calcMode": "cycle",
+    "propMode": "integ"
+  },
+  "state1": {
+    "T0": 27.0,
+    "P0": 100.0,
+    "mass": 2.0
+  },
+  "processes": [
+    { "type": "isochoric",   "inp2a": 326.85, "inp2b": 1.3  },
+    { "type": "polytropic",  "inp2a": 100.0,  "inp2b": 1.28 },
+    { "type": "isobaric",    "inp2a": 27.0,   "inp2b": 1.3  }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "app": "sim-ciclo-vc",
+  "ver": 2,
+  "units": "IMP",
+  "modo": "Refrigeración",
+  "state": {
+    "fluid": "R134a",
+    "Te": -6.6667,
+    "Tc": 43.3333,
+    "sh": 5,
+    "sc": 5,
+    "eta": 0.75,
+    "dimMode": "cap",
+    "dimval": 10.55056
+  }
+}

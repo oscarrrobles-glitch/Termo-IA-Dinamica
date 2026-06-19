@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gases Ideales — Propiedades Termodinámicas (Aire A-22 y otros gases)</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&family=Roboto:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    /* ── Paleta gas ideal (índigo/ámbar) ── */
+    --blue-deep:   #283593;
+    --blue-mid:    #3949AB;
+    --blue-light:  #C5CAE9;
+    --blue-hover:  #283593;
+    --green-dark:  #2E7D32;
+    --purple:      #6A1B9A;
+    --orange:      #E65100;
+    --red:         #C62828;
+    --bg-page:     #ECEFF1;
+    --bg-panel:    #FFFFFF;
+    --bg-row:      #F8F9FA;
+    --text-primary:#212121;
+    --text-sec:    #546E7A;
+    --text-hint:   #90A4AE;
+    --border:      #CFD8DC;
+    --border-focus:#3949AB;
+    --mono: 'Roboto Mono', monospace;
+    --sans: 'Roboto', sans-serif;
+  }
+
+  body { background: var(--bg-page); color: var(--text-primary); font-family: var(--sans); font-size: 14px; min-height: 100vh; }
+
+  .app-header { background: var(--blue-deep); padding: 0 20px; height: 56px; display: flex; align-items: center; gap: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.24); }
+  .app-logo { width: 44px; height: 34px; background: rgba(255,255,255,0.18); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff; font-weight: 700; border: 1px solid rgba(255,255,255,0.25); flex-shrink: 0; letter-spacing: 0.3px; }
+  .app-title { font-size: 15px; font-weight: 500; color: #fff; letter-spacing: 0.3px; }
+  .app-sub { font-size: 11px; color: rgba(255,255,255,0.72); font-family: var(--mono); margin-top: 1px; }
+
+  .tabs { display: flex; background: var(--bg-panel); border-bottom: 1px solid var(--border); padding: 0 20px; gap: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  .tab-btn { background: none; border: none; color: var(--text-sec); font-family: var(--sans); font-size: 13px; font-weight: 500; padding: 12px 18px; cursor: pointer; border-bottom: 3px solid transparent; letter-spacing: 0.3px; transition: color 0.15s, border-color 0.15s; white-space: nowrap; }
+  .tab-btn:hover { color: var(--blue-mid); }
+  .tab-btn.active { color: var(--blue-mid); border-bottom-color: var(--blue-mid); }
+
+  .main { display: flex; height: calc(100vh - 97px); }
+  .panel { display: none; width: 100%; }
+  .panel.active { display: flex; }
+
+  .input-zone { width: 290px; min-width: 268px; background: var(--bg-panel); border-right: 1px solid var(--border); padding: 18px 16px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; box-shadow: 2px 0 6px rgba(0,0,0,0.05); }
+
+  .zone-label { font-size: 10px; font-weight: 500; letter-spacing: 1.4px; text-transform: uppercase; color: var(--purple); margin-bottom: 4px; }
+  .field-group { display: flex; flex-direction: column; gap: 7px; }
+
+  select, input[type=number] { background: #fff; border: 1px solid var(--border); border-radius: 4px; color: var(--text-primary); font-family: var(--mono); font-size: 13px; padding: 8px 10px; outline: none; transition: border-color 0.15s, box-shadow 0.15s; width: 100%; }
+  select:focus, input[type=number]:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px rgba(57,73,171,0.12); }
+  select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23546E7A'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; padding-right: 28px; }
+
+  .radio-group { display: flex; gap: 6px; flex-wrap: wrap; }
+  .radio-btn { flex: 1; min-width: 64px; background: #fff; border: 1px solid var(--border); border-radius: 4px; color: var(--text-sec); font-family: var(--sans); font-size: 12px; font-weight: 500; padding: 7px 8px; cursor: pointer; text-align: center; transition: all 0.15s; }
+  .radio-btn:hover { border-color: var(--blue-mid); color: var(--blue-mid); background: #E8EAF6; }
+  .radio-btn.active { background: #E8EAF6; border-color: var(--blue-mid); color: var(--blue-mid); box-shadow: inset 0 0 0 1px var(--blue-mid); }
+
+  .calc-btn { background: var(--blue-mid); border: none; border-radius: 4px; color: #fff; font-family: var(--sans); font-size: 13px; font-weight: 500; padding: 11px; cursor: pointer; width: 100%; letter-spacing: 0.4px; box-shadow: 0 2px 4px rgba(40,53,147,0.30); transition: background 0.15s, box-shadow 0.15s; }
+  .calc-btn:hover { background: var(--blue-hover); box-shadow: 0 3px 8px rgba(40,53,147,0.38); }
+  .calc-btn:active { background: #1A237E; }
+
+  .region-badge { display: inline-block; font-size: 11px; font-family: var(--mono); font-weight: 500; padding: 4px 12px; border-radius: 12px; margin-top: 4px; letter-spacing: 0.3px; }
+  .r-sat   { background: #E8EAF6; color: #283593; border: 1px solid #9FA8DA; }
+  .r-super { background: #E8F5E9; color: #1B5E20; border: 1px solid #A5D6A7; }
+  .r-comp  { background: #FFF3E0; color: #BF360C; border: 1px solid #FFCC80; }
+  .r-error { background: #FFEBEE; color: #B71C1C; border: 1px solid #EF9A9A; }
+
+  .msg-warning { background: #FFF8E1; border: 1px solid #FFD54F; border-radius: 4px; padding: 10px 16px; color: #E65100; font-size: 12px; line-height: 1.5; margin-bottom: 14px; display: flex; gap: 8px; align-items: flex-start; }
+  .msg-warning .warn-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .msg-info { background: #E8EAF6; border: 1px solid #9FA8DA; border-radius: 4px; padding: 10px 16px; color: #283593; font-size: 12px; line-height: 1.5; margin-bottom: 14px; }
+
+  .output-zone { flex: 1; padding: 20px; overflow-y: auto; background: var(--bg-page); }
+
+  .output-table { width: 100%; border-collapse: collapse; font-family: var(--mono); font-size: 13px; background: var(--bg-panel); border-radius: 6px; overflow: hidden; box-shadow: 0 1px 4px rgba(0,0,0,0.10); margin-bottom: 16px; }
+  .output-table th { text-align: left; padding: 10px 16px; background: var(--blue-deep); color: rgba(255,255,255,0.92); font-size: 10px; letter-spacing: 1px; text-transform: uppercase; font-family: var(--sans); font-weight: 500; }
+  .output-table th:last-child { text-align: right; }
+  .output-table td { padding: 9px 16px; border-bottom: 1px solid #ECEFF1; color: var(--text-primary); }
+  .output-table td:first-child { color: var(--text-sec); font-family: var(--sans); font-size: 13px; font-weight: 500; }
+  .output-table td.val { text-align: right; color: var(--blue-mid); font-weight: 500; }
+  .output-table td.unit-col { color: var(--text-hint); font-size: 11px; text-align: right; }
+  .output-table tr:nth-child(even) td { background: var(--bg-row); }
+  .output-table tr:hover td { background: #E8EAF6; }
+
+  /* state-2 column tables */
+  .state-table .th-1 { background:#283593; color:#fff; text-align:center; }
+  .state-table .th-2 { background:#2E7D32; color:#fff; text-align:center; }
+  .state-table .val-1 { text-align:right; color:#283593; font-weight:500; background:#EDEFF9; }
+  .state-table .val-2 { text-align:right; color:#1B5E20; font-weight:500; background:#EDF7EE; }
+  .state-table td:first-child { min-width: 130px; }
+
+  .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--text-hint); gap: 12px; font-size: 13px; text-align:center; }
+  .empty-icon { font-size: 40px; opacity: 0.45; }
+  .empty-state strong { color: var(--text-sec); }
+
+  .msg-error { background: #FFEBEE; border: 1px solid #EF9A9A; border-radius: 4px; padding: 11px 16px; color: #B71C1C; font-size: 13px; margin-bottom: 14px; }
+  .section-title { font-size: 11px; font-weight: 500; letter-spacing: 0.8px; text-transform: uppercase; color: var(--text-sec); margin-bottom: 10px; font-family: var(--sans); }
+  .sect-divider { border: none; border-top: 1px solid var(--border); margin: 2px 0; }
+
+  .input-wrap { position: relative; display: flex; }
+  .input-wrap input { padding-right: 60px; }
+  .input-unit { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 10px; color: var(--text-hint); font-family: var(--mono); pointer-events: none; white-space: nowrap; }
+
+  .unit-toggle { display:flex; gap:4px; margin-left:auto; }
+  .unit-btn { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.35); border-radius: 4px; color: rgba(255,255,255,0.85); font-family: var(--sans); font-size: 12px; font-weight: 500; padding: 5px 14px; cursor: pointer; transition: all 0.15s; letter-spacing: 0.5px; }
+  .unit-btn.active { background: #fff; color: var(--blue-deep); border-color: #fff; }
+  .unit-btn:hover:not(.active) { background: rgba(255,255,255,0.25); }
+
+  .formula { font-family: var(--mono); font-size: 11px; color: var(--text-sec); background:#F0F2FA; border:1px solid var(--blue-light); border-radius:4px; padding:8px 10px; line-height:1.5; }
+
+  @media (max-width: 600px) {
+    .main { flex-direction: column; height: auto; }
+    .input-zone { width: 100%; min-width: 0; border-right: none; border-bottom: 1px solid var(--border); box-shadow: none; }
+    .output-zone { min-height: 300px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="app-logo">GAS</div>
+  <div>
+    <div class="app-title">Propiedades Termodinámicas de Gases Ideales</div>
+    <div class="app-sub">Aire — Tabla A-22 · Otros gases — coef. cp̄ de A-21 · Moran &amp; Shapiro</div>
+  </div>
+  <div class="unit-toggle">
+    <button class="unit-btn active" id="btn-si" onclick="setUnits('SI')">SI</button>
+    <button class="unit-btn" id="btn-en" onclick="setUnits('EN')">Inglés</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('air')">Aire — Tabla A-22</button>
+  <button class="tab-btn" onclick="switchTab('gas')">Otros gases ideales</button>
+</div>
+
+<!-- ══════════ PANEL AIRE ══════════ -->
+<div class="main panel active" id="panel-air">
+  <div class="input-zone">
+    <div class="field-group">
+      <div class="zone-label">Módulo</div>
+      <div class="radio-group">
+        <div class="radio-btn active" id="airmod-lookup" onclick="setAirMod('lookup')">Consulta</div>
+        <div class="radio-btn" id="airmod-isen" onclick="setAirMod('isen')">Isentrópico</div>
+        <div class="radio-btn" id="airmod-ds" onclick="setAirMod('ds')">Δ Entropía</div>
+      </div>
+    </div>
+    <hr class="sect-divider">
+    <div id="air-inputs"></div>
+    <hr class="sect-divider">
+    <button class="calc-btn" onclick="calcAir()">Calcular</button>
+    <div id="air-badge"></div>
+  </div>
+  <div class="output-zone" id="air-output">
+    <div class="empty-state"><div class="empty-icon">⊙</div><div>Seleccione un módulo, introduzca los datos y presione <strong>Calcular</strong></div></div>
+  </div>
+</div>
+
+<!-- ══════════ PANEL OTROS GASES ══════════ -->
+<div class="main panel" id="panel-gas">
+  <div class="input-zone">
+    <div class="field-group">
+      <div class="zone-label">Gas</div>
+      <select id="gas-sel" onchange="renderGasInputs()">
+        <option value="N2">Nitrógeno · N₂</option>
+        <option value="O2">Oxígeno · O₂</option>
+        <option value="CO2">Dióxido de carbono · CO₂</option>
+        <option value="CO">Monóxido de carbono · CO</option>
+        <option value="H2O">Vapor de agua · H₂O</option>
+        <option value="H2">Hidrógeno · H₂</option>
+        <option value="Air">Aire</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <div class="zone-label">Módulo</div>
+      <div class="radio-group">
+        <div class="radio-btn active" id="gasmod-lookup" onclick="setGasMod('lookup')">Consulta</div>
+        <div class="radio-btn" id="gasmod-isen" onclick="setGasMod('isen')">Isentrópico</div>
+        <div class="radio-btn" id="gasmod-ds" onclick="setGasMod('ds')">Δ Entropía</div>
+      </div>
+    </div>
+    <hr class="sect-divider">
+    <div id="gas-inputs"></div>
+    <hr class="sect-divider">
+    <button class="calc-btn" onclick="calcGas()">Calcular</button>
+    <div id="gas-badge"></div>
+  </div>
+  <div class="output-zone" id="gas-output">
+    <div class="empty-state"><div class="empty-icon">⊙</div><div>Seleccione gas y módulo, introduzca los datos y presione <strong>Calcular</strong></div></div>
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════════
+   PROPIEDADES DE GASES IDEALES — Moran, Shapiro et al.
+   · Aire: Tabla A-22 (T, h, u, s°). pr y vr se calculan a partir de s°
+     con la normalización de Moran:  pr = exp(s°/R − 5.60395),
+     vr = 2.870·T/pr,  R_aire = 0.287 kJ/kg·K.
+   · Otros gases: propiedades calculadas por integración analítica del
+     calor específico  c̄p/R̄ = α + βT + γT² + δT³ + εT⁴  (Tabla A-21,
+     válido 300–1000 K). Base molar, R̄ = 8.314 kJ/kmol·K.
+   ════════════════════════════════════════════════════════════════ */
+
+const R_AIR = 0.287;     // kJ/kg·K
+const RBAR  = 8.314;     // kJ/kmol·K
+
+/* ── TABLA A-22: Aire como gas ideal  [T(K), h(kJ/kg), u(kJ/kg), s°(kJ/kg·K)] ── */
+const A22 = [
+[200,199.97,142.56,1.29559],[210,209.97,149.69,1.34444],[220,219.97,156.82,1.39105],
+[230,230.02,164.00,1.43557],[240,240.02,171.13,1.47824],[250,250.05,178.28,1.51917],
+[260,260.09,185.45,1.55848],[270,270.11,192.60,1.59634],[280,280.13,199.75,1.63279],
+[290,290.16,206.91,1.66802],[300,300.19,214.07,1.70203],[310,310.24,221.25,1.73498],
+[320,320.29,228.42,1.76690],[330,330.34,235.61,1.79783],[340,340.42,242.82,1.82790],
+[350,350.49,250.02,1.85708],[360,360.58,257.24,1.88543],[370,370.67,264.46,1.91313],
+[380,380.77,271.69,1.94001],[390,390.88,278.93,1.96633],[400,400.98,286.16,1.99194],
+[410,411.12,293.43,2.01699],[420,421.26,300.69,2.04142],[430,431.43,307.99,2.06533],
+[440,441.61,315.30,2.08870],[450,451.80,322.62,2.11161],[460,462.02,329.97,2.13407],
+[470,472.24,337.32,2.15604],[480,482.49,344.70,2.17760],[490,492.74,352.08,2.19876],
+[500,503.02,359.49,2.21952],[520,523.63,374.36,2.25997],[540,544.35,389.34,2.29906],
+[560,565.17,404.42,2.33685],[580,586.04,419.55,2.37348],[600,607.02,434.78,2.40902],
+[620,628.07,450.09,2.44356],[640,649.22,465.50,2.47716],[660,670.47,481.01,2.50985],
+[680,691.82,496.62,2.54175],[700,713.27,512.33,2.57277],[720,734.82,528.14,2.60319],
+[740,756.44,544.02,2.63280],[760,778.18,560.01,2.66176],[780,800.03,576.12,2.69013],
+[800,821.95,592.30,2.71787],[820,843.98,608.59,2.74504],[840,866.08,624.95,2.77170],
+[860,888.27,641.40,2.79783],[880,910.56,657.95,2.82344],[900,932.93,674.58,2.84856],
+[920,955.38,691.28,2.87324],[940,977.92,708.08,2.89748],[960,1000.55,725.02,2.92128],
+[980,1023.25,741.98,2.94468],[1000,1046.04,758.94,2.96770],[1020,1068.89,776.10,2.99034],
+[1040,1091.85,793.36,3.01260],[1060,1114.86,810.62,3.03449],[1080,1137.89,827.88,3.05608],
+[1100,1161.07,845.33,3.07732],[1120,1184.28,862.79,3.09825],[1140,1207.57,880.35,3.11883],
+[1160,1230.92,897.91,3.13916],[1180,1254.34,915.57,3.15916],[1200,1277.79,933.33,3.17888],
+[1240,1324.93,968.95,3.21751],[1280,1372.24,1004.76,3.25510],[1320,1419.76,1040.88,3.29160],
+[1360,1467.49,1077.10,3.32724],[1400,1515.42,1113.52,3.36200],[1440,1563.51,1150.13,3.39586],
+[1480,1611.79,1186.95,3.42892],[1520,1660.23,1223.87,3.46120],[1560,1708.82,1260.99,3.49276],
+[1600,1757.57,1298.30,3.52364],[1640,1806.46,1335.72,3.55381],[1700,1880.10,1392.70,3.59790],
+[1750,1941.60,1439.80,3.63360],[1800,2003.30,1487.20,3.66840],[1900,2127.40,1582.60,3.73540],
+[2000,2252.10,1678.70,3.79940],[2100,2377.40,1775.30,3.86050],[2200,2503.20,1872.40,3.91910]
+];
+
+/* Aire aumentado: añade pr y vr calculados (normalización de Moran). */
+const AIR = A22.map(r=>{
+  const s0=r[3];
+  const pr=Math.exp(s0/R_AIR - 5.60395);
+  const vr=2.870*r[0]/pr;
+  return {T:r[0], h:r[1], u:r[2], s0:s0, pr:pr, vr:vr};
+});
+
+/* ── TABLA A-21: coef. c̄p/R̄ = α + βT + γT² + δT³ + εT⁴  (T en K, 300–1000 K) ──
+   Cada gas: {M (kg/kmol), nombre, coef:[α, β, γ, δ, ε]}                     */
+const GASES = {
+  N2 :{name:'Nitrógeno (N₂)',         M:28.01, c:[ 3.675,-1.208e-3, 2.324e-6,-0.632e-9,-0.226e-12]},
+  O2 :{name:'Oxígeno (O₂)',           M:32.00, c:[ 3.626,-1.878e-3, 7.055e-6,-6.764e-9, 2.156e-12]},
+  CO2:{name:'Dióxido de carbono (CO₂)',M:44.01,c:[ 2.401, 8.735e-3,-6.607e-6, 2.002e-9, 0.0]},
+  CO :{name:'Monóxido de carbono (CO)',M:28.01,c:[ 3.710,-1.619e-3, 3.692e-6,-2.032e-9, 0.240e-12]},
+  H2O:{name:'Vapor de agua (H₂O)',    M:18.02, c:[ 4.070,-1.108e-3, 4.152e-6,-2.964e-9, 0.807e-12]},
+  H2 :{name:'Hidrógeno (H₂)',         M:2.016, c:[ 3.057, 2.677e-3,-5.810e-6, 5.521e-9,-1.812e-12]},
+  Air:{name:'Aire',                   M:28.97, c:[ 3.653,-1.337e-3, 3.294e-6,-1.913e-9, 0.2763e-12]}
+};
+const GAS_TREF = 300; // K — referencia para Δh̄, Δū, Δs̄° en el módulo de consulta
+
+/* ── c̄p molar (kJ/kmol·K) ── */
+function cpBar(c, T){ const [a,b,g,d,e]=c; return RBAR*(a + b*T + g*T*T + d*T*T*T + e*T*T*T*T); }
+/* ── Δh̄ = ∫ c̄p dT  (kJ/kmol) entre T1 y T2 ── */
+function dhBar(c, T1, T2){
+  const [a,b,g,d,e]=c;
+  const F = T => a*T + b/2*T*T + g/3*T**3 + d/4*T**4 + e/5*T**5;
+  return RBAR*(F(T2)-F(T1));
+}
+/* ── Δs̄° = ∫ c̄p/T dT  (kJ/kmol·K) entre T1 y T2 ── */
+function ds0Bar(c, T1, T2){
+  const [a,b,g,d,e]=c;
+  const G = T => a*Math.log(T) + b*T + g/2*T*T + d/3*T**3 + e/4*T**4;
+  return RBAR*(G(T2)-G(T1));
+}
+
+/* ══════════ SISTEMA DE UNIDADES ══════════ */
+let SYS='SI';
+/* Factores SI→Inglés */
+const F_T  = 1.8;        // K → °R   (ΔT también ×1.8)
+const F_E  = 0.429923;   // kJ/kg → Btu/lb   y   kJ/kmol → Btu/lbmol
+const F_S  = 0.238846;   // kJ/kg·K → Btu/lb·°R   y   kJ/kmol·K → Btu/lbmol·°R
+const F_M  = 2.20462;    // kg/kmol → lb/lbmol
+
+const U = {
+  SI:{ T:'K', Tdeg:'K', h:'kJ/kg', s:'kJ/kg·K', hbar:'kJ/kmol', sbar:'kJ/kmol·K', cp:'kJ/kmol·K', M:'kg/kmol' },
+  EN:{ T:'°R',Tdeg:'°R',h:'Btu/lb',s:'Btu/lb·°R',hbar:'Btu/lbmol',sbar:'Btu/lbmol·°R',cp:'Btu/lbmol·°R',M:'lb/lbmol'}
+};
+const uL = p => U[SYS][p] || '';
+
+/* Conversión de visualización (SI → unidad actual) */
+function dT(K){ return SYS==='SI'? K : K*F_T; }            // temperatura absoluta
+function dDT(K){ return SYS==='SI'? K : K*F_T; }           // diferencia de temperatura
+function dE(v){ return SYS==='SI'? v : v*F_E; }            // energía específica/molar
+function dS(v){ return SYS==='SI'? v : v*F_S; }            // entropía específica/molar
+function dM(v){ return SYS==='SI'? v : v*F_M; }            // masa molar
+/* Conversión de entrada (unidad actual → SI) */
+function iT(v){ return SYS==='SI'? v : v/F_T; }
+function iE(v){ return SYS==='SI'? v : v/F_E; }
+
+/* ══════════ INTERPOLACIÓN ══════════ */
+function interpByT(arr, T){
+  const n=arr.length;
+  if(T<=arr[0].T) return {...arr[0], _edge:T<arr[0].T};
+  if(T>=arr[n-1].T) return {...arr[n-1], _edge:T>arr[n-1].T};
+  for(let i=0;i<n-1;i++){
+    if(T>=arr[i].T && T<=arr[i+1].T){
+      const f=(T-arr[i].T)/(arr[i+1].T-arr[i].T), o={};
+      for(const k in arr[i]) o[k]=arr[i][k]+(arr[i+1][k]-arr[i][k])*f;
+      return o;
+    }
+  }
+  return {...arr[n-1]};
+}
+/* Inversa: halla T tal que prop(estado)=target (monótona, creciente o decreciente). */
+function inverseByProp(arr, key, target){
+  const n=arr.length, asc = arr[n-1][key] > arr[0][key];
+  const inRange = asc ? (target>=arr[0][key] && target<=arr[n-1][key])
+                      : (target<=arr[0][key] && target>=arr[n-1][key]);
+  if(!inRange) return null;
+  for(let i=0;i<n-1;i++){
+    const a=arr[i][key], b=arr[i+1][key];
+    if((target-a)*(target-b)<=0 && a!==b){
+      const f=(target-a)/(b-a), o={};
+      for(const k in arr[i]) o[k]=arr[i][k]+(arr[i+1][k]-arr[i][k])*f;
+      return o;
+    }
+  }
+  return null;
+}
+
+/* ══════════ MÓDULOS AIRE ══════════ */
+function airLookup(byKey, val_si){
+  let st;
+  if(byKey==='T'){
+    if(val_si<AIR[0].T||val_si>AIR[AIR.length-1].T)
+      return {error:`Temperatura ${val_si.toFixed(1)} K fuera del rango de la Tabla A-22 (200 – 2200 K)`};
+    st=interpByT(AIR, val_si);
+  } else {
+    st=inverseByProp(AIR, byKey, val_si);
+    if(!st) return {error:`Valor de ${byKey} fuera del rango de la Tabla A-22`};
+  }
+  return {state:st, region:'air'};
+}
+function airIsentropic(T1_si, ratioType, ratioVal){
+  if(T1_si<AIR[0].T||T1_si>AIR[AIR.length-1].T)
+    return {error:`T₁ = ${T1_si.toFixed(1)} K fuera del rango (200 – 2200 K)`};
+  if(!(ratioVal>0)) return {error:'La relación debe ser un número positivo'};
+  const s1=interpByT(AIR, T1_si);
+  let s2;
+  if(ratioType==='P'){               // P2/P1 dado:  pr2 = pr1·(P2/P1)
+    const pr2=s1.pr*ratioVal;
+    s2=inverseByProp(AIR, 'pr', pr2);
+    if(!s2) return {error:'El estado 2 queda fuera del rango de la tabla (relación de presiones excesiva)'};
+  } else {                           // V2/V1 dado:  vr2 = vr1·(V2/V1)
+    const vr2=s1.vr*ratioVal;
+    s2=inverseByProp(AIR, 'vr', vr2);
+    if(!s2) return {error:'El estado 2 queda fuera del rango de la tabla (relación de volúmenes excesiva)'};
+  }
+  return {s1, s2, ratioType, ratioVal, region:'air_isen'};
+}
+function airDeltaS(T1_si,P1,T2_si,P2){
+  if(T1_si<AIR[0].T||T1_si>AIR[AIR.length-1].T||T2_si<AIR[0].T||T2_si>AIR[AIR.length-1].T)
+    return {error:'Alguna temperatura está fuera del rango de la Tabla A-22 (200 – 2200 K)'};
+  if(!(P1>0)||!(P2>0)) return {error:'Las presiones deben ser positivas'};
+  const s1=interpByT(AIR,T1_si), s2=interpByT(AIR,T2_si);
+  const ds = (s2.s0 - s1.s0) - R_AIR*Math.log(P2/P1);
+  return {s1,s2,P1,P2,ds, du:s2.u-s1.u, dh:s2.h-s1.h, region:'air_ds'};
+}
+
+/* ══════════ MÓDULOS OTROS GASES ══════════ */
+function gasInRange(T){ return T>=300 && T<=1000; }
+function gasLookup(gk, T_si){
+  const G=GASES[gk];
+  if(!gasInRange(T_si)) return {error:`T = ${T_si.toFixed(1)} K fuera del rango de validez de A-21 (300 – 1000 K)`};
+  const cp=cpBar(G.c,T_si), cv=cp-RBAR, k=cp/cv;
+  const dh=dhBar(G.c,GAS_TREF,T_si), ds0=ds0Bar(G.c,GAS_TREF,T_si);
+  const du=dh-RBAR*(T_si-GAS_TREF);
+  return {G,gk,T:T_si,cp,cv,k,dh,du,ds0,region:'gas'};
+}
+function gasIsentropic(gk,T1_si,ratioVal){   // sólo relación de presiones (base s̄°)
+  const G=GASES[gk];
+  if(!gasInRange(T1_si)) return {error:`T₁ = ${T1_si.toFixed(1)} K fuera del rango A-21 (300 – 1000 K)`};
+  if(!(ratioVal>0)) return {error:'La relación P₂/P₁ debe ser positiva'};
+  // Resolver T2:  s̄°(T2)−s̄°(T1) = R̄·ln(P2/P1)   →   ds0Bar(T1,T2) = R̄·ln(r)
+  const tgt=RBAR*Math.log(ratioVal);
+  let lo=300, hi=1000, fLo=ds0Bar(G.c,T1_si,lo)-tgt, fHi=ds0Bar(G.c,T1_si,hi)-tgt;
+  if(fLo*fHi>0) return {error:'El estado 2 queda fuera del rango 300–1000 K para esa relación de presiones'};
+  let T2=T1_si;
+  for(let i=0;i<100;i++){ T2=0.5*(lo+hi); const f=ds0Bar(G.c,T1_si,T2)-tgt; if(Math.abs(f)<1e-9) break; if(f*fLo<0){hi=T2;fHi=f;}else{lo=T2;fLo=f;} }
+  const dh=dhBar(G.c,T1_si,T2), du=dh-RBAR*(T2-T1_si);
+  const cp1=cpBar(G.c,T1_si), cp2=cpBar(G.c,T2);
+  return {G,gk,T1:T1_si,T2,ratioVal,dh,du,cp1,cp2,region:'gas_isen'};
+}
+function gasDeltaS(gk,T1_si,P1,T2_si,P2){
+  const G=GASES[gk];
+  if(!gasInRange(T1_si)||!gasInRange(T2_si)) return {error:'Alguna temperatura fuera del rango A-21 (300 – 1000 K)'};
+  if(!(P1>0)||!(P2>0)) return {error:'Las presiones deben ser positivas'};
+  const ds0=ds0Bar(G.c,T1_si,T2_si);
+  const ds=ds0 - RBAR*Math.log(P2/P1);
+  const dh=dhBar(G.c,T1_si,T2_si), du=dh-RBAR*(T2_si-T1_si);
+  return {G,gk,T1:T1_si,T2:T2_si,P1,P2,ds0,ds,dh,du,region:'gas_ds'};
+}
+
+/* ══════════ INTERFAZ ══════════ */
+let airMod='lookup', gasMod='lookup';
+let lastAir=null, lastGas=null;
+
+function setUnits(sys){
+  SYS=sys;
+  document.getElementById('btn-si').classList.toggle('active',sys==='SI');
+  document.getElementById('btn-en').classList.toggle('active',sys==='EN');
+  renderAirInputs(); renderGasInputs();
+  if(lastAir) renderAir(lastAir);
+  if(lastGas) renderGas(lastGas);
+}
+function switchTab(id){
+  document.querySelectorAll('.tab-btn').forEach((b,i)=>b.classList.toggle('active',(i===0&&id==='air')||(i===1&&id==='gas')));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+}
+function setAirMod(m){ airMod=m; ['lookup','isen','ds'].forEach(k=>document.getElementById('airmod-'+k).classList.toggle('active',k===m)); renderAirInputs(); }
+function setGasMod(m){ gasMod=m; ['lookup','isen','ds'].forEach(k=>document.getElementById('gasmod-'+k).classList.toggle('active',k===m)); renderGasInputs(); }
+
+function field(label, id, ph, unit, val){
+  return `<div class="field-group"><div class="zone-label">${label}</div>
+    <div class="input-wrap"><input type="number" id="${id}" placeholder="${ph||''}" step="any" ${val!==undefined?`value="${val}"`:''}>
+    <span class="input-unit">${unit||''}</span></div></div>`;
+}
+
+/* ── Inputs AIRE ── */
+function renderAirInputs(){
+  const box=document.getElementById('air-inputs'); const Tu=uL('T');
+  if(airMod==='lookup'){
+    box.innerHTML=`
+      <div class="field-group"><div class="zone-label">Conocido</div>
+        <select id="air-lk-key" onchange="renderAirInputs()">
+          <option value="T">Temperatura (T)</option>
+          <option value="h">Entalpía (h)</option>
+          <option value="u">Energía interna (u)</option>
+          <option value="s0">Función s°</option>
+        </select></div>` + airLookupValueField();
+  } else if(airMod==='isen'){
+    box.innerHTML=
+      field('Temperatura inicial T₁','air-T1','ej. 300',Tu)+
+      `<div class="field-group"><div class="zone-label">Dato del proceso</div>
+        <select id="air-rt"><option value="P">Relación de presiones P₂/P₁</option>
+        <option value="V">Relación de volúmenes V₂/V₁</option></select></div>`+
+      field('Valor de la relación','air-ratio','ej. 8','—')+
+      `<div class="formula">Isentrópico: p_r2/p_r1 = P₂/P₁ &nbsp;·&nbsp; v_r2/v_r1 = V₂/V₁</div>`;
+  } else {
+    box.innerHTML=
+      field('Temperatura T₁','air-T1','ej. 300',Tu)+
+      field('Presión P₁','air-P1','ej. 1','bar/atm')+
+      field('Temperatura T₂','air-T2','ej. 600',Tu)+
+      field('Presión P₂','air-P2','ej. 5','bar/atm')+
+      `<div class="formula">Δs = s°(T₂) − s°(T₁) − R·ln(P₂/P₁)</div>`;
+  }
+}
+function airLookupValueField(){
+  const key=document.getElementById('air-lk-key')?.value||'T';
+  const map={T:['Temperatura',uL('T'),'ej. 300'],h:['Entalpía',uL('h'),'ej. 400'],u:['Energía interna',uL('h'),'ej. 286'],s0:['Función s°',uL('s'),'ej. 1.99']};
+  const [lab,unit,ph]=map[key];
+  return field(lab,'air-val',ph,unit);
+}
+/* ── Inputs OTROS GASES ── */
+function renderGasInputs(){
+  const box=document.getElementById('gas-inputs'); const Tu=uL('T');
+  if(gasMod==='lookup'){
+    box.innerHTML=field('Temperatura T','gas-T','ej. 600',Tu)+
+      `<div class="msg-info">Δh̄, Δū y Δs̄° se reportan respecto a T_ref = ${GAS_TREF} K. Rango válido: 300–1000 K.</div>`;
+  } else if(gasMod==='isen'){
+    box.innerHTML=field('Temperatura inicial T₁','gas-T1','ej. 400',Tu)+
+      field('Relación de presiones P₂/P₁','gas-ratio','ej. 6','—')+
+      `<div class="formula">Isentrópico: s̄°(T₂) − s̄°(T₁) = R̄·ln(P₂/P₁)</div>`;
+  } else {
+    box.innerHTML=field('Temperatura T₁','gas-T1','ej. 400',Tu)+
+      field('Presión P₁','gas-P1','ej. 1','bar/atm')+
+      field('Temperatura T₂','gas-T2','ej. 800',Tu)+
+      field('Presión P₂','gas-P2','ej. 4','bar/atm')+
+      `<div class="formula">Δs̄ = s̄°(T₂) − s̄°(T₁) − R̄·ln(P₂/P₁)</div>`;
+  }
+}
+
+/* ── Helpers de render ── */
+function fmtN(v,dec){ if(v===undefined||v===null||isNaN(v)) return '—'; return v.toFixed(dec); }
+function badge(id,cls,txt){ document.getElementById(id).innerHTML=`<span class="region-badge ${cls}">${txt}</span>`; }
+function row(label,val,unit){ return `<tr><td>${label}</td><td class="val">${val}</td><td class="unit-col">${unit||''}</td></tr>`; }
+
+/* ══════════ CÁLCULO Y RENDER — AIRE ══════════ */
+function calcAir(){
+  let res;
+  if(airMod==='lookup'){
+    const key=document.getElementById('air-lk-key').value;
+    const raw=parseFloat(document.getElementById('air-val').value);
+    if(isNaN(raw)){ alert('Ingrese un valor'); return; }
+    let v_si = key==='T'? iT(raw) : (key==='s0'? raw/(SYS==='SI'?1:F_S) : iE(raw));
+    res=airLookup(key, v_si);
+  } else if(airMod==='isen'){
+    const T1=parseFloat(document.getElementById('air-T1').value);
+    const ratio=parseFloat(document.getElementById('air-ratio').value);
+    if(isNaN(T1)||isNaN(ratio)){ alert('Ingrese T₁ y la relación'); return; }
+    res=airIsentropic(iT(T1), document.getElementById('air-rt').value, ratio);
+  } else {
+    const T1=parseFloat(document.getElementById('air-T1').value), P1=parseFloat(document.getElementById('air-P1').value);
+    const T2=parseFloat(document.getElementById('air-T2').value), P2=parseFloat(document.getElementById('air-P2').value);
+    if([T1,P1,T2,P2].some(isNaN)){ alert('Ingrese T₁, P₁, T₂, P₂'); return; }
+    res=airDeltaS(iT(T1),P1,iT(T2),P2);  // presiones sólo como relación → unidades libres
+  }
+  lastAir=res; renderAir(res);
+}
+function renderAir(res){
+  const out=document.getElementById('air-output');
+  if(res.error){ out.innerHTML=`<div class="msg-error">⚠ ${res.error}</div>`; badge('air-badge','r-error','Error'); return; }
+  const sys=SYS==='SI'?'Sistema Internacional':'Sistema Inglés';
+
+  if(res.region==='air'){
+    const s=res.state; badge('air-badge','r-sat','Aire · gas ideal');
+    out.innerHTML=head('Estado del aire',sys)+`<table class="output-table">
+      <thead><tr><th>Propiedad</th><th>Valor</th><th>Unidad</th></tr></thead><tbody>
+      ${row('Temperatura',fmtN(dT(s.T),2),uL('T'))}
+      ${row('Entalpía · h',fmtN(dE(s.h),2),uL('h'))}
+      ${row('Energía interna · u',fmtN(dE(s.u),2),uL('h'))}
+      ${row('Función s°',fmtN(dS(s.s0),5),uL('s'))}
+      ${row('Presión relativa · p_r',fmtN(s.pr,4),'—')}
+      ${row('Volumen relativo · v_r',fmtN(s.vr,2),'—')}
+      </tbody></table>`+prNote();
+  } else if(res.region==='air_isen'){
+    badge('air-badge','r-super','Proceso isentrópico');
+    const rlab=res.ratioType==='P'?`P₂/P₁ = ${res.ratioVal}`:`V₂/V₁ = ${res.ratioVal}`;
+    out.innerHTML=head('Proceso isentrópico (s = cte)',sys)+
+      `<div class="msg-info">Dato: ${rlab}. Estado 2 obtenido por las funciones relativas de la Tabla A-22.</div>`+
+      twoStateTable([
+        ['Temperatura',dT(res.s1.T),dT(res.s2.T),uL('T'),2],
+        ['Entalpía · h',dE(res.s1.h),dE(res.s2.h),uL('h'),2],
+        ['Energía interna · u',dE(res.s1.u),dE(res.s2.u),uL('h'),2],
+        ['p_r',res.s1.pr,res.s2.pr,'—',4],
+        ['v_r',res.s1.vr,res.s2.vr,'—',2]
+      ])+
+      derived([['Δh = h₂ − h₁',dE(res.s2.h-res.s1.h),uL('h'),2],['Δu = u₂ − u₁',dE(res.s2.u-res.s1.u),uL('h'),2]]);
+  } else if(res.region==='air_ds'){
+    badge('air-badge','r-comp','Cambio de entropía');
+    out.innerHTML=head('Cambio de entropía',sys)+
+      twoStateTable([
+        ['Temperatura',dT(res.s1.T),dT(res.s2.T),uL('T'),2],
+        ['s°(T)',dS(res.s1.s0),dS(res.s2.s0),uL('s'),5],
+        ['Entalpía · h',dE(res.s1.h),dE(res.s2.h),uL('h'),2],
+        ['Energía interna · u',dE(res.s1.u),dE(res.s2.u),uL('h'),2]
+      ])+
+      `<div class="msg-info">Relación de presiones usada: P₂/P₁ = ${(res.P2/res.P1).toFixed(4)}</div>`+
+      derived([
+        ['Δs = s°(T₂)−s°(T₁) − R·ln(P₂/P₁)',dS(res.ds),uL('s'),5],
+        ['Δh = h₂ − h₁',dE(res.dh),uL('h'),2],
+        ['Δu = u₂ − u₁',dE(res.du),uL('h'),2]
+      ]);
+  }
+}
+
+/* ══════════ CÁLCULO Y RENDER — OTROS GASES ══════════ */
+function calcGas(){
+  const gk=document.getElementById('gas-sel').value;
+  let res;
+  if(gasMod==='lookup'){
+    const T=parseFloat(document.getElementById('gas-T').value);
+    if(isNaN(T)){ alert('Ingrese la temperatura'); return; }
+    res=gasLookup(gk, iT(T));
+  } else if(gasMod==='isen'){
+    const T1=parseFloat(document.getElementById('gas-T1').value), r=parseFloat(document.getElementById('gas-ratio').value);
+    if(isNaN(T1)||isNaN(r)){ alert('Ingrese T₁ y P₂/P₁'); return; }
+    res=gasIsentropic(gk, iT(T1), r);
+  } else {
+    const T1=parseFloat(document.getElementById('gas-T1').value), P1=parseFloat(document.getElementById('gas-P1').value);
+    const T2=parseFloat(document.getElementById('gas-T2').value), P2=parseFloat(document.getElementById('gas-P2').value);
+    if([T1,P1,T2,P2].some(isNaN)){ alert('Ingrese T₁, P₁, T₂, P₂'); return; }
+    res=gasDeltaS(gk, iT(T1),P1,iT(T2),P2);
+  }
+  lastGas=res; renderGas(res);
+}
+function renderGas(res){
+  const out=document.getElementById('gas-output');
+  if(res.error){ out.innerHTML=`<div class="msg-error">⚠ ${res.error}</div>`; badge('gas-badge','r-error','Error'); return; }
+  const sys=SYS==='SI'?'Sistema Internacional':'Sistema Inglés';
+  const Mdisp=`${fmtN(dM(res.G.M),3)} ${uL('M')}`;
+
+  if(res.region==='gas'){
+    badge('gas-badge','r-sat',res.G.name);
+    out.innerHTML=head(`${res.G.name} · base molar`,sys)+
+      `<table class="output-table"><thead><tr><th>Propiedad</th><th>Valor</th><th>Unidad</th></tr></thead><tbody>
+      ${row('Masa molar · M',fmtN(dM(res.G.M),3),uL('M'))}
+      ${row('Temperatura',fmtN(dT(res.T),2),uL('T'))}
+      ${row('c̄p',fmtN(dS(res.cp),4),uL('cp'))}
+      ${row('c̄v = c̄p − R̄',fmtN(dS(res.cv),4),uL('cp'))}
+      ${row('k = c̄p/c̄v',fmtN(res.k,4),'—')}
+      ${row(`Δh̄ (desde ${GAS_TREF} K)`,fmtN(dE(res.dh),1),uL('hbar'))}
+      ${row(`Δū (desde ${GAS_TREF} K)`,fmtN(dE(res.du),1),uL('hbar'))}
+      ${row(`Δs̄° (desde ${GAS_TREF} K)`,fmtN(dS(res.ds0),4),uL('sbar'))}
+      </tbody></table>`+
+      `<div class="msg-info">Propiedades calculadas con c̄p/R̄ = α + βT + γT² + δT³ + εT⁴ (Tabla A-21). Por mol; divida entre M para base másica.</div>`;
+  } else if(res.region==='gas_isen'){
+    badge('gas-badge','r-super','Proceso isentrópico');
+    out.innerHTML=head(`Proceso isentrópico · ${res.G.name}`,sys)+
+      `<div class="msg-info">Dato: P₂/P₁ = ${res.ratioVal}. T₂ resuelta de s̄°(T₂)−s̄°(T₁)=R̄·ln(P₂/P₁).</div>`+
+      twoStateTable([
+        ['Temperatura',dT(res.T1),dT(res.T2),uL('T'),2],
+        ['c̄p',dS(res.cp1),dS(res.cp2),uL('cp'),4]
+      ])+
+      derived([
+        ['Δh̄ = h̄₂ − h̄₁',dE(res.dh),uL('hbar'),1],
+        ['Δū = ū₂ − ū₁',dE(res.du),uL('hbar'),1]
+      ]);
+  } else {
+    badge('gas-badge','r-comp','Cambio de entropía');
+    out.innerHTML=head(`Cambio de entropía · ${res.G.name}`,sys)+
+      `<div class="msg-info">Masa molar M = ${Mdisp}. Relación P₂/P₁ = ${(res.P2/res.P1).toFixed(4)}.</div>`+
+      derived([
+        ['Δs̄° = s̄°(T₂) − s̄°(T₁)',dS(res.ds0),uL('sbar'),4],
+        ['Δs̄ = Δs̄° − R̄·ln(P₂/P₁)',dS(res.ds),uL('sbar'),4],
+        ['Δh̄ = h̄₂ − h̄₁',dE(res.dh),uL('hbar'),1],
+        ['Δū = ū₂ − ū₁',dE(res.du),uL('hbar'),1]
+      ]);
+  }
+}
+
+/* ── Componentes de salida ── */
+function head(title,sys){ return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+  <span class="section-title" style="margin:0">${title}</span>
+  <span style="font-size:11px;color:var(--text-hint);font-family:var(--mono)">${sys}</span></div>`; }
+function twoStateTable(rows){
+  let body=rows.map(r=>`<tr><td>${r[0]}</td><td class="val-1">${fmtN(r[1],r[4])}</td><td class="val-2">${fmtN(r[2],r[4])}</td><td class="unit-col">${r[3]}</td></tr>`).join('');
+  return `<table class="output-table state-table"><thead><tr><th>Propiedad</th><th class="th-1">Estado 1</th><th class="th-2">Estado 2</th><th>Unidad</th></tr></thead><tbody>${body}</tbody></table>`;
+}
+function derived(rows){
+  let body=rows.map(r=>row(r[0],fmtN(r[1],r[3]),r[2])).join('');
+  return `<table class="output-table"><thead><tr><th>Resultado</th><th>Valor</th><th>Unidad</th></tr></thead><tbody>${body}</tbody></table>`;
+}
+function prNote(){ return SYS==='EN'
+  ? `<div class="msg-warning"><span class="warn-icon">⚠</span><span>En el sistema inglés, h, u y s° se convierten por factor desde A-22 (SI). p_r y v_r son funciones de referencia adimensionales en su uso (sólo importan sus cocientes). El dato absoluto de s° puede diferir del valor impreso en A-22E por una constante de referencia; las diferencias y los procesos isentrópicos son exactos.</span></div>`
+  : ''; }
+
+/* Inicializar */
+renderAirInputs();
+renderGasInputs();
+</script>
+</body>
+</html>

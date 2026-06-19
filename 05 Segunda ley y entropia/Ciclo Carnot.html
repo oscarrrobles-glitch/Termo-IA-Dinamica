@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TermoIA·Dinámica — Simulador del Ciclo de Carnot</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============ PALETA CLARA IBM/Material + BRANDING TermoIA (igual al simulador Rankine) ============ */
+:root{
+  --bg:#f5f7fa; --panel:#ffffff; --panel-2:#f0f4f8; --line:#dde3ec;
+  --ink:#1a2233; --ink-dim:#6b7a99;
+  --accent:#1976d2; --accent-2:#1565c0; --accent-3:#7b1fa2;
+  --hot:#ef6c00; --cold:#1565c0; --good:#2e7d32; --warn:#f57c00; --bad:#c62828;
+  --grid:#e5ebf2;
+  --header-bg:linear-gradient(90deg,#1565c0 0%,#1976d2 60%,#1e88e5 100%);
+  --canvas-bg:#fafbfc;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',"Segoe UI",Roboto,Arial,sans-serif;font-size:14px;line-height:1.45}
+header{display:flex;align-items:center;gap:16px;padding:14px 22px;border-bottom:1px solid var(--line);background:var(--header-bg);box-shadow:0 2px 8px rgba(21,101,192,.18)}
+.logo{font-weight:700;font-size:22px;letter-spacing:.5px;color:#fff;white-space:nowrap;text-transform:uppercase}
+.logo .dot{color:rgba(255,255,255,.85)}
+.subtitle{color:rgba(255,255,255,.85);font-size:13px;border-left:1px solid rgba(255,255,255,.3);padding-left:16px;font-weight:300}
+.badge{margin-left:auto;font-size:11px;color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.35);padding:4px 10px;border-radius:999px}
+main{display:grid;grid-template-columns:300px 1fr 330px;gap:14px;padding:14px;align-items:start}
+@media(max-width:1180px){ main{grid-template-columns:1fr} }
+@media(min-width:1181px){
+  #panel-controles,#panel-resultados{position:sticky;top:14px;align-self:start;max-height:calc(100vh - 28px);overflow-y:auto}
+  #panel-controles::-webkit-scrollbar,#panel-resultados::-webkit-scrollbar{width:6px}
+  #panel-controles::-webkit-scrollbar-thumb,#panel-resultados::-webkit-scrollbar-thumb{background:var(--line);border-radius:3px}
+  #panel-controles::-webkit-scrollbar-thumb:hover,#panel-resultados::-webkit-scrollbar-thumb:hover{background:var(--accent)}
+}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 14px 16px;box-shadow:0 1px 3px rgba(15,40,80,.04)}
+.card h2{font-size:13px;text-transform:uppercase;letter-spacing:1px;color:var(--accent-2);margin-bottom:10px;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.card h2 .num{background:var(--accent);color:#fff;font-weight:700;width:20px;height:20px;border-radius:6px;display:inline-grid;place-items:center;font-size:12px}
+.field{margin-bottom:14px}
+.field label{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-dim);margin-bottom:5px}
+.field label b{color:var(--ink);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent)}
+input[type=number],select{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:7px 9px;font-size:13px}
+input[type=number]:focus,select:focus{outline:1px solid var(--accent)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.hint{font-size:11px;color:var(--ink-dim);margin-top:-6px;margin-bottom:10px}
+.btn{width:100%;padding:9px;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink);cursor:pointer;font-size:13px;font-weight:600;transition:.15s}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.primary{background:linear-gradient(120deg,var(--accent),var(--accent-2));color:#fff;border:none}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.toggle-line{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-dim);margin-top:8px}
+.toggle-line input{accent-color:var(--accent-3)}
+/* diagramas */
+.diagrams{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:760px){ .diagrams{grid-template-columns:1fr} }
+.canvas-wrap{position:relative}
+canvas{width:100%;height:auto;display:block;background:var(--canvas-bg);border-radius:8px;border:1px solid var(--line);max-height:320px;cursor:zoom-in;transition:transform .15s,border-color .15s}
+canvas:hover{border-color:var(--accent);transform:scale(1.015)}
+.cursor-tip{position:absolute;pointer-events:none;background:rgba(255,255,255,.98);border:1px solid var(--accent);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--ink);display:none;z-index:5;min-width:150px;font-variant-numeric:tabular-nums;box-shadow:0 6px 18px rgba(21,101,192,.18)}
+.cursor-tip b{color:var(--accent)}
+.cursor-tip .gr{color:var(--ink-dim)}
+/* resultados */
+.res-grid{display:grid;grid-template-columns:1fr;gap:8px}
+.metric{background:var(--panel-2);border:1px solid var(--line);border-radius:9px;padding:9px 11px;display:flex;justify-content:space-between;align-items:center}
+.metric .k{font-size:12px;color:var(--ink-dim)}
+.metric .v{font-weight:800;font-size:16px;font-variant-numeric:tabular-nums}
+.metric small{color:var(--ink-dim);font-weight:500;font-size:11px;margin-left:3px}
+.eff-bar{height:8px;background:var(--panel-2);border-radius:6px;overflow:hidden;margin-top:6px;border:1px solid var(--line)}
+.eff-bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent-2),var(--accent))}
+.carnot-mark{font-size:11px;color:var(--ink-dim);margin-top:4px}
+table.states{width:100%;border-collapse:collapse;font-size:11.5px;font-variant-numeric:tabular-nums}
+table.states th,table.states td{border:1px solid var(--line);padding:5px 6px;text-align:right}
+table.states th{background:var(--panel-2);color:var(--accent);text-align:center;font-size:11px;letter-spacing:.3px;font-weight:600}
+table.states td:first-child,table.states th:first-child{text-align:center;color:var(--ink-dim)}
+.alert{margin-top:10px;padding:9px 11px;border-radius:9px;font-size:12px;display:flex;gap:8px;align-items:flex-start}
+.alert.ok{background:rgba(46,125,50,.08);border:1px solid var(--good);color:var(--good)}
+.alert.warn{background:rgba(245,124,0,.08);border:1px solid var(--warn);color:var(--warn)}
+.alert.bad{background:rgba(198,40,40,.08);border:1px solid var(--bad);color:var(--bad)}
+/* modo explicación */
+.explain-card{background:var(--panel-2);border:1px dashed var(--accent-3);border-radius:9px;padding:9px 11px;margin-bottom:8px;font-size:11.5px;color:var(--ink-dim)}
+.explain-card b{color:var(--accent-3)}
+.explain-card .eq{display:block;margin-top:5px;font-family:"Cambria Math",Georgia,serif;color:var(--ink);font-size:12.5px}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:11px;color:var(--ink-dim);margin-top:8px}
+.legend i{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:4px}
+footer{padding:14px 22px;color:var(--ink-dim);font-size:11px;border-top:1px solid var(--line);text-align:center}
+.section-flow{display:flex;gap:6px;align-items:center;justify-content:center;font-size:11px;color:var(--ink-dim);margin-bottom:10px;flex-wrap:wrap}
+.section-flow span{background:var(--panel-2);border:1px solid var(--line);border-radius:6px;padding:3px 7px;transition:.15s}
+.section-flow span.on{border-color:var(--accent);background:#e3f2fd;color:var(--accent-2);font-weight:700}
+.section-flow .ar{color:var(--accent)}
+/* esquema */
+.schem{background:var(--panel-2);border:1px solid var(--line);border-radius:9px;padding:10px 12px 14px;margin-bottom:14px;position:relative}
+.schem-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.schem-title{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--accent);font-weight:700}
+.schem-hint{font-size:10.5px;color:var(--ink-dim);font-style:italic}
+.schem-wrap{position:relative;cursor:zoom-in;transition:transform .15s,border-color .15s;border:1px solid transparent;border-radius:8px}
+.schem-wrap:hover{transform:scale(1.005);border-color:var(--accent)}
+.schem-svg{width:100%;height:auto;display:block;max-height:280px;margin:0 auto}
+.schem-svg .flowdash{stroke-dasharray:10 7;animation:flow 1s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-17}}
+.schem-svg .earrow{cursor:crosshair}
+.schem-svg .earrow:hover line{filter:drop-shadow(0 0 5px currentColor)}
+.schem-legend{display:flex;flex-wrap:wrap;gap:10px;font-size:10.5px;color:var(--ink-dim);margin-top:8px}
+.schem-legend i{display:inline-block;width:18px;height:3px;border-radius:2px;vertical-align:middle;margin-right:4px}
+.modal-schem-wrap{background:var(--canvas-bg);border:1px solid var(--line);border-radius:8px;padding:12px;position:relative;width:min(90vw,1100px);max-height:82vh;overflow:auto;cursor:default}
+.modal-schem-wrap .schem-svg{max-height:none}
+/* modal zoom */
+.modal-overlay{position:fixed;inset:0;background:rgba(26,34,51,.55);display:none;align-items:center;justify-content:center;z-index:1000;backdrop-filter:blur(4px);padding:24px}
+.modal-overlay.is-open{display:flex;animation:fadeIn .18s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal-card{background:var(--panel);border:1px solid var(--accent);border-radius:12px;padding:18px 18px 14px;position:relative;max-width:96vw;max-height:96vh;box-shadow:0 18px 60px rgba(15,40,80,.25);display:flex;flex-direction:column;gap:8px}
+.modal-card .modal-title{color:var(--accent-2);font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:1px;margin-right:34px}
+.modal-card canvas{background:var(--canvas-bg);border:1px solid var(--line);border-radius:8px;display:block;max-width:90vw;max-height:80vh;cursor:crosshair;transform:none !important}
+.modal-card canvas:hover{border-color:var(--line)}
+.modal-close{position:absolute;top:10px;right:12px;background:transparent;border:1px solid var(--line);color:var(--ink);width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:18px;line-height:1;transition:.15s}
+.modal-close:hover{border-color:var(--bad);color:var(--bad);transform:scale(1.08)}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">TermoIA<span class="dot">·</span>Dinámica</div>
+  <div class="subtitle">Laboratorio virtual del Ciclo de Carnot — diagramas T&#8211;s / P&#8211;v interactivos · Unidad 5 (5.1&#8211;5.4)</div>
+  <div class="badge" id="dataBadge">Modelo: gas ideal · c<sub>v</sub> constante (SI)</div>
+</header>
+
+<main>
+  <!-- ================= PANEL IZQUIERDO: CONTROLES ================= -->
+  <section class="card" id="panel-controles">
+    <h2><span class="num">1</span> Configuración del ciclo</h2>
+
+    <div class="field">
+      <label for="sistema">Sistema de unidades</label>
+      <select id="sistema">
+        <option value="SI">SI — kPa · K · kJ/kg</option>
+        <option value="EN">Inglés (USCS) — psia · °R · Btu/lbm</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="modo">Modo de operación</label>
+      <select id="modo">
+        <option value="engine">Máquina térmica (1→2→3→4)</option>
+        <option value="fridge">Refrigerador — ciclo invertido</option>
+        <option value="hp">Bomba de calor — ciclo invertido</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="gas">Gas de trabajo (1 kg, sistema cerrado)</label>
+      <select id="gas">
+        <option value="aire">Aire (γ ≈ 1.400)</option>
+        <option value="helio">Helio (γ ≈ 1.667)</option>
+        <option value="nitrogeno">Nitrógeno (γ ≈ 1.400)</option>
+        <option value="co2">Dióxido de carbono (γ ≈ 1.288)</option>
+      </select>
+    </div>
+    <div class="hint" id="gasHint"></div>
+
+    <div class="field">
+      <label for="th">T<sub>H</sub> — reservorio caliente <b><span id="thV">600</span> <span id="u-th">K</span></b></label>
+      <input type="range" id="th" min="350" max="1200" step="5" value="600">
+    </div>
+    <div class="field">
+      <label for="tc">T<sub>C</sub> — reservorio frío <b><span id="tcV">300</span> <span id="u-tc">K</span></b></label>
+      <input type="range" id="tc" min="200" max="350" step="5" value="300">
+    </div>
+    <div class="field">
+      <label for="p1">Presión máxima, P<sub>1</sub> <b><span id="p1V">1000</span> <span id="u-p1">kPa</span></b></label>
+      <input type="range" id="p1" min="100" max="3000" step="10" value="1000">
+    </div>
+    <div class="field">
+      <label for="rexp">Relación de expansión isotérmica, r = V<sub>2</sub>/V<sub>1</sub> <b><span id="rexpV">4.0</span></b></label>
+      <input type="range" id="rexp" min="1.5" max="12" step="0.1" value="4">
+    </div>
+    <div class="hint">r fija cuánto calor intercambia cada isoterma (q = R·T·ln r). No altera η: la eficiencia de Carnot depende solo de T<sub>H</sub> y T<sub>C</sub>.</div>
+
+    <h2 style="margin-top:6px"><span class="num">2</span> Irreversibilidad externa (ΔT finito)</h2>
+    <div class="toggle-line" style="margin-top:0;margin-bottom:8px">
+      <input type="checkbox" id="chkIrr"><label for="chkIrr">Activar ΔT finito en los intercambios (ciclo endorreversible)</label>
+    </div>
+    <div id="irrInputs" style="display:none">
+      <div class="field">
+        <label for="dth">ΔT<sub>H</sub> — caída en el intercambio caliente <b><span id="dthV">50</span> <span id="u-dth">K</span></b></label>
+        <input type="range" id="dth" min="0" max="150" step="1" value="50">
+      </div>
+      <div class="field">
+        <label for="dtc">ΔT<sub>C</sub> — caída en el intercambio frío <b><span id="dtcV">25</span> <span id="u-dtc">K</span></b></label>
+        <input type="range" id="dtc" min="0" max="100" step="1" value="25">
+      </div>
+      <div class="hint">El gas opera entre temperaturas internas distintas a las de los reservorios (máquina: T'<sub>H</sub> = T<sub>H</sub>−ΔT<sub>H</sub>, T'<sub>C</sub> = T<sub>C</sub>+ΔT<sub>C</sub>; ciclo invertido: signos opuestos). La transferencia de calor a través de un ΔT finito es la irreversibilidad externa típica (tema 5.3) y genera entropía en el universo.</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" id="btnReset">Restablecer</button>
+      <button class="btn" id="btnCaso">Ejemplo 5.6 (Potter &amp; Scott)</button>
+    </div>
+    <div class="hint" style="margin-top:8px">Ejemplo 5.6: máquina de Carnot con aire, T<sub>H</sub> = 500 K, T<sub>C</sub> = 300 K, con p = 80 kPa y v = 10 m³/kg sobre la isoterma fría. Resultados del libro: η = 40 %, w ≈ 128 kJ/kg. Nota: el libro numera 1 en (80 kPa, 300 K); la app numera 1 donde P es máxima, de modo que los estados 1-2-3-4 del libro corresponden a 4-1-2-3 de la app.</div>
+    <button class="btn primary" id="btnCSV" style="margin-top:8px">⤓ Capturar estado (CSV)</button>
+
+    <div class="toggle-line">
+      <input type="checkbox" id="chkExplain"><label for="chkExplain">Modo explicación (leyes y ecuaciones)</label>
+    </div>
+    <div class="toggle-line">
+      <input type="checkbox" id="chkCurves" checked><label for="chkCurves">Curvas de referencia (isotermas en P–v, isócoras en T–s)</label>
+    </div>
+    <div class="toggle-line">
+      <input type="checkbox" id="chkAnim" checked><label for="chkAnim">Animar el recorrido del ciclo</label>
+    </div>
+  </section>
+
+  <!-- ================= CENTRO: DIAGRAMAS ================= -->
+  <section class="card" id="panel-diagramas">
+    <h2><span class="num">3</span> Visualización gráfica</h2>
+
+    <div class="schem">
+      <div class="schem-head">
+        <span class="schem-title">Esquema del ciclo — reservorios, energía y cilindro–pistón</span>
+        <span class="schem-hint">Pase el cursor sobre una flecha de energía · clic para ampliar</span>
+      </div>
+      <div class="schem-wrap" id="schemWrap" title="Clic para ampliar el esquema">
+        <div id="schemSvgWrap"></div>
+        <div class="cursor-tip" id="tipSchem"></div>
+      </div>
+      <div class="schem-legend">
+        <span><i style="background:#ef6c00"></i>Calor a alta temperatura, q<sub>H</sub></span>
+        <span><i style="background:#1565c0"></i>Calor a baja temperatura, q<sub>C</sub></span>
+        <span><i style="background:#2e7d32"></i>Trabajo neto, w<sub>neto</sub></span>
+      </div>
+    </div>
+
+    <div class="section-flow" id="flow"></div>
+    <div class="diagrams">
+      <div class="canvas-wrap">
+        <canvas id="cvTs" width="460" height="370" title="Clic para ampliar"></canvas>
+        <div class="cursor-tip" id="tipTs"></div>
+      </div>
+      <div class="canvas-wrap">
+        <canvas id="cvPv" width="460" height="370" title="Clic para ampliar"></canvas>
+        <div class="cursor-tip" id="tipPv"></div>
+      </div>
+    </div>
+    <div class="legend">
+      <span><i style="background:#ef6c00"></i>Isoterma con admisión de calor</span>
+      <span><i style="background:#7b1fa2"></i>Expansión adiabática reversible</span>
+      <span><i style="background:#1565c0"></i>Isoterma con rechazo de calor</span>
+      <span><i style="background:#2e7d32"></i>Compresión adiabática reversible</span>
+      <span><i style="background:rgba(25,118,210,.35)"></i>Área sombreada en T–s = w<sub>neto</sub></span>
+      <span><i style="background:#ef6c00;opacity:.5;border-top:1px dashed #ef6c00;height:0"></i>T de reservorios (discontinua, con ΔT finito)</span>
+    </div>
+    <div id="explainBox"></div>
+  </section>
+
+  <!-- ================= DERECHA: RESULTADOS ================= -->
+  <section class="card" id="panel-resultados">
+    <h2><span class="num">4</span> Resultados del análisis</h2>
+    <div class="res-grid">
+      <div class="metric"><span class="k" id="kWnet">Trabajo neto, w<sub>neto</sub></span><span class="v" id="rWnet">—<small>kJ/kg</small></span></div>
+      <div class="metric"><span class="k">Calor a T alta, q<sub>H</sub></span><span class="v" id="rQh">—<small>kJ/kg</small></span></div>
+      <div class="metric"><span class="k">Calor a T baja, q<sub>C</sub></span><span class="v" id="rQc">—<small>kJ/kg</small></span></div>
+      <div class="metric"><span class="k">Trab. expansión / compresión</span><span class="v" id="rWec">—</span></div>
+      <div class="metric"><span class="k">Relación de retroceso, bwr</span><span class="v" id="rBwr">—<small>%</small></span></div>
+    </div>
+
+    <div class="metric" style="margin-top:10px">
+      <span class="k" id="perfLabel">Eficiencia térmica, η<sub>ter</sub></span>
+      <span class="v" id="rPerf" style="color:var(--accent)">—<small>%</small></span>
+    </div>
+    <div class="eff-bar"><i id="effFill" style="width:0%"></i></div>
+    <div class="carnot-mark" id="rLimit">límite reversible = —</div>
+
+    <div id="cycleAlert" class="alert ok" style="margin-top:12px">—</div>
+
+    <h2 style="margin-top:16px"><span class="num">5</span> Tabla de estados</h2>
+    <table class="states" id="stateTable">
+      <thead><tr><th>Edo.</th><th>P<br><span id="th-uP">kPa</span></th><th>T<br><span id="th-uT">K</span></th><th>v<br><span id="th-uV">m³/kg</span></th><th>u<br><span id="th-uU">kJ/kg</span></th><th>h<br><span id="th-uH">kJ/kg</span></th><th>s<br><span id="th-uS">kJ/kg·K</span></th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <div class="hint" style="margin-top:6px">u y h con referencia u = h = 0 en T = 0; s relativa al estado 1 (s<sub>1</sub> ≡ 1.000).</div>
+
+    <!-- ================= PANEL DE ENTROPÍA ================= -->
+    <div id="sigmaPanel" style="display:none;margin-top:16px">
+      <h2><span class="num">6</span> Entropía generada y trabajo perdido</h2>
+      <div class="res-grid">
+        <div class="metric"><span class="k">σ<sub>universo</sub> por ciclo</span><span class="v" id="rSigma" style="color:var(--accent-3)">—<small>kJ/kg·K</small></span></div>
+        <div class="metric"><span class="k" id="kWlost">Trabajo perdido, w<sub>perdido</sub> = T<sub>0</sub>·σ</span><span class="v" id="rWlost" style="color:var(--bad)">—<small>kJ/kg</small></span></div>
+        <div class="metric" id="mCA"><span class="k">η de Curzon–Ahlborn (referencia)</span><span class="v" id="rCA">—<small>%</small></span></div>
+      </div>
+      <table class="states" id="tempTable" style="margin-top:10px">
+        <thead><tr><th>Nivel térmico</th><th>Reservorio</th><th>Gas (interno)</th><th>ΔT</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="explain-card" id="sigmaNote" style="margin-top:10px"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  Simulador educativo del proyecto <b>TermoIA·Dinámica</b> — Ciclo de Carnot con gas ideal y calores específicos constantes
+  (Çengel cap. 6 · Moran &amp; Shapiro cap. 5 · Potter &amp; Scott cap. 5). Archivo HTML autocontenido, sin dependencias externas.
+  · <span id="selftest">validando…</span>
+</footer>
+
+<!-- ZOOM MODAL -->
+<div class="modal-overlay" id="diagModal" role="dialog" aria-modal="true" aria-label="Diagrama ampliado">
+  <div class="modal-card">
+    <span class="modal-title" id="modalTitle">Diagrama</span>
+    <button class="modal-close" id="modalClose" aria-label="Cerrar">×</button>
+    <div class="canvas-wrap" id="modalCanvasWrap" style="position:relative">
+      <canvas id="modalCv" width="900" height="700"></canvas>
+      <div class="cursor-tip" id="tipModal"></div>
+    </div>
+    <div class="modal-schem-wrap" id="modalSchemWrap" style="display:none">
+      <div id="modalSchemSvg"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ===================== 0. UTILIDADES Y CONSTANTES =========================== */
+const $=id=>document.getElementById(id);
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const f=(x,d)=>isFinite(x)?x.toFixed(d):'—';
+
+/* Propiedades de gas ideal (SI): R y cv en kJ/kg·K (Çengel, Tabla A-2 a 300 K) */
+const GASES={
+  aire:      {name:'Aire',                R:0.2870, cv:0.7180},
+  helio:     {name:'Helio',               R:2.0769, cv:3.1156},
+  nitrogeno: {name:'Nitrógeno',           R:0.2968, cv:0.7430},
+  co2:       {name:'Dióxido de carbono',  R:0.1889, cv:0.6570}
+};
+
+/* Conversión SI → sistema inglés (USCS) */
+const CF={T:1.8, P:1/6.894757, E:1/2.326, S:1/4.1868, V:16.018463};
+const UNITS={
+  SI:{label:'SI', T:'K', P:'kPa', E:'kJ/kg', S:'kJ/kg·K', V:'m³/kg',
+    ranges:{th:[350,1200,5,600], tc:[200,350,5,300], p1:[100,3000,10,1000],
+            rexp:[1.5,12,0.1,4], dth:[0,150,1,50], dtc:[0,100,1,25]},
+    caso:{th:500,tc:300,p1:478.15,rexp:9.2915}},   /* Ejemplo 5.6 Potter & Scott */
+  EN:{label:'Inglés (USCS)', T:'°R', P:'psia', E:'Btu/lbm', S:'Btu/lbm·°R', V:'ft³/lbm',
+    ranges:{th:[630,2160,10,1080], tc:[360,630,5,540], p1:[15,435,1,145],
+            rexp:[1.5,12,0.1,4], dth:[0,270,2,90], dtc:[0,180,2,45]},
+    caso:{th:900,tc:540,p1:69.35,rexp:9.2915}}     /* Ejemplo 5.6 en unidades inglesas */
+};
+let U=UNITS.SI; U.sys='SI';
+function setUnitSystem(sys){ U=UNITS[sys]; U.sys=sys; }
+/* lectura (unidad mostrada → SI) y despliegue (SI → unidad mostrada) */
+const rT=v=>U.sys==='SI'?v:v/CF.T,   dT=v=>U.sys==='SI'?v:v*CF.T;
+const rP=v=>U.sys==='SI'?v:v/CF.P,   dP=v=>U.sys==='SI'?v:v*CF.P;
+const dE=v=>U.sys==='SI'?v:v*CF.E,   dS=v=>U.sys==='SI'?v:v*CF.S,  dV=v=>U.sys==='SI'?v:v*CF.V;
+
+const els={};
+['sistema','modo','gas','th','tc','p1','rexp','chkIrr','dth','dtc','chkExplain','chkCurves','chkAnim',
+ 'thV','tcV','p1V','rexpV','dthV','dtcV','irrInputs','sigmaPanel','gasHint'].forEach(id=>els[id]=$(id));
+
+/* ===================== 1. MODELO TERMODINÁMICO ============================== */
+/* Ciclo de Carnot, gas ideal, 1 kg, sistema cerrado.
+   Máquina:   1→2 isoterma T'H (q_H entra) · 2→3 adiabática · 3→4 isoterma T'C (q_C sale) · 4→1 adiabática.
+   Invertido: 1→4→3→2→1 (antihorario): absorbe q_C a T'C y rechaza q_H a T'H consumiendo w_neto. */
+function calcCarnot(P){
+  const g=GASES[P.gas], Rg=g.R, cv=g.cv, cp=cv+Rg, gam=cp/cv;
+  const inv = P.modo!=='engine';
+  let THg, TCg;
+  if(P.useIrr){
+    if(!inv){ THg=P.th-P.dth; TCg=P.tc+P.dtc; }   // máquina: el gas recibe a menos T y rechaza a más T
+    else    { THg=P.th+P.dth; TCg=P.tc-P.dtc; }   // invertido: el gas rechaza a más T y absorbe a menos T
+  } else { THg=P.th; TCg=P.tc; }
+  const valid = (THg>TCg+0.5) && (TCg>5) && (P.th>P.tc+0.5);
+
+  /* geometría de estados (referida a las temperaturas internas del gas) */
+  const lnr=Math.log(P.rexp);
+  const v1=Rg*THg/P.p1, v2=v1*P.rexp;
+  const k=valid?Math.pow(THg/TCg,1/(gam-1)):1;
+  const v3=v2*k, v4=v1*k;
+  const sOf=(T,v)=>cv*Math.log(T/THg)+Rg*Math.log(v/v1)+1.0;   // s1 ≡ 1.000
+  const st=(T,v)=>({T,v,p:Rg*T/v,u:cv*T,h:cp*T,s:sOf(T,v)});
+  const states=[st(THg,v1),st(THg,v2),st(TCg,v3),st(TCg,v4)];   // índices 0..3 = estados 1..4
+
+  /* energías por unidad de masa */
+  const qH=Rg*THg*lnr, qC=Rg*TCg*lnr, wnet=qH-qC;
+  const wAd=cv*(THg-TCg);
+  const wExp=qH+wAd, wComp=qC+wAd, bwr=wComp/wExp;
+
+  /* desempeño */
+  const eta=valid?1-TCg/THg:NaN;
+  const etaRes=1-P.tc/P.th;
+  const copR=valid?TCg/(THg-TCg):NaN,  copRmax=P.tc/(P.th-P.tc);
+  const copHP=valid?THg/(THg-TCg):NaN, copHPmax=P.th/(P.th-P.tc);
+  const etaCA=1-Math.sqrt(P.tc/P.th);
+
+  /* generación de entropía del universo por ciclo (reservorios a P.th y P.tc) */
+  let sigma;
+  if(!inv) sigma=qC/P.tc - qH/P.th;       // máquina
+  else     sigma=qH/P.th - qC/P.tc;       // ciclo invertido
+  if(!P.useIrr) sigma=0;
+  const T0=!inv?P.tc:P.th;
+  const wlost=T0*sigma;
+
+  /* trayectoria de procesos */
+  const path = !inv
+    ? [{a:1,b:2,iso:true ,kind:'heat'},{a:2,b:3,iso:false,kind:'exp'},
+       {a:3,b:4,iso:true ,kind:'cool'},{a:4,b:1,iso:false,kind:'comp'}]
+    : [{a:1,b:4,iso:false,kind:'exp'},{a:4,b:3,iso:true ,kind:'heat'},
+       {a:3,b:2,iso:false,kind:'comp'},{a:2,b:1,iso:true ,kind:'cool'}];
+
+  return {g,Rg,cv,cp,gam,inv,modo:P.modo,THg,TCg,valid,lnr,states,sOf,
+          qH,qC,wnet,wAd,wExp,wComp,bwr,eta,etaRes,copR,copRmax,copHP,copHPmax,etaCA,
+          sigma,wlost,T0,path};
+}
+
+/* ===================== 2. DIAGRAMA GENÉRICO (canvas) ======================== */
+function drawDiagram(cv,opts){
+  const ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);
+  const m={l:60,r:16,t:22,b:42};
+  const px=v=>m.l+(v-opts.xmin)/(opts.xmax-opts.xmin)*(W-m.l-m.r);
+  const py=v=>H-m.b-(v-opts.ymin)/(opts.ymax-opts.ymin)*(H-m.t-m.b);
+  /* rejilla */
+  ctx.strokeStyle='#e5ebf2'; ctx.fillStyle='#6b7a99'; ctx.lineWidth=1;
+  ctx.font='10px Segoe UI'; ctx.textAlign='center';
+  for(let i=0;i<=5;i++){
+    const gx=opts.xmin+(opts.xmax-opts.xmin)*i/5;
+    ctx.beginPath();ctx.moveTo(px(gx),m.t);ctx.lineTo(px(gx),H-m.b);ctx.stroke();
+    ctx.fillText(gx.toFixed(opts.xdec),px(gx),H-m.b+14);
+  }
+  ctx.textAlign='right';
+  for(let i=0;i<=5;i++){
+    const gy=opts.ymin+(opts.ymax-opts.ymin)*i/5;
+    ctx.beginPath();ctx.moveTo(m.l,py(gy));ctx.lineTo(W-m.r,py(gy));ctx.stroke();
+    ctx.fillText(gy.toFixed(opts.ydec),m.l-6,py(gy)+3);
+  }
+  /* ejes / títulos */
+  ctx.fillStyle='#1a2233'; ctx.textAlign='center'; ctx.font='11px Segoe UI';
+  ctx.fillText(opts.xlabel,(m.l+W-m.r)/2,H-6);
+  ctx.save();ctx.translate(13,(m.t+H-m.b)/2);ctx.rotate(-Math.PI/2);
+  ctx.fillText(opts.ylabel,0,0);ctx.restore();
+  ctx.fillStyle='#1565c0';ctx.font='bold 11px Segoe UI';ctx.textAlign='left';
+  ctx.fillText(opts.title,m.l,14);
+
+  /* área sombreada (w_neto) */
+  if(opts.shade && opts.shade.length>2){
+    ctx.beginPath();
+    opts.shade.forEach((P,i)=>{ i?ctx.lineTo(px(P.x),py(P.y)):ctx.moveTo(px(P.x),py(P.y)); });
+    ctx.closePath();
+    ctx.fillStyle='rgba(25,118,210,.07)'; ctx.fill();
+  }
+  /* curvas de referencia tenues */
+  if(opts.refCurves) opts.refCurves.forEach(rc=>{
+    ctx.strokeStyle=rc.color||'rgba(123,31,162,.30)';ctx.lineWidth=1;ctx.setLineDash(rc.dash||[4,3]);
+    ctx.beginPath();
+    rc.pts.forEach((P,i)=>{ i?ctx.lineTo(px(P.x),py(P.y)):ctx.moveTo(px(P.x),py(P.y)); });
+    ctx.stroke();ctx.setLineDash([]);
+  });
+  /* líneas horizontales de reservorio (T-s, con ΔT finito) */
+  if(opts.refLines) opts.refLines.forEach(rl=>{
+    ctx.strokeStyle=rl.color;ctx.lineWidth=1.4;ctx.setLineDash([7,5]);
+    ctx.beginPath();ctx.moveTo(m.l,py(rl.y));ctx.lineTo(W-m.r,py(rl.y));ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=rl.color;ctx.font='10px Segoe UI';ctx.textAlign='right';
+    ctx.fillText(rl.label,W-m.r-4,py(rl.y)-4);
+  });
+  /* procesos del ciclo (con flecha de dirección a media trayectoria) */
+  opts.processes.forEach(pr=>{
+    ctx.strokeStyle=pr.color;ctx.lineWidth=3;ctx.beginPath();
+    pr.pts.forEach((P,i)=>{ i?ctx.lineTo(px(P.x),py(P.y)):ctx.moveTo(px(P.x),py(P.y)); });
+    ctx.stroke();
+    const n=pr.pts.length, i0=Math.floor((n-1)/2), A=pr.pts[i0], B=pr.pts[Math.min(i0+1,n-1)];
+    const ax=px(A.x),ay=py(A.y),bx=px(B.x),by=py(B.y);
+    const ang=Math.atan2(by-ay,bx-ax), mx=(ax+bx)/2,my=(ay+by)/2, L=9;
+    ctx.fillStyle=pr.color;ctx.beginPath();
+    ctx.moveTo(mx+L*Math.cos(ang),my+L*Math.sin(ang));
+    ctx.lineTo(mx+L*Math.cos(ang+2.6),my+L*Math.sin(ang+2.6));
+    ctx.lineTo(mx+L*Math.cos(ang-2.6),my+L*Math.sin(ang-2.6));
+    ctx.closePath();ctx.fill();
+  });
+  /* puntos de estado */
+  opts.points.forEach(P=>{
+    ctx.fillStyle='#ffffff';ctx.strokeStyle='#1565c0';ctx.lineWidth=2.5;
+    ctx.beginPath();ctx.arc(px(P.x),py(P.y),6,0,7);ctx.fill();ctx.stroke();
+    ctx.fillStyle='#1565c0';ctx.font='bold 15px Segoe UI';ctx.textAlign='left';
+    ctx.fillText(P.label,px(P.x)+9,py(P.y)-8);
+  });
+  /* marcador animado */
+  if(opts.marker){
+    ctx.fillStyle='#c62828';ctx.strokeStyle='#fff';ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(px(opts.marker.x),py(opts.marker.y),6.5,0,7);ctx.fill();ctx.stroke();
+  }
+  cv._map={px,py,m,opts,
+    inv:(mx,my)=>({x:opts.xmin+(mx-m.l)/(W-m.l-m.r)*(opts.xmax-opts.xmin),
+                   y:opts.ymin+(H-m.b-my)/(H-m.t-m.b)*(opts.ymax-opts.ymin)})};
+}
+
+/* puntos de un segmento de proceso en cada plano */
+function segPoints(R,seg,mode){
+  const A=R.states[seg.a-1], B=R.states[seg.b-1];
+  const pts=[];
+  if(mode==='ts'){
+    if(seg.iso){ pts.push({x:A.s,y:A.T},{x:B.s,y:B.T}); }
+    else { pts.push({x:A.s,y:A.T},{x:A.s,y:(A.T+B.T)/2},{x:B.s,y:B.T}); } // vertical (s const)
+  } else {
+    const N=26;
+    for(let i=0;i<=N;i++){
+      const u=i/N;
+      let T,v;
+      if(seg.iso){ T=A.T; v=A.v*Math.pow(B.v/A.v,u); }
+      else { T=A.T+(B.T-A.T)*u; v=A.v*Math.pow(A.T/T,1/(R.gam-1)); }
+      pts.push({x:v,y:R.Rg*T/v});
+    }
+  }
+  return pts;
+}
+const COLKIND={heat:'#ef6c00',exp:'#7b1fa2',cool:'#1565c0',comp:'#2e7d32'};
+function buildProcesses(R,mode){
+  return R.path.map(seg=>({color:COLKIND[seg.kind],pts:segPoints(R,seg,mode)}));
+}
+
+/* estado instantáneo del marcador animado: ph ∈ [0,4) */
+function markerState(R,ph){
+  const i=Math.floor(ph)%4, u=ph-Math.floor(ph);
+  const seg=R.path[i], A=R.states[seg.a-1], B=R.states[seg.b-1];
+  let T,v;
+  if(seg.iso){ T=A.T; v=A.v*Math.pow(B.v/A.v,u); }
+  else { T=A.T+(B.T-A.T)*u; v=A.v*Math.pow(A.T/T,1/(R.gam-1)); }
+  return {T,v,s:R.sOf(T,v),p:R.Rg*T/v,seg,i};
+}
+
+function renderDiagrams(R,mk){
+  if(!R.valid){ return; }
+  const S=R.states;
+  /* ----- límites T-s ----- */
+  const sAll=S.map(q=>q.s);
+  let smin=Math.min(...sAll), smax=Math.max(...sAll);
+  const sp=(smax-smin)||1; smin-=sp*0.18; smax+=sp*0.18;
+  const Pp=window._P||{};
+  const tTop=Math.max(R.THg,Pp.th||0)+60, tBot=Math.max(60,Math.min(R.TCg,Pp.tc||1e9)-60);
+  const refLines=(Pp.useIrr&&window._P)?[
+    {y:Pp.th,label:'T_H,res = '+f(dT(Pp.th),0)+' '+U.T,color:'#ef6c00'},
+    {y:Pp.tc,label:'T_C,res = '+f(dT(Pp.tc),0)+' '+U.T,color:'#1565c0'}]:null;
+  /* isócoras tenues en T-s */
+  let refTs=null;
+  if($('chkCurves').checked){
+    refTs=[S[0].v,S[1].v,S[2].v,S[3].v].map(v=>{
+      const pts=[];
+      for(let T=tBot;T<=tTop;T+=(tTop-tBot)/30) pts.push({x:R.sOf(T,v),y:T});
+      return {pts,color:'rgba(123,31,162,.22)',dash:[3,4]};
+    });
+  }
+  const shadeTs=[{x:S[0].s,y:S[0].T},{x:S[1].s,y:S[1].T},{x:S[2].s,y:S[2].T},{x:S[3].s,y:S[3].T}];
+  drawDiagram($('cvTs'),{
+    title:'Diagrama T–s (rectángulo de Carnot)',
+    xlabel:'Entropía específica s ('+U.S+')', ylabel:'Temperatura T ('+U.T+')',
+    xmin:dS(smin),xmax:dS(smax),ymin:dT(tBot),ymax:dT(tTop),xdec:2,ydec:0,
+    refCurves:refTs?refTs.map(rc=>({...rc,pts:rc.pts.map(p=>({x:dS(p.x),y:dT(p.y)}))})):null,
+    refLines:refLines?refLines.map(rl=>({...rl,y:dT(rl.y)})):null,
+    shade:shadeTs.map(p=>({x:dS(p.x),y:dT(p.y)})),
+    processes:buildProcesses(R,'ts').map(pr=>({color:pr.color,pts:pr.pts.map(p=>({x:dS(p.x),y:dT(p.y)}))})),
+    points:S.map((q,i)=>({x:dS(q.s),y:dT(q.T),label:String(i+1)})),
+    marker:mk?{x:dS(mk.s),y:dT(mk.T)}:null
+  });
+  /* ----- límites P-v ----- */
+  const vmax=S[2].v*1.10, pmax=S[0].p*1.10;
+  let refPv=null;
+  if($('chkCurves').checked){
+    refPv=[];
+    for(let j=0;j<=4;j++){
+      const T=R.TCg+(R.THg-R.TCg)*j/4;
+      const pts=[];
+      for(let i=0;i<=40;i++){
+        const v=S[0].v*0.55*Math.pow(vmax/(S[0].v*0.55),i/40);
+        const p=R.Rg*T/v;
+        if(p<=pmax) pts.push({x:v,y:p});
+      }
+      refPv.push({pts,color:'rgba(239,108,0,.18)',dash:[3,4]});
+    }
+  }
+  const shadePv=R.path.flatMap(seg=>segPoints(R,seg,'pv'));
+  drawDiagram($('cvPv'),{
+    title:'Diagrama P–v (isotermas y adiabáticas)',
+    xlabel:'Volumen específico v ('+U.V+')', ylabel:'Presión P ('+U.P+')',
+    xmin:0,xmax:dV(vmax),ymin:0,ymax:dP(pmax),xdec:U.sys==='SI'?2:1,ydec:0,
+    refCurves:refPv?refPv.map(rc=>({...rc,pts:rc.pts.map(p=>({x:dV(p.x),y:dP(p.y)}))})):null,
+    shade:shadePv.map(p=>({x:dV(p.x),y:dP(p.y)})),
+    processes:buildProcesses(R,'pv').map(pr=>({color:pr.color,pts:pr.pts.map(p=>({x:dV(p.x),y:dP(p.y)}))})),
+    points:S.map((q,i)=>({x:dV(q.v),y:dP(q.p),label:String(i+1)})),
+    marker:mk?{x:dV(mk.v),y:dP(mk.p)}:null
+  });
+}
+
+/* ===================== 3. CURSOR DE PROPIEDADES ============================= */
+function fmtTip(o){
+  return `<b>${o.region}</b><br>`+
+    `<span class="gr">P</span> ${f(dP(o.p),o.p<100?2:1)} ${U.P} &nbsp; <span class="gr">T</span> ${f(dT(o.T),1)} ${U.T}<br>`+
+    `<span class="gr">v</span> ${f(dV(o.v),4)} ${U.V}<br>`+
+    `<span class="gr">s</span> ${f(dS(o.s),3)} &nbsp; <span class="gr">u</span> ${f(dE(o.u),1)} &nbsp; <span class="gr">h</span> ${f(dE(o.h),1)}`;
+}
+function propsFromTS(sDisp,TDisp){
+  const R=window._R; if(!R||!R.valid) return '';
+  const s=U.sys==='SI'?sDisp:sDisp/CF.S;  // entrada en unidades mostradas → SI
+  const T=U.sys==='SI'?TDisp:TDisp/CF.T;
+  if(T<=1) return '';
+  const v=R.states[0].v*Math.exp((s-1.0-R.cv*Math.log(T/R.THg))/R.Rg);
+  const inside=(T>=R.TCg-1&&T<=R.THg+1&&s>=R.states[0].s-1e-6&&s<=R.states[1].s+1e-6);
+  return fmtTip({region:'Gas ideal — '+(inside?'interior del ciclo':'exterior del ciclo'),
+    p:R.Rg*T/v,T,v,s,u:R.cv*T,h:R.cp*T});
+}
+function propsFromPV(vDisp,pDisp){
+  const R=window._R; if(!R||!R.valid) return '';
+  const v=U.sys==='SI'?vDisp:vDisp/CF.V;
+  const p=U.sys==='SI'?pDisp:pDisp/CF.P;
+  if(v<=1e-6||p<=1e-3) return '';
+  const T=p*v/R.Rg, s=R.sOf(T,v);
+  const inside=(T>=R.TCg-1&&T<=R.THg+1&&s>=R.states[0].s-1e-3&&s<=R.states[1].s+1e-3);
+  return fmtTip({region:'Gas ideal — '+(inside?'interior del ciclo':'exterior del ciclo'),
+    p,T,v,s,u:R.cv*T,h:R.cp*T});
+}
+function setupCursor(canvasId,tipId,kind){
+  const cv=$(canvasId), tip=$(tipId);
+  cv.addEventListener('mousemove',e=>{
+    if(!cv._map){return;}
+    const k=(typeof kind==='function')?kind():kind;
+    if(k!=='ts'&&k!=='pv'){ tip.style.display='none'; return; }
+    const rect=cv.getBoundingClientRect();
+    const mx=(e.clientX-rect.left)*cv.width/rect.width, my=(e.clientY-rect.top)*cv.height/rect.height;
+    const M=cv._map;
+    if(mx<M.m.l||mx>cv.width-M.m.r||my<M.m.t||my>cv.height-M.m.b){ tip.style.display='none'; return; }
+    const pt=M.inv(mx,my);
+    const info=k==='ts'?propsFromTS(pt.x,pt.y):propsFromPV(pt.x,pt.y);
+    if(!info){ tip.style.display='none'; return; }
+    tip.innerHTML=info; tip.style.display='block';
+    const host=tip.offsetParent||cv, hrect=host.getBoundingClientRect();
+    let lx=e.clientX-hrect.left+14, ly=e.clientY-hrect.top+14;
+    if(lx>hrect.width-180) lx=e.clientX-hrect.left-180;
+    if(ly>hrect.height-90) ly=e.clientY-hrect.top-90;
+    tip.style.left=lx+'px'; tip.style.top=ly+'px';
+  });
+  cv.addEventListener('mouseleave',()=>{ tip.style.display='none'; });
+}
+
+/* ===================== 4. ESQUEMA SVG (energía + pistón) ==================== */
+function arrowSVG(x,y1,y2,w,color,label,sub,tip,horiz,id){
+  w=clamp(w,4,26);
+  const dir=(horiz?y2>y1:y2>y1)?1:-1, hL=11+w*0.55;
+  let s=`<g class="earrow" data-tip="${tip}" id="${id||''}" style="color:${color}">`;
+  if(!horiz){
+    const yBase=y2-dir*hL;
+    s+=`<line x1="${x}" y1="${y1}" x2="${x}" y2="${yBase}" stroke="${color}" stroke-width="${w}" class="flowdash"/>`;
+    s+=`<polygon points="${x-w*0.85-4},${yBase} ${x+w*0.85+4},${yBase} ${x},${y2}" fill="${color}"/>`;
+    s+=`<text x="${x+w*0.85+9}" y="${(y1+y2)/2}" font-size="14" font-weight="700" fill="${color}">${label}</text>`;
+    s+=`<text x="${x+w*0.85+9}" y="${(y1+y2)/2+15}" font-size="11" fill="#6b7a99" font-family="IBM Plex Mono,monospace">${sub}</text>`;
+  } else {
+    const xBase=y2-dir*hL;
+    s+=`<line x1="${y1}" y1="${x}" x2="${xBase}" y2="${x}" stroke="${color}" stroke-width="${w}" class="flowdash"/>`;
+    s+=`<polygon points="${xBase},${x-w*0.85-4} ${xBase},${x+w*0.85+4} ${y2},${x}" fill="${color}"/>`;
+    s+=`<text x="${(y1+y2)/2}" y="${x-w*0.85-8}" font-size="14" font-weight="700" fill="${color}" text-anchor="middle">${label}</text>`;
+    s+=`<text x="${(y1+y2)/2}" y="${x+w*0.85+18}" font-size="11" fill="#6b7a99" text-anchor="middle" font-family="IBM Plex Mono,monospace">${sub}</text>`;
+  }
+  return s+'</g>';
+}
+function buildSchemSVG(P,R,pre){
+  const inv=R.inv;
+  const eU=U.E;
+  const wRef=Math.max(R.qH,1e-9);
+  const wQH=R.qH/wRef*24, wQC=R.qC/wRef*24, wW=Math.max(R.wnet/wRef*24,4);
+  const modoTxt=R.modo==='engine'?'Máquina térmica':(R.modo==='fridge'?'Refrigerador':'Bomba de calor');
+  const tipQH=`q_H = R·T'_H·ln r = ${f(dE(R.qH),2)} ${eU} — calor ${inv?'rechazado hacia':'admitido desde'} el reservorio caliente`;
+  const tipQC=`q_C = R·T'_C·ln r = ${f(dE(R.qC),2)} ${eU} — calor ${inv?'absorbido desde':'rechazado hacia'} el reservorio frío`;
+  const tipW =`w_neto = q_H − q_C = ${f(dE(R.wnet),2)} ${eU} — trabajo ${inv?'consumido por':'producido por'} el ciclo`;
+  let s=`<svg class="schem-svg" viewBox="0 0 780 300" xmlns="http://www.w3.org/2000/svg">`;
+  /* reservorios */
+  s+=`<rect x="26" y="10" width="320" height="40" rx="7" fill="#ef6c00" opacity=".93"/>
+  <text x="186" y="28" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">Reservorio caliente</text>
+  <text x="186" y="44" text-anchor="middle" fill="#fff" font-size="11.5" font-family="IBM Plex Mono,monospace">T_H = ${f(dT(P.th),0)} ${U.T}${P.useIrr?'  (gas: '+f(dT(R.THg),0)+')':''}</text>
+  <rect x="26" y="250" width="320" height="40" rx="7" fill="#1565c0" opacity=".93"/>
+  <text x="186" y="268" text-anchor="middle" fill="#fff" font-size="13" font-weight="700">Reservorio frío</text>
+  <text x="186" y="284" text-anchor="middle" fill="#fff" font-size="11.5" font-family="IBM Plex Mono,monospace">T_C = ${f(dT(P.tc),0)} ${U.T}${P.useIrr?'  (gas: '+f(dT(R.TCg),0)+')':''}</text>`;
+  /* dispositivo */
+  s+=`<circle cx="150" cy="150" r="44" fill="#fff" stroke="#1976d2" stroke-width="3.5"/>
+  <text x="150" y="146" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0d3c78">Carnot</text>
+  <text x="150" y="162" text-anchor="middle" font-size="10" fill="#6b7a99">${modoTxt}</text>`;
+  /* flechas de energía */
+  if(!inv){
+    s+=arrowSVG(150,52,104,wQH,'#ef6c00','q_H',f(dE(R.qH),1)+' '+eU,tipQH,false);
+    s+=arrowSVG(150,196,248,wQC,'#1565c0','q_C',f(dE(R.qC),1)+' '+eU,tipQC,false);
+    s+=arrowSVG(150,196,330,wW,'#2e7d32','w_neto',f(dE(R.wnet),1)+' '+eU,tipW,true);
+  } else {
+    s+=arrowSVG(150,104,52,wQH,'#ef6c00','q_H',f(dE(R.qH),1)+' '+eU,tipQH,false);
+    s+=arrowSVG(150,248,196,wQC,'#1565c0','q_C',f(dE(R.qC),1)+' '+eU,tipQC,false);
+    s+=arrowSVG(150,330,196,wW,'#2e7d32','w_neto',f(dE(R.wnet),1)+' '+eU,tipW,true);
+  }
+  /* ---- cilindro-pistón ---- */
+  const CX=420,CW=300,CY=92,CH=86;
+  s+=`<text x="${CX+CW/2}" y="46" text-anchor="middle" font-size="11" fill="#6b7a99" letter-spacing="1">CILINDRO–PISTÓN (1 kg de ${R.g.name.toLowerCase()})</text>
+  <text id="${pre}schemPhase" x="${CX+CW/2}" y="68" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0d3c78"></text>
+  <rect x="${CX-3}" y="${CY-3}" width="${CW+20}" height="${CH+6}" rx="6" fill="none" stroke="#90a4ae" stroke-width="3"/>
+  <rect id="${pre}schemGas" x="${CX}" y="${CY}" width="120" height="${CH}" fill="rgba(239,108,0,.22)"/>
+  <rect id="${pre}schemPiston" x="${CX+120}" y="${CY-4}" width="13" height="${CH+8}" rx="2" fill="#90a4ae" stroke="#5a6478"/>
+  <line id="${pre}schemRod" x1="${CX+133}" y1="${CY+CH/2}" x2="765" y2="${CY+CH/2}" stroke="#5a6478" stroke-width="5"/>
+  <rect id="${pre}schemContact" x="${CX-3}" y="${CY+CH+9}" width="${CW+20}" height="9" rx="3" fill="#ef6c00"/>
+  <text id="${pre}schemContactTxt" x="${CX+CW/2}" y="${CY+CH+34}" text-anchor="middle" font-size="11" fill="#6b7a99"></text>`;
+  /* marcas de los 4 estados sobre el cilindro */
+  const lnv3=Math.log(R.states[2].v/R.states[0].v);
+  for(let i=0;i<4;i++){
+    const xx=CX+ (Math.log(R.states[i].v/R.states[0].v)/lnv3)*(CW-20)+10;
+    s+=`<line x1="${xx}" y1="${CY+CH+2}" x2="${xx}" y2="${CY+CH+8}" stroke="#1565c0" stroke-width="2"/>
+    <text x="${xx}" y="${CY-8}" text-anchor="middle" font-size="11" font-weight="700" fill="#1565c0">${i+1}</text>`;
+  }
+  return s+'</svg>';
+}
+function bindSchemTips(wrapEl,tipEl){
+  wrapEl.querySelectorAll('[data-tip]').forEach(g=>{
+    g.addEventListener('mousemove',e=>{
+      tipEl.innerHTML='<b>Energía</b><br>'+g.dataset.tip;
+      tipEl.style.display='block';
+      const host=tipEl.offsetParent||wrapEl, hrect=host.getBoundingClientRect();
+      let lx=e.clientX-hrect.left+14, ly=e.clientY-hrect.top+14;
+      if(lx>hrect.width-230) lx=e.clientX-hrect.left-230;
+      tipEl.style.left=lx+'px'; tipEl.style.top=ly+'px';
+    });
+    g.addEventListener('mouseleave',()=>{ tipEl.style.display='none'; });
+  });
+}
+function renderSchematic(P,R){
+  const wrap=$('schemSvgWrap');
+  wrap.innerHTML=R.valid?buildSchemSVG(P,R,''):'<div style="padding:30px;text-align:center;color:#c62828;font-weight:600">Configuración no operable: revise T_H, T_C y los ΔT.</div>';
+  if(R.valid) bindSchemTips($('schemWrap'),$('tipSchem'));
+}
+/* actualización del pistón durante la animación */
+const PHASETXT={
+  heat: ['Expansión isotérmica a T′_H — admite q_H','Expansión isotérmica a T′_C — absorbe q_C'],
+  cool: ['Compresión isotérmica a T′_C — rechaza q_C','Compresión isotérmica a T′_H — rechaza q_H'],
+  exp:  ['Expansión adiabática reversible (T′_H → T′_C)','Expansión adiabática reversible (T′_H → T′_C)'],
+  comp: ['Compresión adiabática reversible (T′_C → T′_H)','Compresión adiabática reversible (T′_C → T′_H)']
+};
+function updatePiston(R,mk){
+  const gas=$('schemGas'); if(!gas||!R.valid) return;
+  const CX=420,CW=300,CH=86,CY=92;
+  const frac=Math.log(mk.v/R.states[0].v)/Math.log(R.states[2].v/R.states[0].v);
+  const gw=clamp(20+frac*(CW-40),12,CW-8);
+  gas.setAttribute('width',gw);
+  $('schemPiston').setAttribute('x',CX+gw);
+  $('schemRod').setAttribute('x1',CX+gw+13);
+  const seg=mk.seg;
+  let fill,contact,ctxt;
+  if(seg.iso&&Math.abs(mk.T-R.THg)<1e-6){ fill='rgba(239,108,0,.25)'; contact='#ef6c00'; ctxt='Pared diatérmica en contacto con el reservorio caliente'; }
+  else if(seg.iso){ fill='rgba(21,101,192,.25)'; contact='#1565c0'; ctxt='Pared diatérmica en contacto con el reservorio frío'; }
+  else { fill='rgba(123,31,162,.16)'; contact='#b0bec5'; ctxt='Aislado térmicamente (q = 0): proceso adiabático reversible'; }
+  gas.setAttribute('fill',fill);
+  $('schemContact').setAttribute('fill',contact);
+  $('schemContactTxt').textContent=ctxt;
+  const lbl=seg.a+'→'+seg.b+' · '+PHASETXT[seg.kind][R.inv?1:0];
+  $('schemPhase').textContent=lbl;
+  /* resaltar fase en la cinta de flujo */
+  for(let i=0;i<4;i++){ const el=$('flowSeg'+i); if(el) el.classList.toggle('on',i===mk.i); }
+}
+
+/* ===================== 5. CINTA DE FLUJO Y EXPLICACIONES ==================== */
+function renderFlow(R){
+  const flow=$('flow');
+  if(!R.valid){ flow.innerHTML=''; return; }
+  const names={heat:R.inv?'isoterma fría (q_C entra)':'isoterma caliente (q_H entra)',
+               cool:R.inv?'isoterma caliente (q_H sale)':'isoterma fría (q_C sale)',
+               exp:'expansión adiabática', comp:'compresión adiabática'};
+  flow.innerHTML=R.path.map((sg,i)=>`<span id="flowSeg${i}">${sg.a}→${sg.b} ${names[sg.kind]}</span>`)
+    .join('<span class="ar">→</span>')+
+    (R.inv?'<span style="border:none;background:none;color:#7b1fa2;font-weight:600">· ciclo invertido (antihorario)</span>':'');
+}
+const EXPLICACIONES={
+  comun:[
+    {t:'Primera ley aplicada al ciclo',d:'En todo ciclo ΔU = 0, de modo que el trabajo neto es la diferencia de los calores intercambiados.',
+     e:'w<sub>neto</sub> = q<sub>H</sub> − q<sub>C</sub>'},
+    {t:'Proceso isotérmico de gas ideal',d:'A T constante la energía interna no cambia (Δu = 0) y todo el calor se convierte en trabajo de frontera.',
+     e:'q = w = R·T·ln(v<sub>b</sub>/v<sub>a</sub>)'},
+    {t:'Proceso adiabático reversible (isentrópico)',d:'Sin transferencia de calor, el trabajo se hace a costa de la energía interna; la entropía permanece constante.',
+     e:'q = 0 · T·v<sup>γ−1</sup> = cte · w = c<sub>v</sub>·(T<sub>a</sub> − T<sub>b</sub>)'},
+    {t:'Principios de Carnot (5.4)',d:'Ninguna máquina entre dos reservorios supera a la reversible, y todas las reversibles comparten la misma eficiencia, función exclusiva de las temperaturas absolutas.',
+     e:'η<sub>Carnot</sub> = 1 − T<sub>C</sub>/T<sub>H</sub>'}],
+  engine:[
+    {t:'Kelvin–Planck (5.2)',d:'Es imposible operar en un ciclo, intercambiar calor con un solo reservorio y producir trabajo neto: por eso q_C nunca puede ser cero y η < 100 %.',
+     e:'η = w<sub>neto</sub>/q<sub>H</sub> = 1 − q<sub>C</sub>/q<sub>H</sub> = 1 − T<sub>C</sub>/T<sub>H</sub>'}],
+  reversed:[
+    {t:'Clausius (5.2)',d:'El calor no fluye espontáneamente de frío a caliente: el ciclo invertido lo logra únicamente consumiendo trabajo.',
+     e:'COP<sub>R</sub> = T<sub>C</sub>/(T<sub>H</sub>−T<sub>C</sub>) · COP<sub>BC</sub> = T<sub>H</sub>/(T<sub>H</sub>−T<sub>C</sub>) · COP<sub>BC</sub> = COP<sub>R</sub> + 1'}],
+  irr:[
+    {t:'Irreversibilidad externa (5.3)',d:'La transferencia de calor a través de un ΔT finito genera entropía aunque el gas describa internamente un ciclo reversible (modelo endorreversible). El trabajo perdido es proporcional a la entropía generada.',
+     e:'σ<sub>univ</sub> = q<sub>C</sub>/T<sub>C</sub> − q<sub>H</sub>/T<sub>H</sub> &gt; 0 · w<sub>perdido</sub> = T<sub>0</sub>·σ · η<sub>CA</sub> = 1 − √(T<sub>C</sub>/T<sub>H</sub>)'}]
+};
+function renderExplain(P){
+  const box=$('explainBox');
+  if(!els.chkExplain.checked){ box.innerHTML=''; return; }
+  let list=[...EXPLICACIONES.comun];
+  list=list.concat(P.modo==='engine'?EXPLICACIONES.engine:EXPLICACIONES.reversed);
+  if(P.useIrr) list=list.concat(EXPLICACIONES.irr);
+  box.innerHTML='<div style="margin:10px 0 6px;font-size:11px;letter-spacing:1px;color:#7b1fa2;text-transform:uppercase">Modo explicación — leyes y ecuaciones</div>'+
+    list.map(x=>`<div class="explain-card"><b>${x.t}</b><br>${x.d}<span class="eq">${x.e}</span></div>`).join('');
+}
+
+/* ===================== 6. RESULTADOS Y TABLAS =============================== */
+function renderResults(R,P){
+  $('rWnet').innerHTML=`${f(dE(R.wnet),1)}<small>${U.E}</small>`;
+  $('kWnet').innerHTML=R.inv?'Trabajo consumido, w<sub>neto</sub>':'Trabajo neto, w<sub>neto</sub>';
+  $('rQh').innerHTML=`${f(dE(R.qH),1)}<small>${U.E}</small>`;
+  $('rQc').innerHTML=`${f(dE(R.qC),1)}<small>${U.E}</small>`;
+  $('rWec').innerHTML=`${f(dE(R.wExp),1)} / ${f(dE(R.wComp),1)}<small>${U.E}</small>`;
+  $('rBwr').innerHTML=`${f(R.bwr*100,1)}<small>%</small>`;
+  let perf,perfMax,lbl,unitTxt='%';
+  if(P.modo==='engine'){ perf=R.eta*100; perfMax=R.etaRes*100; lbl='Eficiencia térmica, η<sub>ter</sub>'; }
+  else if(P.modo==='fridge'){ perf=R.copR; perfMax=R.copRmax; lbl='COP del refrigerador, COP<sub>R</sub>'; unitTxt=''; }
+  else { perf=R.copHP; perfMax=R.copHPmax; lbl='COP de la bomba de calor, COP<sub>BC</sub>'; unitTxt=''; }
+  $('perfLabel').innerHTML=lbl;
+  $('rPerf').innerHTML=`${f(perf,2)}<small>${unitTxt}</small>`;
+  $('effFill').style.width=isFinite(perf/perfMax)?clamp(perf/perfMax*100,0,100)+'%':'0%';
+  const apr=isFinite(perf/perfMax)?f(perf/perfMax*100,1):'—';
+  $('rLimit').innerHTML=(P.modo==='engine'
+      ?`η<sub>Carnot</sub>(reservorios) = ${f(perfMax,2)} %`
+      :`COP<sub>máx</sub>(reservorios) = ${f(perfMax,2)}`)+
+    ` · aprovechamiento = ${apr} % del límite reversible`+
+    (P.useIrr&&P.modo==='engine'?` · η<sub>CA</sub> = ${f(R.etaCA*100,2)} %`:``);
+
+  /* alerta */
+  const al=$('cycleAlert');
+  if(!R.valid){
+    al.className='alert bad';
+    al.innerHTML='✖ Configuración no operable: la temperatura interna caliente del gas debe superar a la fría (revise T<sub>H</sub>, T<sub>C</sub> y los ΔT).';
+  } else if(!P.useIrr){
+    al.className='alert ok';
+    al.innerHTML='✔ Ciclo totalmente reversible: σ<sub>universo</sub> = 0. Es el límite superior que ninguna máquina real puede alcanzar (principios de Carnot).';
+  } else {
+    al.className='alert warn';
+    al.innerHTML=`⚠ Irreversibilidad externa activa: cada ciclo genera σ = ${f(dS(R.sigma),4)} ${U.S} en el universo. El gas es internamente reversible, pero el ΔT finito degrada el desempeño (ciclo endorreversible).`;
+  }
+
+  /* tabla de estados */
+  const procNext={};
+  R.path.forEach(sg=>{ procNext[sg.a]=sg.a+'→'+sg.b; });
+  const tb=document.querySelector('#stateTable tbody');
+  tb.innerHTML='';
+  if(R.valid) R.states.forEach((s,i)=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td>${i+1}</td><td>${f(dP(s.p),1)}</td><td>${f(dT(s.T),1)}</td>`+
+      `<td>${f(dV(s.v),4)}</td><td>${f(dE(s.u),1)}</td><td>${f(dE(s.h),1)}</td><td>${f(dS(s.s),4)}</td>`;
+    tb.appendChild(tr);
+  });
+
+  /* panel de entropía */
+  els.sigmaPanel.style.display=P.useIrr?'block':'none';
+  if(P.useIrr&&R.valid){
+    $('rSigma').innerHTML=`${f(dS(R.sigma),4)}<small>${U.S}</small>`;
+    $('rWlost').innerHTML=`${f(dE(R.wlost),2)}<small>${U.E}</small>`;
+    $('kWlost').innerHTML=(R.inv?'Trabajo extra consumido':'Trabajo perdido')+', w = T<sub>0</sub>·σ';
+    $('mCA').style.display=P.modo==='engine'?'flex':'none';
+    $('rCA').innerHTML=`${f(R.etaCA*100,2)}<small>%</small>`;
+    const tt=document.querySelector('#tempTable tbody');
+    tt.innerHTML=
+      `<tr><td style="text-align:left">Alta temperatura</td><td>${f(dT(P.th),1)} ${U.T}</td><td>${f(dT(R.THg),1)} ${U.T}</td><td>${f(dT(Math.abs(P.th-R.THg)),1)} ${U.T}</td></tr>`+
+      `<tr><td style="text-align:left">Baja temperatura</td><td>${f(dT(P.tc),1)} ${U.T}</td><td>${f(dT(R.TCg),1)} ${U.T}</td><td>${f(dT(Math.abs(P.tc-R.TCg)),1)} ${U.T}</td></tr>`;
+    $('sigmaNote').innerHTML=`<b>Lectura del balance.</b> El gas describe un rectángulo de Carnot entre sus temperaturas internas `+
+      `T'<sub>H</sub> = ${f(dT(R.THg),0)} ${U.T} y T'<sub>C</sub> = ${f(dT(R.TCg),0)} ${U.T}, pero los reservorios están a `+
+      `${f(dT(P.th),0)} y ${f(dT(P.tc),0)} ${U.T}. Cada intercambio a través de un ΔT finito genera entropía; por ciclo, `+
+      `σ = ${f(dS(R.sigma),4)} ${U.S}, equivalente a ${R.inv?'un consumo extra':'una pérdida'} de ${f(dE(R.wlost),2)} ${U.E} `+
+      `respecto del ciclo totalmente reversible.`+
+      `<span class="eq">σ<sub>univ</sub> = Σ q/T<sub>res</sub> · w<sub>perdido</sub> = T<sub>0</sub>·σ</span>`;
+  }
+}
+
+/* ===================== 7. LECTURA DE PARÁMETROS Y UPDATE ==================== */
+function readParams(){
+  return {
+    modo:els.modo.value, gas:els.gas.value,
+    th:rT(+els.th.value), tc:rT(+els.tc.value),
+    p1:rP(+els.p1.value), rexp:clamp(+els.rexp.value,1.05,20),
+    useIrr:!!els.chkIrr.checked,
+    dth:rT(+els.dth.value), dtc:rT(+els.dtc.value)
+  };
+}
+function update(){
+  els.thV.textContent=(+els.th.value).toFixed(0);
+  els.tcV.textContent=(+els.tc.value).toFixed(0);
+  els.p1V.textContent=(+els.p1.value).toFixed(0);
+  els.rexpV.textContent=(+els.rexp.value).toFixed(1);
+  els.dthV.textContent=(+els.dth.value).toFixed(0);
+  els.dtcV.textContent=(+els.dtc.value).toFixed(0);
+  const P=readParams();
+  els.irrInputs.style.display=P.useIrr?'block':'none';
+  const g=GASES[P.gas], cp=g.cv+g.R;
+  els.gasHint.innerHTML=`R = ${g.R.toFixed(4)} · c<sub>v</sub> = ${g.cv.toFixed(4)} · c<sub>p</sub> = ${cp.toFixed(4)} kJ/kg·K · γ = ${(cp/g.cv).toFixed(3)}`;
+  const R=calcCarnot(P);
+  window._R=R; window._P=P;
+  renderResults(R,P);
+  renderDiagrams(R,null);
+  renderFlow(R);
+  renderSchematic(P,R);
+  renderExplain(P);
+  if(_diagModal.ovr.classList.contains('is-open')) _diagModal._render();
+}
+
+/* ===================== 8. ANIMACIÓN ========================================= */
+const ANIM={ph:0,last:0,raf:null};
+function tick(ts){
+  ANIM.raf=requestAnimationFrame(tick);
+  if(!els.chkAnim.checked) return;
+  const R=window._R; if(!R||!R.valid) return;
+  const dt=Math.min((ts-ANIM.last)/1000,0.1); ANIM.last=ts;
+  ANIM.ph=(ANIM.ph+dt*0.45)%4;
+  const mk=markerState(R,ANIM.ph);
+  renderDiagrams(R,mk);
+  updatePiston(R,mk);
+}
+
+/* ===================== 9. UNIDADES ========================================== */
+function applyUnitLabels(){
+  const set=(id,t)=>{const e=$(id); if(e) e.textContent=t;};
+  set('u-th',U.T); set('u-tc',U.T); set('u-p1',U.P); set('u-dth',U.T); set('u-dtc',U.T);
+  set('th-uP',U.P); set('th-uT',U.T); set('th-uV',U.V); set('th-uU',U.E); set('th-uH',U.E); set('th-uS',U.S);
+  $('dataBadge').innerHTML='Modelo: gas ideal · c<sub>v</sub> constante ('+U.label+')';
+}
+function applySliderRanges(){
+  const set=(id,r)=>{const e=els[id]; e.min=r[0]; e.max=r[1]; e.step=r[2];};
+  set('th',U.ranges.th); set('tc',U.ranges.tc); set('p1',U.ranges.p1);
+  set('rexp',U.ranges.rexp); set('dth',U.ranges.dth); set('dtc',U.ranges.dtc);
+}
+function switchUnits(newSys){
+  if(U.sys===newSys) return;
+  const toT=v=>newSys==='EN'?v*CF.T:v/CF.T;
+  const toP=v=>newSys==='EN'?v*CF.P:v/CF.P;
+  const cur={th:+els.th.value,tc:+els.tc.value,p1:+els.p1.value,dth:+els.dth.value,dtc:+els.dtc.value};
+  setUnitSystem(newSys);
+  applySliderRanges(); applyUnitLabels();
+  const sv=(id,val,r)=>{els[id].value=clamp(val,r[0],r[1]);};
+  sv('th',toT(cur.th),U.ranges.th); sv('tc',toT(cur.tc),U.ranges.tc);
+  sv('p1',toP(cur.p1),U.ranges.p1);
+  sv('dth',toT(cur.dth),U.ranges.dth); sv('dtc',toT(cur.dtc),U.ranges.dtc);
+  update();
+}
+
+/* ===================== 10. EXPORTACIÓN CSV ================================== */
+function exportCSV(){
+  const R=window._R, P=window._P; if(!R||!R.valid) return;
+  let csv='TermoIA-Dinamica - Captura de estado del Ciclo de Carnot\n';
+  csv+='Sistema de unidades,'+U.label+'\n';
+  csv+='Modo,'+P.modo+',Gas,'+R.g.name+'\n';
+  csv+='TH_res('+U.T+'),'+f(dT(P.th),2)+',TC_res('+U.T+'),'+f(dT(P.tc),2)+'\n';
+  csv+='TH_gas('+U.T+'),'+f(dT(R.THg),2)+',TC_gas('+U.T+'),'+f(dT(R.TCg),2)+'\n';
+  csv+='P1('+U.P+'),'+f(dP(window._P.p1),2)+',r=V2/V1,'+P.rexp+'\n';
+  csv+='R(kJ/kgK),'+R.Rg+',cv(kJ/kgK),'+R.cv+',gamma,'+R.gam.toFixed(4)+'\n\n';
+  csv+='Estado,P('+U.P+'),T('+U.T+'),v('+U.V+'),u('+U.E+'),h('+U.E+'),s('+U.S+')\n';
+  R.states.forEach((s,i)=>{
+    csv+=[i+1,f(dP(s.p),3),f(dT(s.T),2),f(dV(s.v),5),f(dE(s.u),2),f(dE(s.h),2),f(dS(s.s),4)].join(',')+'\n';
+  });
+  csv+='\nResultados\n';
+  csv+='q_H('+U.E+'),'+f(dE(R.qH),3)+'\n';
+  csv+='q_C('+U.E+'),'+f(dE(R.qC),3)+'\n';
+  csv+='w_neto('+U.E+'),'+f(dE(R.wnet),3)+'\n';
+  csv+='w_expansion('+U.E+'),'+f(dE(R.wExp),3)+'\n';
+  csv+='w_compresion('+U.E+'),'+f(dE(R.wComp),3)+'\n';
+  csv+='bwr,'+f(R.bwr*100,2)+'%\n';
+  if(P.modo==='engine'){
+    csv+='eta_termica,'+f(R.eta*100,3)+'%\n';
+    csv+='eta_Carnot_reservorios,'+f(R.etaRes*100,3)+'%\n';
+  } else {
+    csv+='COP,'+f(P.modo==='fridge'?R.copR:R.copHP,4)+'\n';
+    csv+='COP_max_reservorios,'+f(P.modo==='fridge'?R.copRmax:R.copHPmax,4)+'\n';
+  }
+  if(P.useIrr){
+    csv+='\nIrreversibilidad externa\n';
+    csv+='dTH('+U.T+'),'+f(dT(P.dth),2)+',dTC('+U.T+'),'+f(dT(P.dtc),2)+'\n';
+    csv+='sigma_universo('+U.S+'),'+f(dS(R.sigma),5)+'\n';
+    csv+='w_perdido('+U.E+'),'+f(dE(R.wlost),3)+'\n';
+    csv+='eta_CurzonAhlborn,'+f(R.etaCA*100,3)+'%\n';
+  }
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='TermoIA_CicloCarnot_'+P.modo+'.csv';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ===================== 11. MODAL ZOOM ======================================= */
+const _diagModal={
+  ovr:$('diagModal'), cv:$('modalCv'),
+  cvWrap:$('modalCanvasWrap'), schemWrap:$('modalSchemWrap'),
+  tit:$('modalTitle'), src:null,
+  open(srcId){
+    if(!window._R||!window._R.valid) return;
+    this.src=srcId;
+    const tt={ts:'Diagrama T–s ampliado',pv:'Diagrama P–v ampliado',schem:'Esquema del ciclo (ampliado)'};
+    this.tit.textContent=tt[srcId]||'Diagrama ampliado';
+    const isSchem=srcId==='schem';
+    this.cvWrap.style.display=isSchem?'none':'block';
+    this.schemWrap.style.display=isSchem?'block':'none';
+    this.ovr.classList.add('is-open');
+    this._render();
+  },
+  close(){ this.ovr.classList.remove('is-open'); this.src=null; },
+  _render(){
+    const R=window._R,P=window._P; if(!R||!R.valid||!this.src) return;
+    if(this.src==='schem'){
+      $('modalSchemSvg').innerHTML=buildSchemSVG(P,R,'m');
+      return;
+    }
+    /* reutiliza renderDiagrams dibujando en el canvas grande */
+    const S=R.states, isTs=this.src==='ts';
+    if(isTs){
+      const sAll=S.map(q=>q.s);
+      let smin=Math.min(...sAll),smax=Math.max(...sAll);
+      const sp=(smax-smin)||1; smin-=sp*0.18; smax+=sp*0.18;
+      const tTop=Math.max(R.THg,P.th)+60, tBot=Math.max(60,Math.min(R.TCg,P.tc)-60);
+      drawDiagram(this.cv,{
+        title:'Diagrama T–s',xlabel:'Entropía específica s ('+U.S+')',ylabel:'Temperatura T ('+U.T+')',
+        xmin:dS(smin),xmax:dS(smax),ymin:dT(tBot),ymax:dT(tTop),xdec:2,ydec:0,
+        refLines:P.useIrr?[{y:dT(P.th),label:'T_H,res',color:'#ef6c00'},{y:dT(P.tc),label:'T_C,res',color:'#1565c0'}]:null,
+        shade:S.map(q=>({x:dS(q.s),y:dT(q.T)})),
+        processes:buildProcesses(R,'ts').map(pr=>({color:pr.color,pts:pr.pts.map(p=>({x:dS(p.x),y:dT(p.y)}))})),
+        points:S.map((q,i)=>({x:dS(q.s),y:dT(q.T),label:String(i+1)}))
+      });
+    } else {
+      const vmax=S[2].v*1.10, pmax=S[0].p*1.10;
+      drawDiagram(this.cv,{
+        title:'Diagrama P–v',xlabel:'Volumen específico v ('+U.V+')',ylabel:'Presión P ('+U.P+')',
+        xmin:0,xmax:dV(vmax),ymin:0,ymax:dP(pmax),xdec:U.sys==='SI'?2:1,ydec:0,
+        shade:R.path.flatMap(sg=>segPoints(R,sg,'pv')).map(p=>({x:dV(p.x),y:dP(p.y)})),
+        processes:buildProcesses(R,'pv').map(pr=>({color:pr.color,pts:pr.pts.map(p=>({x:dV(p.x),y:dP(p.y)}))})),
+        points:S.map((q,i)=>({x:dV(q.v),y:dP(q.p),label:String(i+1)}))
+      });
+    }
+  }
+};
+
+/* ===================== 12. AUTOVALIDACIÓN =================================== */
+(function selfTest(){
+  try{
+    const Rg=0.287,cv=0.718,gam=(cv+Rg)/cv,TH=600,TC=300,r=4;
+    const qH=Rg*TH*Math.log(r),qC=Rg*TC*Math.log(r),w=qH-qC;
+    const ok1=Math.abs(w/qH-(1-TC/TH))<1e-12;                       // η = 1 − TC/TH
+    const ok2=Math.abs(Rg*Math.log(r)-(-(-Rg*Math.log(r))))<1e-12;  // ΔS_ciclo = 0
+    const v1=Rg*TH/1000,v2=r*v1,k=Math.pow(TH/TC,1/(gam-1));
+    const ok3=Math.abs((v2*k)/(v1*k)-r)<1e-9;                       // cierre geométrico
+    $('selftest').textContent=(ok1&&ok2&&ok3)
+      ?'✔ Autovalidación: η = 1 − T_C/T_H · ΔS_ciclo = 0 · cierre geométrico del ciclo'
+      :'✖ Autovalidación falló';
+  }catch(e){ $('selftest').textContent='✖ Error de autovalidación: '+e.message; }
+})();
+
+/* ===================== 13. ARRANQUE ========================================= */
+['modo','gas','th','tc','p1','rexp','dth','dtc'].forEach(id=>els[id].addEventListener('input',update));
+els.chkIrr.addEventListener('change',update);
+els.chkCurves.addEventListener('change',update);
+els.chkExplain.addEventListener('change',()=>renderExplain(readParams()));
+els.chkAnim.addEventListener('change',()=>{ if(!els.chkAnim.checked) update(); });
+$('sistema').addEventListener('change',e=>switchUnits(e.target.value));
+$('btnReset').addEventListener('click',()=>{
+  const r=U.ranges;
+  applySliderRanges();            /* restaura los pasos de los deslizadores */
+  els.modo.value='engine'; els.gas.value='aire';
+  els.th.value=r.th[3]; els.tc.value=r.tc[3]; els.p1.value=r.p1[3]; els.rexp.value=r.rexp[3];
+  els.chkIrr.checked=false; els.dth.value=r.dth[3]; els.dtc.value=r.dtc[3];
+  update();
+});
+$('btnCaso').addEventListener('click',()=>{
+  /* Ejemplo 5.6 (Potter & Scott): los valores exactos no caen en la malla de los
+     deslizadores, por lo que se libera el paso (step='any') antes de asignarlos. */
+  const c=U.caso;
+  els.modo.value='engine'; els.gas.value='aire'; els.chkIrr.checked=false;
+  els.p1.step='any'; els.rexp.step='any';
+  els.th.value=c.th; els.tc.value=c.tc; els.p1.value=c.p1; els.rexp.value=c.rexp;
+  update();
+});
+$('btnCSV').addEventListener('click',exportCSV);
+setupCursor('cvTs','tipTs','ts');
+setupCursor('cvPv','tipPv','pv');
+setupCursor('modalCv','tipModal',()=>_diagModal&&_diagModal.src);
+$('cvTs').addEventListener('click',()=>_diagModal.open('ts'));
+$('cvPv').addEventListener('click',()=>_diagModal.open('pv'));
+$('schemWrap').addEventListener('click',()=>_diagModal.open('schem'));
+$('modalClose').addEventListener('click',()=>_diagModal.close());
+$('diagModal').addEventListener('click',e=>{ if(e.target.id==='diagModal') _diagModal.close(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&_diagModal.ovr.classList.contains('is-open')) _diagModal.close(); });
+
+setUnitSystem($('sistema').value||'SI');
+applySliderRanges();
+applyUnitLabels();
+update();
+requestAnimationFrame(ts=>{ ANIM.last=ts; tick(ts); });
+</script>
+</body>
+</html>

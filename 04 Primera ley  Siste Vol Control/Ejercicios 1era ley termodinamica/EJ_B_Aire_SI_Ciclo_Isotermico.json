@@ -1,0 +1,26 @@
+{
+  "app": "TermoIA-PrimeraLey",
+  "version": "1.1",
+  "savedAt": "2026-06-16T00:00:00.000Z",
+  "title": "EJ-B · Ciclo con Proceso Isotérmico — Aire (SI)",
+  "source": "Adaptado de Moran & Shapiro 7e — Prob. 2.48",
+  "description": "0.93 kg de Aire realiza un ciclo de tres procesos. Estado 1: T₁=27 °C, P₁=100 kPa. Proceso 1→2: compresión isotérmica (T=cte, T=27 °C) hasta P₂=300 kPa. Proceso 2→3: calentamiento isobárico (P=cte, P=300 kPa) hasta T₃=626.85 °C (900 K). Proceso 3→1: enfriamiento isocórico (v=cte) hasta T₁=27 °C, P₁=100 kPa. Determinar: W, Q y ΔU de cada proceso y del ciclo; identificar el tipo de ciclo (motor o refrigeración).",
+  "config": {
+    "currentUnit": "SI",
+    "tempSubUnit": "C",
+    "pressSubUnit": "kPa",
+    "currentGas": "air",
+    "calcMode": "cycle",
+    "propMode": "integ"
+  },
+  "state1": {
+    "T0": 27.0,
+    "P0": 100.0,
+    "mass": 0.93
+  },
+  "processes": [
+    { "type": "isothermal", "inp2a": 300.0,   "inp2b": 1.3 },
+    { "type": "isobaric",   "inp2a": 626.85,  "inp2b": 1.3 },
+    { "type": "isochoric",  "inp2a": 27.0,    "inp2b": 1.3 }
+  ]
+}
