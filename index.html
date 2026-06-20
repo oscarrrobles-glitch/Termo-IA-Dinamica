@@ -21,53 +21,69 @@
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5}
-header.top{background:var(--header-bg);color:#fff;padding:22px 26px 24px}
-.top-inner{max-width:1080px;margin:0 auto;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+header.top{background:var(--header-bg);color:#fff;padding:20px 26px}
+.top-inner{max-width:1200px;margin:0 auto;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
 .brand{font-weight:700;font-size:1.15rem;letter-spacing:.5px;background:rgba(255,255,255,.16);padding:6px 14px;border-radius:10px;white-space:nowrap}
 .brand .dot{color:rgba(255,255,255,.85)}
-.htitle{flex:1;min-width:220px}
-.htitle h1{margin:0;font-size:1.2rem;font-weight:600}
-.htitle p{margin:3px 0 0;font-size:.86rem;color:rgba(255,255,255,.82);font-weight:300}
+.htitle{flex:1;min-width:200px}
+.htitle h1{margin:0;font-size:1.18rem;font-weight:600}
+.htitle p{margin:3px 0 0;font-size:.85rem;color:rgba(255,255,255,.82);font-weight:300}
 .hbadge{font-family:var(--mono);font-size:.8rem;background:rgba(255,255,255,.16);padding:8px 14px;border-radius:10px;font-weight:500}
 .hbadge b{font-size:1.05rem;font-weight:600}
-nav.jump{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
-.jump-inner{max-width:1080px;margin:0 auto;display:flex;gap:8px;padding:10px 26px;overflow-x:auto;scrollbar-width:thin}
-nav.jump a{--c:var(--accent);text-decoration:none;white-space:nowrap;font-size:.8rem;font-weight:600;color:var(--ink-dim);border:1px solid var(--border);border-radius:999px;padding:5px 12px;backgr[...]
-nav.jump a:hover{color:#fff;background:var(--c);border-color:var(--c)}
-main{max-width:1080px;margin:0 auto;padding:22px 26px 56px}
-.toolbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:6px 0 22px}
-.search{flex:1;min-width:240px;position:relative}
+
+/* ---- layout master-detail ---- */
+.layout{max-width:1200px;margin:0 auto;display:flex;align-items:flex-start;gap:22px;padding:22px 26px 50px}
+aside.menu{width:286px;flex:none;position:sticky;top:14px;max-height:calc(100vh - 28px);overflow-y:auto;
+  background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:10px}
+.menu-label{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);padding:8px 10px 6px}
+.m-item{display:flex;align-items:center;gap:11px;width:100%;text-align:left;cursor:pointer;
+  background:transparent;border:1px solid transparent;border-radius:11px;padding:9px 10px;margin-bottom:2px;
+  font-family:var(--sans);color:var(--ink);transition:.14s}
+.m-item:hover{background:var(--panel-2)}
+.m-item.active{background:var(--cl);border-color:var(--c)}
+.m-ico{flex:none;width:34px;height:34px;border-radius:9px;background:var(--cl);color:var(--c);display:grid;place-items:center}
+.m-ico svg{width:19px;height:19px}
+.m-item.active .m-ico{background:var(--c);color:#fff}
+.m-text{display:flex;flex-direction:column;gap:1px;min-width:0;flex:1}
+.m-title{font-size:.9rem;font-weight:600;line-height:1.25;display:flex;gap:7px;align-items:baseline}
+.m-num{font-family:var(--mono);font-size:.72rem;color:var(--c);font-weight:600}
+.m-count{font-family:var(--mono);font-size:.7rem;color:var(--ink-faint)}
+.m-item.active .m-count{color:var(--c)}
+
+.main{flex:1;min-width:0}
+.toolbar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:0 0 18px}
+.search{flex:1;min-width:220px;position:relative}
 .search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:var(--ink-faint)}
-.search input{width:100%;padding:11px 14px 11px 40px;border:1px solid var(--border);border-radius:10px;font-family:var(--sans);font-size:.95rem;background:var(--panel);color:var(--ink);box-shadow:var([...]
+.search input{width:100%;padding:11px 14px 11px 40px;border:1px solid var(--border);border-radius:10px;font-family:var(--sans);font-size:.95rem;background:var(--panel);color:var(--ink);box-shadow:var(--shadow)}
 .search input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light)}
-.controls{display:flex;gap:8px}
-.controls button{border:1px solid var(--border);background:var(--panel);color:var(--ink-dim);border-radius:10px;padding:10px 14px;font-family:var(--sans);font-weight:600;font-size:.84rem;cursor:pointe[...]
-.controls button:hover{color:var(--accent-dark);border-color:var(--accent)}
-.count-info{font-size:.82rem;color:var(--ink-dim);font-family:var(--mono)}
-.unit{background:var(--panel);border:1px solid var(--border);border-left:5px solid var(--c);border-radius:var(--radius);box-shadow:var(--shadow);margin-bottom:18px;overflow:hidden}
-.unit-head{display:flex;align-items:center;gap:14px;padding:16px 20px;cursor:pointer;list-style:none;user-select:none}
-.unit-head::-webkit-details-marker{display:none}
-.unit-num{font-family:var(--mono);font-weight:600;font-size:.95rem;color:#fff;background:var(--c);padding:5px 10px;border-radius:8px;min-width:42px;text-align:center}
-.unit-title{flex:1;font-size:1.06rem;font-weight:600;color:var(--ink)}
-.unit-count{font-family:var(--mono);font-size:.78rem;color:var(--c);background:var(--cl);padding:4px 11px;border-radius:999px;font-weight:600;white-space:nowrap}
-.chev{font-size:1.4rem;color:var(--ink-faint);transition:transform .2s;line-height:1}
-details[open] .chev{transform:rotate(90deg)}
-.subgroup{margin:6px 20px 0;font-size:.82rem;font-weight:600;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:8px}
+.count-info{font-size:.82rem;color:var(--ink-dim);font-family:var(--mono);white-space:nowrap}
+.search-head{display:none;margin:0 0 16px;font-size:.92rem;color:var(--ink-dim)}
+.search-head b{color:var(--ink)}
+
+.panel{background:var(--panel);border:1px solid var(--border);border-left:5px solid var(--c);
+  border-radius:var(--radius);box-shadow:var(--shadow);padding:6px 4px 8px;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.panel-head{display:flex;align-items:center;gap:14px;padding:16px 20px 10px}
+.p-num{font-family:var(--mono);font-weight:600;font-size:1rem;color:#fff;background:var(--c);padding:6px 12px;border-radius:9px;min-width:46px;text-align:center}
+.p-meta h2{margin:0;font-size:1.12rem;font-weight:600;color:var(--ink)}
+.p-sub{margin:2px 0 0;font-size:.8rem;color:var(--c);font-family:var(--mono);font-weight:500}
+.subgroup{margin:8px 20px 0;font-size:.8rem;font-weight:600;color:var(--ink-dim);text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:8px}
 .subgroup .sub-count{font-family:var(--mono);font-size:.72rem;color:var(--c);background:var(--cl);padding:1px 8px;border-radius:999px}
-.empty{margin:0;padding:6px 20px 20px;color:var(--ink-dim);font-style:italic;font-size:.9rem}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(265px,1fr));gap:13px;padding:14px 20px 20px}
-.card{display:flex;gap:13px;align-items:flex-start;text-decoration:none;color:inherit;background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:14px;transition:transform .14s[...]
+.empty{margin:0;padding:6px 20px 22px;color:var(--ink-dim);font-style:italic;font-size:.9rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(258px,1fr));gap:13px;padding:14px 20px 18px}
+.card{display:flex;gap:13px;align-items:flex-start;text-decoration:none;color:inherit;background:var(--panel-2);border:1px solid var(--border);border-radius:12px;padding:14px;transition:transform .14s,box-shadow .14s,border-color .14s}
 .card:hover{transform:translateY(-2px);box-shadow:var(--shadow);border-color:var(--c)}
 .ico{flex:none;width:42px;height:42px;border-radius:11px;background:var(--cl);color:var(--c);display:grid;place-items:center}
 .ico svg{width:23px;height:23px}
 .card-body{display:flex;flex-direction:column;gap:4px;min-width:0}
 .card-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.card-name{font-weight:600;font-size:.96rem;color:var(--ink);line-height:1.25}
+.card-name{font-weight:600;font-size:.95rem;color:var(--ink);line-height:1.25}
 .tag{font-size:.62rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--c);background:var(--cl);padding:2px 7px;border-radius:6px;white-space:nowrap}
 .card-desc{font-size:.82rem;color:var(--ink-dim);line-height:1.4}
 .card-path{font-family:var(--mono);font-size:.68rem;color:var(--ink-faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.no-results{display:none;text-align:center;color:var(--ink-dim);padding:40px;font-size:.95rem}
-details.note{max-width:1080px;margin:0 auto 30px;background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:12px;box-shadow:var(--shadow)}
+.no-results{display:none;text-align:center;color:var(--ink-dim);padding:40px;font-size:.95rem;background:var(--panel);border:1px dashed var(--border);border-radius:var(--radius)}
+
+details.note{max-width:1200px;margin:0 auto 26px;background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:12px;box-shadow:var(--shadow)}
 details.note summary{padding:14px 18px;cursor:pointer;font-weight:600;color:var(--accent-dark);font-size:.95rem;list-style:none}
 details.note summary::-webkit-details-marker{display:none}
 details.note summary::before{content:"\2630  ";color:var(--accent)}
@@ -75,9 +91,18 @@ details.note summary::before{content:"\2630  ";color:var(--accent)}
 .note-body ol{line-height:1.7;padding-left:20px}
 .note-body code{font-family:var(--mono);font-size:.84rem;background:var(--panel-2);border:1px solid var(--border);border-radius:5px;padding:1px 6px}
 .note-body pre{background:#0d2438;color:#cfe3f8;border-radius:9px;padding:12px 14px;overflow-x:auto;font-family:var(--mono);font-size:.8rem;line-height:1.5}
-footer{max-width:1080px;margin:0 auto;padding:0 26px 40px;color:var(--ink-faint);font-size:.8rem;border-top:1px solid var(--border);padding-top:18px}
+footer{max-width:1200px;margin:0 auto;padding:0 26px 40px;color:var(--ink-faint);font-size:.8rem}
 footer code{font-family:var(--mono)}
-@media (max-width:560px){.grid{grid-template-columns:1fr}header.top{padding:18px}main{padding:18px}}
+
+@media (max-width:860px){
+  .layout{flex-direction:column;padding:16px}
+  aside.menu{width:100%;position:static;max-height:none;display:flex;gap:8px;overflow-x:auto;padding:8px}
+  .menu-label{display:none}
+  .m-item{flex:0 0 auto;width:auto;margin-bottom:0;flex-direction:column;gap:6px;text-align:center;min-width:96px}
+  .m-text{align-items:center}
+  .m-title{flex-direction:column;gap:0}
+  .grid{grid-template-columns:1fr}
+}
 </style>
 </head>
 <body>
@@ -86,405 +111,393 @@ footer code{font-family:var(--mono)}
     <span class="brand">Termo<span class="dot">IA</span></span>
     <div class="htitle">
       <h1>Índice de Aplicaciones Interactivas</h1>
-      <p>Termodinámica · Laboratorio digital para el aprendizaje activo</p>
+      <p>Termodinámica · Selecciona una unidad en el menú para ver sus aplicaciones</p>
     </div>
-    <span class="hbadge"><b>33</b> aplicaciones · 7 unidades</span>
+    <span class="hbadge"><b>33</b> aplicaciones · 8 unidades</span>
   </div>
 </header>
-<nav class="jump">
-  <div class="jump-inner">
-      <a href="#u01" style="--c:#1976d2">01 · Conceptos y definiciones</a>
-      <a href="#u02" style="--c:#00897b">02 · Sustancias puras</a>
-      <a href="#u03" style="--c:#ef6c00">03 · Energía, calor y trabajo</a>
-      <a href="#u04" style="--c:#1565c0">04 · Primera ley</a>
-      <a href="#u05" style="--c:#7b1fa2">05 · Segunda ley y entropía</a>
-      <a href="#u06" style="--c:#546e7a">06 · Análisis de exergía</a>
-      <a href="#u07" style="--c:#c62828">07 · Ciclos de potencia y refrigeración</a>
-      <a href="#u08" style="--c:#0277bd">08 · Psicrometría</a>
-  </div>
-</nav>
-<main>
-  <div class="toolbar">
-    <div class="search">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-      <input id="q" type="search" placeholder="Buscar aplicación, diagrama o tema…" autocomplete="off" aria-label="Buscar">
+<div class="layout">
+  <aside class="menu" aria-label="Unidades">
+    <div class="menu-label">Unidades</div>
+      <button class="m-item active" type="button" data-target="u01" aria-current="true" style="--c:#1976d2;--cl:#e3f0fd">
+        <span class="m-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v6L5 18a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/><path d="M7.5 14h9"/></svg></span>
+        <span class="m-text"><span class="m-title"><span class="m-num">01</span>Conceptos y definiciones</span><span class="m-count">1 app</span></span>
+      </button>
+      <button class="m-item" type="button" data-target="u02" style="--c:#00897b;--cl:#d7f0eb">
+        <span class="m-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14h18M9 4v16M15 4v16"/></svg></span>
+        <span class="m-text"><span class="m-title"><span class="m-num">02</span>Sustancias puras</span><span class="m-count">21 apps</span></span>
+      </button>
+      <button class="m-item" type="button" data-target="u03" style="--c:#ef6c00;--cl:#fde7d2">
+        <span class="m-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2M6.3 6.3l1.4 1.4M16.3 16.3l1.4 1.4M17.7 6.3l-1.4 1.4M7.7 16.3l-1.4 1.4"/></svg></span>
+        <span class="m-text"><span class="m-title"><span class="m-num">03</span>Energía, calor y trabajo</span><span class="m-count">1 app</span></span>
+      </button>
+      <button class="m-item" type="button" data-target="u04" style="--c:#1565c0;--cl:#dce9fb">
+        <span class="m-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 3L5 13h5l-1 8 8-11h-5l1-7z"/></svg></span>
+        <span class="m-text"><span class="m-title"><span class="m-num">04</span>Primera ley – Sistemas y Volúmenes de Control</span><span class="m-count">4 apps</span></span>
+      </button>
+      <button class="m-item" type="button" data-target="u05" style="--c:#7b1fa2;--cl:#eddcf5">
+        <span class="m-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8c3-4 6 4 9 0M4 14c3-4 6 4 9 0"/><path d="M17 7l3 3-3 3"/></svg></span>
+        <span class="m-text"><span class="m-title"><span class="m-num">05</span>Segunda ley y entropía</span><span class="m-count">3 apps</span></span>
+      </button>
+      <button class="m-item" type="button" data-target="u06" style="--c:#546e7a;--cl:#e3e9ec">
+        <span class="m-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 15l3-4 3 2 4-6"/></svg></span>
+        <span class="m-text"><span class="m-title"><span class="m-num">06</span>Análisis de exergía</span><span class="m-count">0 apps</span></span>
+      </button>
+      <button class="m-item" type="button" data-target="u07" style="--c:#c62828;--cl:#f7dcdc">
+        <span class="m-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 3v4M21 12h-4"/><path d="M12 12l4-2"/></svg></span>
+        <span class="m-text"><span class="m-title"><span class="m-num">07</span>Ciclos de potencia y refrigeración</span><span class="m-count">2 apps</span></span>
+      </button>
+      <button class="m-item" type="button" data-target="u08" style="--c:#0277bd;--cl:#d4ebf7">
+        <span class="m-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/><path d="M9.5 14a2.5 2.5 0 0 0 2.5 2.5"/></svg></span>
+        <span class="m-text"><span class="m-title"><span class="m-num">08</span>Psicrometría</span><span class="m-count">1 app</span></span>
+      </button>
+  </aside>
+  <div class="main">
+    <div class="toolbar">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <input id="q" type="search" placeholder="Buscar en todas las unidades…" autocomplete="off" aria-label="Buscar">
+      </div>
+      <span class="count-info" id="counter"></span>
     </div>
-    <div class="controls">
-      <button type="button" id="expand">Expandir todo</button>
-      <button type="button" id="collapse">Contraer todo</button>
-    </div>
-    <span class="count-info" id="counter"></span>
+    <p class="search-head" id="searchHead"></p>
+      <section class="panel" id="u01" style="--c:#1976d2;--cl:#e3f0fd;">
+        <div class="panel-head">
+          <span class="p-num">01</span>
+          <div class="p-meta"><h2>Conceptos y definiciones</h2><p class="p-sub">1 aplicación</p></div>
+        </div>
+        <div class="grid">
+        <a class="card" href="01 Conceptos y definiciones/Laboratorio conceptos básicos.html" data-search="laboratorio de conceptos básicos sistema, propiedades, presión, temperatura y densidad en un entorno interactivo. laboratorio conceptos básicos.html 01 conceptos y definiciones">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v6L5 18a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3"/><path d="M7.5 14h9"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Laboratorio de Conceptos Básicos</span><span class="tag">Laboratorio</span></span>
+            <span class="card-desc">Sistema, propiedades, presión, temperatura y densidad en un entorno interactivo.</span>
+            <span class="card-path">01 Conceptos y definiciones/</span>
+          </span>
+        </a>
+        </div>
+      </section>
+      <section class="panel" id="u02" style="--c:#00897b;--cl:#d7f0eb;display:none;">
+        <div class="panel-head">
+          <span class="p-num">02</span>
+          <div class="p-meta"><h2>Sustancias puras</h2><p class="p-sub">21 aplicaciones</p></div>
+        </div>
+        <h3 class="subgroup">Gas ideal <span class="sub-count">1</span></h3>
+        <div class="grid">
+        <a class="card" href="02 Sustancias puras/Tables Gas Ideal/IdealGasTables.html" data-search="tablas de gas ideal propiedades de gases ideales (aire y gases comunes) en función de la temperatura. idealgastables.html 02 sustancias puras/tables gas ideal">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14h18M9 4v16M15 4v16"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Tablas de Gas Ideal</span><span class="tag">Tablas</span></span>
+            <span class="card-desc">Propiedades de gases ideales (aire y gases comunes) en función de la temperatura.</span>
+            <span class="card-path">02 Sustancias puras/Tables Gas Ideal/</span>
+          </span>
+        </a>
+        </div>
+        <h3 class="subgroup">Agua (H₂O) <span class="sub-count">10</span></h3>
+        <div class="grid">
+        <a class="card" href="02 Sustancias puras/Tables H2O/SteamTables.html" data-search="tablas de vapor (h₂o) saturación, vapor sobrecalentado y líquido comprimido del agua. steamtables.html 02 sustancias puras/tables h2o">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14h18M9 4v16M15 4v16"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Tablas de Vapor (H₂O)</span><span class="tag">Tablas</span></span>
+            <span class="card-desc">Saturación, vapor sobrecalentado y líquido comprimido del agua.</span>
+            <span class="card-path">02 Sustancias puras/Tables H2O/</span>
+          </span>
+        </a>
+        <a class="card" href="02 Sustancias puras/Tables H2O/Diagrama_P-h.html" data-search="diagrama p–h diagrama termodinámico presión – entalpía del agua (h₂o). diagrama_p-h.html 02 sustancias puras/tables h2o">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 15l3-4 3 2 4-6"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Diagrama P–h</span><span class="tag">Diagrama</span></span>
+            <span class="card-desc">Diagrama termodinámico Presión – Entalpía del agua (H₂O).</span>
+            <span class="card-path">02 Sustancias puras/Tables H2O/</span>
+          </span>
+        </a>
+        <a class="card" href="02 Sustancias puras/Tables H2O/Diagrama_P-s.html" data-search="diagrama p–s diagrama termodinámico presión – entropía del agua (h₂o). diagrama_p-s.html 02 sustancias puras/tables h2o">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 15l3-4 3 2 4-6"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Diagrama P–s</span><span class="tag">Diagrama</span></span>
+            <span class="card-desc">Diagrama termodinámico Presión – Entropía del agua (H₂O).</span>
+            <span class="card-path">02 Sustancias puras/Tables H2O/</span>
+          </span>
+        </a>
+        <a class="card" href="02 Sustancias puras/Tables H2O/Diagrama_P-u.html" data-search="diagrama p–u diagrama termodinámico presión – energía interna del agua (h₂o). diagrama_p-u.html 02 sustancias puras/tables h2o">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 15l3-4 3 2 4-6"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Diagrama P–u</span><span class="tag">Diagrama</span></span>
+            <span class="card-desc">Diagrama termodinámico Presión – Energía interna del agua (H₂O).</span>
+            <span class="card-path">02 Sustancias puras/Tables H2O/</span>
+          </span>
+        </a>
+        <a class="card" href="02 Sustancias puras/Tables H2O/Diagrama_P-v.html" data-search="diagrama p–v diagrama termodinámico presión – volumen específico del agua (h₂o). diagrama_p-v.html 02 sustancias puras/tables h2o">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 15l3-4 3 2 4-6"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Diagrama P–v</span><span class="tag">Diagrama</span></span>
+            <span class="card-desc">Diagrama termodinámico Presión – Volumen específico del agua (H₂O).</span>
+            <span class="card-path">02 Sustancias puras/Tables H2O/</span>
+          </span>
+        </a>
+        <a class="card" href="02 Sustancias puras/Tables H2O/Diagrama_T-h.html" data-search="diagrama t–h diagrama termodinámico temperatura – entalpía del agua (h₂o). diagrama_t-h.html 02 sustancias puras/tables h2o">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 15l3-4 3 2 4-6"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Diagrama T–h</span><span class="tag">Diagrama</span></span>
+            <span class="card-desc">Diagrama termodinámico Temperatura – Entalpía del agua (H₂O).</span>
+            <span class="card-path">02 Sustancias puras/Tables H2O/</span>
+          </span>
+        </a>
+        <a class="card" href="02 Sustancias puras/Tables H2O/Diagrama_T-s.html" data-search="diagrama t–s diagrama termodinámico temperatura – entropía del agua (h₂o). diagrama_t-s.html 02 sustancias puras/tables h2o">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 15l3-4 3 2 4-6"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Diagrama T–s</span><span class="tag">Diagrama</span></span>
+            <span class="card-desc">Diagrama termodinámico Temperatura – Entropía del agua (H₂O).</span>
+            <span class="card-path">02 Sustancias puras/Tables H2O/</span>
+          </span>
+        </a>
+        <a class="card" href="02 Sustancias puras/Tables H2O/Diagrama_T-u.html" data-search="diagrama t–u diagrama termodinámico temperatura – energía interna del agua (h₂o). diagrama_t-u.html 02 sustancias puras/tables h2o">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 15l3-4 3 2 4-6"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Diagrama T–u</span><span class="tag">Diagrama</span></span>
+            <span class="card-desc">Diagrama termodinámico Temperatura – Energía interna del agua (H₂O).</span>
+            <span class="card-path">02 Sustancias puras/Tables H2O/</span>
+          </span>
+        </a>
+        <a class="card" href="02 Sustancias puras/Tables H2O/Diagrama_T-v.html" data-search="diagrama t–v diagrama termodinámico temperatura – volumen específico del agua (h₂o). diagrama_t-v.html 02 sustancias puras/tables h2o">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 15l3-4 3 2 4-6"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Diagrama T–v</span><span class="tag">Diagrama</span></span>
+            <span class="card-desc">Diagrama termodinámico Temperatura – Volumen específico del agua (H₂O).</span>
+            <span class="card-path">02 Sustancias puras/Tables H2O/</span>
+          </span>
+        </a>
+        <a class="card" href="02 Sustancias puras/Tables H2O/Diagrama_h-s.html" data-search="diagrama h–s diagrama termodinámico entalpía – entropía (mollier) del agua (h₂o). diagrama_h-s.html 02 sustancias puras/tables h2o">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 15l3-4 3 2 4-6"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Diagrama h–s</span><span class="tag">Diagrama</span></span>
+            <span class="card-desc">Diagrama termodinámico Entalpía – Entropía (Mollier) del agua (H₂O).</span>
+            <span class="card-path">02 Sustancias puras/Tables H2O/</span>
+          </span>
+        </a>
+        </div>
+        <h3 class="subgroup">Refrigerante R-134a <span class="sub-count">10</span></h3>
+        <div class="grid">
+        <a class="card" href="02 Sustancias puras/Tables R134a/R134aTables.html" data-search="tablas de r-134a propiedades del refrigerante r-134a: saturación y sobrecalentado. r134atables.html 02 sustancias puras/tables r134a">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14h18M9 4v16M15 4v16"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Tablas de R-134a</span><span class="tag">Tablas</span></span>
+            <span class="card-desc">Propiedades del refrigerante R-134a: saturación y sobrecalentado.</span>
+            <span class="card-path">02 Sustancias puras/Tables R134a/</span>
+          </span>
+        </a>
+        <a class="card" href="02 Sustancias puras/Tables R134a/Diagrama_P-h_R134a.html" data-search="diagrama p–h diagrama termodinámico presión – entalpía del refrigerante r-134a. diagrama_p-h_r134a.html 02 sustancias puras/tables r134a">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 15l3-4 3 2 4-6"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Diagrama P–h</span><span class="tag">Diagrama</span></span>
+            <span class="card-desc">Diagrama termodinámico Presión – Entalpía del refrigerante R-134a.</span>
+            <span class="card-path">02 Sustancias puras/Tables R134a/</span>
+          </span>
+        </a>
+        <a class="card" href="02 Sustancias puras/Tables R134a/Diagrama_P-s_R134a.html" data-search="diagrama p–s diagrama termodinámico presión – entropía del refrigerante r-134a. diagrama_p-s_r134a.html 02 sustancias puras/tables r134a">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 15l3-4 3 2 4-6"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Diagrama P–s</span><span class="tag">Diagrama</span></span>
+            <span class="card-desc">Diagrama termodinámico Presión – Entropía del refrigerante R-134a.</span>
+            <span class="card-path">02 Sustancias puras/Tables R134a/</span>
+          </span>
+        </a>
+        <a class="card" href="02 Sustancias puras/Tables R134a/Diagrama_P-u_R134a.html" data-search="diagrama p–u diagrama termodinámico presión – energía interna del refrigerante r-134a. diagrama_p-u_r134a.html 02 sustancias puras/tables r134a">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 15l3-4 3 2 4-6"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Diagrama P–u</span><span class="tag">Diagrama</span></span>
+            <span class="card-desc">Diagrama termodinámico Presión – Energía interna del refrigerante R-134a.</span>
+            <span class="card-path">02 Sustancias puras/Tables R134a/</span>
+          </span>
+        </a>
+        <a class="card" href="02 Sustancias puras/Tables R134a/Diagrama_P-v_R134a.html" data-search="diagrama p–v diagrama termodinámico presión – volumen específico del refrigerante r-134a. diagrama_p-v_r134a.html 02 sustancias puras/tables r134a">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 15l3-4 3 2 4-6"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Diagrama P–v</span><span class="tag">Diagrama</span></span>
+            <span class="card-desc">Diagrama termodinámico Presión – Volumen específico del refrigerante R-134a.</span>
+            <span class="card-path">02 Sustancias puras/Tables R134a/</span>
+          </span>
+        </a>
+        <a class="card" href="02 Sustancias puras/Tables R134a/Diagrama_T-h_R134a.html" data-search="diagrama t–h diagrama termodinámico temperatura – entalpía del refrigerante r-134a. diagrama_t-h_r134a.html 02 sustancias puras/tables r134a">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 15l3-4 3 2 4-6"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Diagrama T–h</span><span class="tag">Diagrama</span></span>
+            <span class="card-desc">Diagrama termodinámico Temperatura – Entalpía del refrigerante R-134a.</span>
+            <span class="card-path">02 Sustancias puras/Tables R134a/</span>
+          </span>
+        </a>
+        <a class="card" href="02 Sustancias puras/Tables R134a/Diagrama_T-s_R134a.html" data-search="diagrama t–s diagrama termodinámico temperatura – entropía del refrigerante r-134a. diagrama_t-s_r134a.html 02 sustancias puras/tables r134a">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 15l3-4 3 2 4-6"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Diagrama T–s</span><span class="tag">Diagrama</span></span>
+            <span class="card-desc">Diagrama termodinámico Temperatura – Entropía del refrigerante R-134a.</span>
+            <span class="card-path">02 Sustancias puras/Tables R134a/</span>
+          </span>
+        </a>
+        <a class="card" href="02 Sustancias puras/Tables R134a/Diagrama_T-u_R134a.html" data-search="diagrama t–u diagrama termodinámico temperatura – energía interna del refrigerante r-134a. diagrama_t-u_r134a.html 02 sustancias puras/tables r134a">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 15l3-4 3 2 4-6"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Diagrama T–u</span><span class="tag">Diagrama</span></span>
+            <span class="card-desc">Diagrama termodinámico Temperatura – Energía interna del refrigerante R-134a.</span>
+            <span class="card-path">02 Sustancias puras/Tables R134a/</span>
+          </span>
+        </a>
+        <a class="card" href="02 Sustancias puras/Tables R134a/Diagrama_T-v_R134a.html" data-search="diagrama t–v diagrama termodinámico temperatura – volumen específico del refrigerante r-134a. diagrama_t-v_r134a.html 02 sustancias puras/tables r134a">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 15l3-4 3 2 4-6"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Diagrama T–v</span><span class="tag">Diagrama</span></span>
+            <span class="card-desc">Diagrama termodinámico Temperatura – Volumen específico del refrigerante R-134a.</span>
+            <span class="card-path">02 Sustancias puras/Tables R134a/</span>
+          </span>
+        </a>
+        <a class="card" href="02 Sustancias puras/Tables R134a/Diagrama_h-s_R134a.html" data-search="diagrama h–s diagrama termodinámico entalpía – entropía (mollier) del refrigerante r-134a. diagrama_h-s_r134a.html 02 sustancias puras/tables r134a">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d="M7 15l3-4 3 2 4-6"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Diagrama h–s</span><span class="tag">Diagrama</span></span>
+            <span class="card-desc">Diagrama termodinámico Entalpía – Entropía (Mollier) del refrigerante R-134a.</span>
+            <span class="card-path">02 Sustancias puras/Tables R134a/</span>
+          </span>
+        </a>
+        </div>
+      </section>
+      <section class="panel" id="u03" style="--c:#ef6c00;--cl:#fde7d2;display:none;">
+        <div class="panel-head">
+          <span class="p-num">03</span>
+          <div class="p-meta"><h2>Energía, calor y trabajo</h2><p class="p-sub">1 aplicación</p></div>
+        </div>
+        <div class="grid">
+        <a class="card" href="03 Energia, calor y trabajo/Trabajo.html" data-search="trabajo trabajo de frontera móvil y formas de trabajo en procesos termodinámicos. trabajo.html 03 energia, calor y trabajo">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2"/><path d="M12 4v2M12 18v2M4 12h2M18 12h2M6.3 6.3l1.4 1.4M16.3 16.3l1.4 1.4M17.7 6.3l-1.4 1.4M7.7 16.3l-1.4 1.4"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Trabajo</span><span class="tag">Interactivo</span></span>
+            <span class="card-desc">Trabajo de frontera móvil y formas de trabajo en procesos termodinámicos.</span>
+            <span class="card-path">03 Energia, calor y trabajo/</span>
+          </span>
+        </a>
+        </div>
+      </section>
+      <section class="panel" id="u04" style="--c:#1565c0;--cl:#dce9fb;display:none;">
+        <div class="panel-head">
+          <span class="p-num">04</span>
+          <div class="p-meta"><h2>Primera ley – Sistemas y Volúmenes de Control</h2><p class="p-sub">4 aplicaciones</p></div>
+        </div>
+        <div class="grid">
+        <a class="card" href="04 Primera ley  Siste Vol Control/1era ley termodinamica.html" data-search="primera ley de la termodinámica balance de energía en sistemas cerrados. 1era ley termodinamica.html 04 primera ley  siste vol control">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 3L5 13h5l-1 8 8-11h-5l1-7z"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Primera Ley de la Termodinámica</span><span class="tag">Interactivo</span></span>
+            <span class="card-desc">Balance de energía en sistemas cerrados.</span>
+            <span class="card-path">04 Primera ley  Siste Vol Control/</span>
+          </span>
+        </a>
+        <a class="card" href="04 Primera ley  Siste Vol Control/Vol control ciclo termodinamico.html" data-search="volumen de control – ciclo termodinámico balance de energía en volúmenes de control y dispositivos de flujo. vol control ciclo termodinamico.html 04 primera ley  siste vol control">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h4l2 4h6l2-4h4"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Volumen de Control – Ciclo Termodinámico</span><span class="tag">Interactivo</span></span>
+            <span class="card-desc">Balance de energía en volúmenes de control y dispositivos de flujo.</span>
+            <span class="card-path">04 Primera ley  Siste Vol Control/</span>
+          </span>
+        </a>
+        <a class="card" href="04 Primera ley  Siste Vol Control/Ciclo refrigeracion.html" data-search="ciclo de refrigeración análisis energético del ciclo de refrigeración por compresión de vapor. ciclo refrigeracion.html 04 primera ley  siste vol control">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-3-6.2"/><path d="M20 4v4h-4"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Ciclo de Refrigeración</span><span class="tag">Interactivo</span></span>
+            <span class="card-desc">Análisis energético del ciclo de refrigeración por compresión de vapor.</span>
+            <span class="card-path">04 Primera ley  Siste Vol Control/</span>
+          </span>
+        </a>
+        <a class="card" href="04 Primera ley  Siste Vol Control/cp-cv-k.html" data-search="calores específicos (cₚ, cᵥ, k) calores específicos cₚ y cᵥ y la relación k = cₚ/cᵥ. cp-cv-k.html 04 primera ley  siste vol control">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M3 14h18M9 4v16M15 4v16"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Calores Específicos (cₚ, cᵥ, k)</span><span class="tag">Interactivo</span></span>
+            <span class="card-desc">Calores específicos cₚ y cᵥ y la relación k = cₚ/cᵥ.</span>
+            <span class="card-path">04 Primera ley  Siste Vol Control/</span>
+          </span>
+        </a>
+        </div>
+      </section>
+      <section class="panel" id="u05" style="--c:#7b1fa2;--cl:#eddcf5;display:none;">
+        <div class="panel-head">
+          <span class="p-num">05</span>
+          <div class="p-meta"><h2>Segunda ley y entropía</h2><p class="p-sub">3 aplicaciones</p></div>
+        </div>
+        <div class="grid">
+        <a class="card" href="05 Segunda ley y entropia/Balance entropia.html" data-search="balance de entropía balance de entropía y generación de entropía en procesos. balance entropia.html 05 segunda ley y entropia">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8c3-4 6 4 9 0M4 14c3-4 6 4 9 0"/><path d="M17 7l3 3-3 3"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Balance de Entropía</span><span class="tag">Interactivo</span></span>
+            <span class="card-desc">Balance de entropía y generación de entropía en procesos.</span>
+            <span class="card-path">05 Segunda ley y entropia/</span>
+          </span>
+        </a>
+        <a class="card" href="05 Segunda ley y entropia/Ciclo Carnot.html" data-search="ciclo de carnot ciclo de carnot: eficiencia máxima y límites de la segunda ley. ciclo carnot.html 05 segunda ley y entropia">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M4 9h16M9 9v10"/><path d="M13 13l3 3 3-4"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Ciclo de Carnot</span><span class="tag">Interactivo</span></span>
+            <span class="card-desc">Ciclo de Carnot: eficiencia máxima y límites de la segunda ley.</span>
+            <span class="card-path">05 Segunda ley y entropia/</span>
+          </span>
+        </a>
+        <a class="card" href="05 Segunda ley y entropia/Ciclo Refrigeracion.html" data-search="ciclo de refrigeración ciclo de refrigeración analizado desde la segunda ley (cop, irreversibilidades). ciclo refrigeracion.html 05 segunda ley y entropia">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-3-6.2"/><path d="M20 4v4h-4"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Ciclo de Refrigeración</span><span class="tag">Interactivo</span></span>
+            <span class="card-desc">Ciclo de refrigeración analizado desde la segunda ley (COP, irreversibilidades).</span>
+            <span class="card-path">05 Segunda ley y entropia/</span>
+          </span>
+        </a>
+        </div>
+      </section>
+      <section class="panel" id="u06" style="--c:#546e7a;--cl:#e3e9ec;display:none;">
+        <div class="panel-head">
+          <span class="p-num">06</span>
+          <div class="p-meta"><h2>Análisis de exergía</h2><p class="p-sub">0 aplicaciones</p></div>
+        </div>
+        <p class="empty">Unidad sin aplicaciones publicadas por el momento.</p>
+      </section>
+      <section class="panel" id="u07" style="--c:#c62828;--cl:#f7dcdc;display:none;">
+        <div class="panel-head">
+          <span class="p-num">07</span>
+          <div class="p-meta"><h2>Ciclos de potencia y refrigeración</h2><p class="p-sub">2 aplicaciones</p></div>
+        </div>
+        <div class="grid">
+        <a class="card" href="07 Ciclos potencia y refrigeración/Ciclo Rankine.html" data-search="ciclo rankine ciclo rankine de potencia de vapor: análisis, eficiencia y mejoras. ciclo rankine.html 07 ciclos potencia y refrigeración">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 3v4M21 12h-4"/><path d="M12 12l4-2"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Ciclo Rankine</span><span class="tag">Interactivo</span></span>
+            <span class="card-desc">Ciclo Rankine de potencia de vapor: análisis, eficiencia y mejoras.</span>
+            <span class="card-path">07 Ciclos potencia y refrigeración/</span>
+          </span>
+        </a>
+        <a class="card" href="07 Ciclos potencia y refrigeración/Ciclo refrigeracion.html" data-search="ciclo de refrigeración ciclo de refrigeración por compresión de vapor: cop y diagrama. ciclo refrigeracion.html 07 ciclos potencia y refrigeración">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-3-6.2"/><path d="M20 4v4h-4"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Ciclo de Refrigeración</span><span class="tag">Interactivo</span></span>
+            <span class="card-desc">Ciclo de refrigeración por compresión de vapor: COP y diagrama.</span>
+            <span class="card-path">07 Ciclos potencia y refrigeración/</span>
+          </span>
+        </a>
+        </div>
+      </section>
+      <section class="panel" id="u08" style="--c:#0277bd;--cl:#d4ebf7;display:none;">
+        <div class="panel-head">
+          <span class="p-num">08</span>
+          <div class="p-meta"><h2>Psicrometría</h2><p class="p-sub">1 aplicación</p></div>
+        </div>
+        <div class="grid">
+        <a class="card" href="08 Psicrometría/Carta_Psicrometrica.html" data-search="carta psicrométrica carta psicrométrica interactiva del aire húmedo (humedad, entalpía, punto de rocío). carta_psicrometrica.html 08 psicrometría">
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/><path d="M9.5 14a2.5 2.5 0 0 0 2.5 2.5"/></svg></span>
+          <span class="card-body">
+            <span class="card-top"><span class="card-name">Carta Psicrométrica</span><span class="tag">Interactivo</span></span>
+            <span class="card-desc">Carta psicrométrica interactiva del aire húmedo (humedad, entalpía, punto de rocío).</span>
+            <span class="card-path">08 Psicrometría/</span>
+          </span>
+        </a>
+        </div>
+      </section>
+    <p class="no-results" id="noResults">No se encontraron aplicaciones para tu búsqueda.</p>
   </div>
-
-    <section id="u01">
-    <details class="unit" open style="--c:#1976d2;--cl:#e3f0fd">
-      <summary class="unit-head">
-        <span class="unit-num">01</span>
-        <span class="unit-title">Conceptos y definiciones</span>
-        <span class="unit-count">1 app</span>
-        <span class="chev" aria-hidden="true">›</span>
-      </summary>
-      <div class="grid">
-      <a class="card" href="01 Conceptos y definiciones/Laboratorio conceptos básicos.html" data-search="laboratorio de conceptos básicos sistema, propiedades, presión, temperatura y densidad en un[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3h6M10 3v6L5 18a2 [...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Laboratorio de Conceptos Básicos</span><span class="tag">Laboratorio</span></span>
-          <span class="card-desc">Sistema, propiedades, presión, temperatura y densidad en un entorno interactivo.</span>
-          <span class="card-path">01 Conceptos y definiciones/</span>
-        </span>
-      </a>
-      </div>
-    </details>
-    </section>
-    <section id="u02">
-    <details class="unit" open style="--c:#00897b;--cl:#d7f0eb">
-      <summary class="unit-head">
-        <span class="unit-num">02</span>
-        <span class="unit-title">Sustancias puras</span>
-        <span class="unit-count">21 apps</span>
-        <span class="chev" aria-hidden="true">›</span>
-      </summary>
-      <h3 class="subgroup">Gas ideal <span class="sub-count">1</span></h3>
-      <div class="grid">
-      <a class="card" href="02 Sustancias puras/Tables Gas Ideal/IdealGasTables.html" data-search="tablas de gas ideal propiedades de gases ideales (aire y gases comunes) en función de la temperatura[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" h[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Tablas de Gas Ideal</span><span class="tag">Tablas</span></span>
-          <span class="card-desc">Propiedades de gases ideales (aire y gases comunes) en función de la temperatura.</span>
-          <span class="card-path">02 Sustancias puras/Tables Gas Ideal/</span>
-        </span>
-      </a>
-      </div>
-      <h3 class="subgroup">Agua (H₂O) <span class="sub-count">10</span></h3>
-      <div class="grid">
-      <a class="card" href="02 Sustancias puras/Tables H2O/SteamTables.html" data-search="tablas de vapor (h₂o) saturación, vapor sobrecalentado y líquido comprimido del agua. steamtables.html 02 [...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" h[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Tablas de Vapor (H₂O)</span><span class="tag">Tablas</span></span>
-          <span class="card-desc">Saturación, vapor sobrecalentado y líquido comprimido del agua.</span>
-          <span class="card-path">02 Sustancias puras/Tables H2O/</span>
-        </span>
-      </a>
-      <a class="card" href="02 Sustancias puras/Tables H2O/Diagrama_P-h.html" data-search="diagrama p–h diagrama termodinámico presión – entalpía del agua (h₂o). diagrama_p-h.html 02 sustanci[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d=[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Diagrama P–h</span><span class="tag">Diagrama</span></span>
-          <span class="card-desc">Diagrama termodinámico Presión – Entalpía del agua (H₂O).</span>
-          <span class="card-path">02 Sustancias puras/Tables H2O/</span>
-        </span>
-      </a>
-      <a class="card" href="02 Sustancias puras/Tables H2O/Diagrama_P-s.html" data-search="diagrama p–s diagrama termodinámico presión – entropía del agua (h₂o). diagrama_p-s.html 02 sustanci[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d=[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Diagrama P–s</span><span class="tag">Diagrama</span></span>
-          <span class="card-desc">Diagrama termodinámico Presión – Entropía del agua (H₂O).</span>
-          <span class="card-path">02 Sustancias puras/Tables H2O/</span>
-        </span>
-      </a>
-      <a class="card" href="02 Sustancias puras/Tables H2O/Diagrama_P-u.html" data-search="diagrama p–u diagrama termodinámico presión – energía interna del agua (h₂o). diagrama_p-u.html 02 s[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d=[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Diagrama P–u</span><span class="tag">Diagrama</span></span>
-          <span class="card-desc">Diagrama termodinámico Presión – Energía interna del agua (H₂O).</span>
-          <span class="card-path">02 Sustancias puras/Tables H2O/</span>
-        </span>
-      </a>
-      <a class="card" href="02 Sustancias puras/Tables H2O/Diagrama_P-v.html" data-search="diagrama p–v diagrama termodinámico presión – volumen específico del agua (h₂o). diagrama_p-v.html 0[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d=[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Diagrama P–v</span><span class="tag">Diagrama</span></span>
-          <span class="card-desc">Diagrama termodinámico Presión – Volumen específico del agua (H₂O).</span>
-          <span class="card-path">02 Sustancias puras/Tables H2O/</span>
-        </span>
-      </a>
-      <a class="card" href="02 Sustancias puras/Tables H2O/Diagrama_T-h.html" data-search="diagrama t–h diagrama termodinámico temperatura – entalpía del agua (h₂o). diagrama_t-h.html 02 susta[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d=[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Diagrama T–h</span><span class="tag">Diagrama</span></span>
-          <span class="card-desc">Diagrama termodinámico Temperatura – Entalpía del agua (H₂O).</span>
-          <span class="card-path">02 Sustancias puras/Tables H2O/</span>
-        </span>
-      </a>
-      <a class="card" href="02 Sustancias puras/Tables H2O/Diagrama_T-s.html" data-search="diagrama t–s diagrama termodinámico temperatura – entropía del agua (h₂o). diagrama_t-s.html 02 susta[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d=[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Diagrama T–s</span><span class="tag">Diagrama</span></span>
-          <span class="card-desc">Diagrama termodinámico Temperatura – Entropía del agua (H₂O).</span>
-          <span class="card-path">02 Sustancias puras/Tables H2O/</span>
-        </span>
-      </a>
-      <a class="card" href="02 Sustancias puras/Tables H2O/Diagrama_T-u.html" data-search="diagrama t–u diagrama termodinámico temperatura – energía interna del agua (h₂o). diagrama_t-u.html 0[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d=[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Diagrama T–u</span><span class="tag">Diagrama</span></span>
-          <span class="card-desc">Diagrama termodinámico Temperatura – Energía interna del agua (H₂O).</span>
-          <span class="card-path">02 Sustancias puras/Tables H2O/</span>
-        </span>
-      </a>
-      <a class="card" href="02 Sustancias puras/Tables H2O/Diagrama_T-v.html" data-search="diagrama t–v diagrama termodinámico temperatura – volumen específico del agua (h₂o). diagrama_t-v.htm[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d=[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Diagrama T–v</span><span class="tag">Diagrama</span></span>
-          <span class="card-desc">Diagrama termodinámico Temperatura – Volumen específico del agua (H₂O).</span>
-          <span class="card-path">02 Sustancias puras/Tables H2O/</span>
-        </span>
-      </a>
-      <a class="card" href="02 Sustancias puras/Tables H2O/Diagrama_h-s.html" data-search="diagrama h–s diagrama termodinámico entalpía – entropía (mollier) del agua (h₂o). diagrama_h-s.html [...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d=[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Diagrama h–s</span><span class="tag">Diagrama</span></span>
-          <span class="card-desc">Diagrama termodinámico Entalpía – Entropía (Mollier) del agua (H₂O).</span>
-          <span class="card-path">02 Sustancias puras/Tables H2O/</span>
-        </span>
-      </a>
-      </div>
-      <h3 class="subgroup">Refrigerante R-134a <span class="sub-count">10</span></h3>
-      <div class="grid">
-      <a class="card" href="02 Sustancias puras/Tables R134a/R134aTables.html" data-search="tablas de r-134a propiedades del refrigerante r-134a: saturación y sobrecalentado. r134atables.html 02 sust[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" h[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Tablas de R-134a</span><span class="tag">Tablas</span></span>
-          <span class="card-desc">Propiedades del refrigerante R-134a: saturación y sobrecalentado.</span>
-          <span class="card-path">02 Sustancias puras/Tables R134a/</span>
-        </span>
-      </a>
-      <a class="card" href="02 Sustancias puras/Tables R134a/Diagrama_P-h_R134a.html" data-search="diagrama p–h diagrama termodinámico presión – entalpía del refrigerante r-134a. diagrama_p-h_r[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d=[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Diagrama P–h</span><span class="tag">Diagrama</span></span>
-          <span class="card-desc">Diagrama termodinámico Presión – Entalpía del refrigerante R-134a.</span>
-          <span class="card-path">02 Sustancias puras/Tables R134a/</span>
-        </span>
-      </a>
-      <a class="card" href="02 Sustancias puras/Tables R134a/Diagrama_P-s_R134a.html" data-search="diagrama p–s diagrama termodinámico presión – entropía del refrigerante r-134a. diagrama_p-s_r[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d=[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Diagrama P–s</span><span class="tag">Diagrama</span></span>
-          <span class="card-desc">Diagrama termodinámico Presión – Entropía del refrigerante R-134a.</span>
-          <span class="card-path">02 Sustancias puras/Tables R134a/</span>
-        </span>
-      </a>
-      <a class="card" href="02 Sustancias puras/Tables R134a/Diagrama_P-u_R134a.html" data-search="diagrama p–u diagrama termodinámico presión – energía interna del refrigerante r-134a. diagram[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d=[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Diagrama P–u</span><span class="tag">Diagrama</span></span>
-          <span class="card-desc">Diagrama termodinámico Presión – Energía interna del refrigerante R-134a.</span>
-          <span class="card-path">02 Sustancias puras/Tables R134a/</span>
-        </span>
-      </a>
-      <a class="card" href="02 Sustancias puras/Tables R134a/Diagrama_P-v_R134a.html" data-search="diagrama p–v diagrama termodinámico presión – volumen específico del refrigerante r-134a. diag[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d=[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Diagrama P–v</span><span class="tag">Diagrama</span></span>
-          <span class="card-desc">Diagrama termodinámico Presión – Volumen específico del refrigerante R-134a.</span>
-          <span class="card-path">02 Sustancias puras/Tables R134a/</span>
-        </span>
-      </a>
-      <a class="card" href="02 Sustancias puras/Tables R134a/Diagrama_T-h_R134a.html" data-search="diagrama t–h diagrama termodinámico temperatura – entalpía del refrigerante r-134a. diagrama_t-[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d=[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Diagrama T–h</span><span class="tag">Diagrama</span></span>
-          <span class="card-desc">Diagrama termodinámico Temperatura – Entalpía del refrigerante R-134a.</span>
-          <span class="card-path">02 Sustancias puras/Tables R134a/</span>
-        </span>
-      </a>
-      <a class="card" href="02 Sustancias puras/Tables R134a/Diagrama_T-s_R134a.html" data-search="diagrama t–s diagrama termodinámico temperatura – entropía del refrigerante r-134a. diagrama_t-[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d=[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Diagrama T–s</span><span class="tag">Diagrama</span></span>
-          <span class="card-desc">Diagrama termodinámico Temperatura – Entropía del refrigerante R-134a.</span>
-          <span class="card-path">02 Sustancias puras/Tables R134a/</span>
-        </span>
-      </a>
-      <a class="card" href="02 Sustancias puras/Tables R134a/Diagrama_T-u_R134a.html" data-search="diagrama t–u diagrama termodinámico temperatura – energía interna del refrigerante r-134a. diag[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d=[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Diagrama T–u</span><span class="tag">Diagrama</span></span>
-          <span class="card-desc">Diagrama termodinámico Temperatura – Energía interna del refrigerante R-134a.</span>
-          <span class="card-path">02 Sustancias puras/Tables R134a/</span>
-        </span>
-      </a>
-      <a class="card" href="02 Sustancias puras/Tables R134a/Diagrama_T-v_R134a.html" data-search="diagrama t–v diagrama termodinámico temperatura – volumen específico del refrigerante r-134a. d[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d=[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Diagrama T–v</span><span class="tag">Diagrama</span></span>
-          <span class="card-desc">Diagrama termodinámico Temperatura – Volumen específico del refrigerante R-134a.</span>
-          <span class="card-path">02 Sustancias puras/Tables R134a/</span>
-        </span>
-      </a>
-      <a class="card" href="02 Sustancias puras/Tables R134a/Diagrama_h-s_R134a.html" data-search="diagrama h–s diagrama termodinámico entalpía – entropía (mollier) del refrigerante r-134a. dia[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4v16h16"/><path d=[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Diagrama h–s</span><span class="tag">Diagrama</span></span>
-          <span class="card-desc">Diagrama termodinámico Entalpía – Entropía (Mollier) del refrigerante R-134a.</span>
-          <span class="card-path">02 Sustancias puras/Tables R134a/</span>
-        </span>
-      </a>
-      </div>
-    </details>
-    </section>
-    <section id="u03">
-    <details class="unit" open style="--c:#ef6c00;--cl:#fde7d2">
-      <summary class="unit-head">
-        <span class="unit-num">03</span>
-        <span class="unit-title">Energía, calor y trabajo</span>
-        <span class="unit-count">1 app</span>
-        <span class="chev" aria-hidden="true">›</span>
-      </summary>
-      <div class="grid">
-      <a class="card" href="03 Energia, calor y trabajo/Trabajo.html" data-search="trabajo trabajo de frontera móvil y formas de trabajo en procesos termodinámicos. trabajo.html 03 energia, calor y [...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3.2[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Trabajo</span><span class="tag">Interactivo</span></span>
-          <span class="card-desc">Trabajo de frontera móvil y formas de trabajo en procesos termodinámicos.</span>
-          <span class="card-path">03 Energia, calor y trabajo/</span>
-        </span>
-      </a>
-      </div>
-    </details>
-    </section>
-    <section id="u04">
-    <details class="unit" open style="--c:#1565c0;--cl:#dce9fb">
-      <summary class="unit-head">
-        <span class="unit-num">04</span>
-        <span class="unit-title">Primera ley – Sistemas y Volúmenes de Control</span>
-        <span class="unit-count">4 apps</span>
-        <span class="chev" aria-hidden="true">›</span>
-      </summary>
-      <div class="grid">
-      <a class="card" href="04 Primera ley  Siste Vol Control/1era ley termodinamica.html" data-search="primera ley de la termodinámica balance de energía en sistemas cerrados. 1era ley termodinamic[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 3L5 13h5l-1 8 8-1[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Primera Ley de la Termodinámica</span><span class="tag">Interactivo</span></span>
-          <span class="card-desc">Balance de energía en sistemas cerrados.</span>
-          <span class="card-path">04 Primera ley  Siste Vol Control/</span>
-        </span>
-      </a>
-      <a class="card" href="04 Primera ley  Siste Vol Control/Vol control ciclo termodinamico.html" data-search="volumen de control – ciclo termodinámico balance de energía en volúmenes de contro[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" h[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Volumen de Control – Ciclo Termodinámico</span><span class="tag">Interactivo</span></span>
-          <span class="card-desc">Balance de energía en volúmenes de control y dispositivos de flujo.</span>
-          <span class="card-path">04 Primera ley  Siste Vol Control/</span>
-        </span>
-      </a>
-      <a class="card" href="04 Primera ley  Siste Vol Control/Ciclo refrigeracion.html" data-search="ciclo de refrigeración análisis energético del ciclo de refrigeración por compresión de vapor.[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-3-6.[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Ciclo de Refrigeración</span><span class="tag">Interactivo</span></span>
-          <span class="card-desc">Análisis energético del ciclo de refrigeración por compresión de vapor.</span>
-          <span class="card-path">04 Primera ley  Siste Vol Control/</span>
-        </span>
-      </a>
-      <a class="card" href="04 Primera ley  Siste Vol Control/cp-cv-k.html" data-search="calores específicos (cₚ, cᵥ, k) calores específicos cₚ y cᵥ y la relación k = cₚ/cᵥ. cp-cv-k.htm[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" h[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Calores Específicos (cₚ, cᵥ, k)</span><span class="tag">Interactivo</span></span>
-          <span class="card-desc">Calores específicos cₚ y cᵥ y la relación k = cₚ/cᵥ.</span>
-          <span class="card-path">04 Primera ley  Siste Vol Control/</span>
-        </span>
-      </a>
-      </div>
-    </details>
-    </section>
-    <section id="u05">
-    <details class="unit" open style="--c:#7b1fa2;--cl:#eddcf5">
-      <summary class="unit-head">
-        <span class="unit-num">05</span>
-        <span class="unit-title">Segunda ley y entropía</span>
-        <span class="unit-count">3 apps</span>
-        <span class="chev" aria-hidden="true">›</span>
-      </summary>
-      <div class="grid">
-      <a class="card" href="05 Segunda ley y entropia/Balance entropia.html" data-search="balance de entropía balance de entropía y generación de entropía en procesos. balance entropia.html 05 seg[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8c3-4 6 4 9 0M4 14[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Balance de Entropía</span><span class="tag">Interactivo</span></span>
-          <span class="card-desc">Balance de entropía y generación de entropía en procesos.</span>
-          <span class="card-path">05 Segunda ley y entropia/</span>
-        </span>
-      </a>
-      <a class="card" href="05 Segunda ley y entropia/Ciclo Carnot.html" data-search="ciclo de carnot ciclo de carnot: eficiencia máxima y límites de la segunda ley. ciclo carnot.html 05 segunda ley[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" h[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Ciclo de Carnot</span><span class="tag">Interactivo</span></span>
-          <span class="card-desc">Ciclo de Carnot: eficiencia máxima y límites de la segunda ley.</span>
-          <span class="card-path">05 Segunda ley y entropia/</span>
-        </span>
-      </a>
-      <a class="card" href="05 Segunda ley y entropia/Ciclo Refrigeracion.html" data-search="ciclo de refrigeración ciclo de refrigeración analizado desde la segunda ley (cop, irreversibilidades). c[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-3-6.[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Ciclo de Refrigeración</span><span class="tag">Interactivo</span></span>
-          <span class="card-desc">Ciclo de refrigeración analizado desde la segunda ley (COP, irreversibilidades).</span>
-          <span class="card-path">05 Segunda ley y entropia/</span>
-        </span>
-      </a>
-      </div>
-    </details>
-    </section>
-    <section id="u06">
-    <details class="unit" open style="--c:#546e7a;--cl:#e3e9ec">
-      <summary class="unit-head">
-        <span class="unit-num">06</span>
-        <span class="unit-title">Análisis de exergía</span>
-        <span class="unit-count">0 apps</span>
-        <span class="chev" aria-hidden="true">›</span>
-      </summary>
-      <p class="empty">Unidad sin aplicaciones publicadas por el momento.</p>
-    </details>
-    </section>
-    <section id="u07">
-    <details class="unit" open style="--c:#c62828;--cl:#f7dcdc">
-      <summary class="unit-head">
-        <span class="unit-num">07</span>
-        <span class="unit-title">Ciclos de potencia y refrigeración</span>
-        <span class="unit-count">2 apps</span>
-        <span class="chev" aria-hidden="true">›</span>
-      </summary>
-      <div class="grid">
-      <a class="card" href="07 Ciclos potencia y refrigeración/Ciclo Rankine.html" data-search="ciclo rankine ciclo rankine de potencia de vapor: análisis, eficiencia y mejoras. ciclo rankine.html 0[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9"/[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Ciclo Rankine</span><span class="tag">Interactivo</span></span>
-          <span class="card-desc">Ciclo Rankine de potencia de vapor: análisis, eficiencia y mejoras.</span>
-          <span class="card-path">07 Ciclos potencia y refrigeración/</span>
-        </span>
-      </a>
-      <a class="card" href="07 Ciclos potencia y refrigeración/Ciclo refrigeracion.html" data-search="ciclo de refrigeración ciclo de refrigeración por compresión de vapor: cop y diagrama. ciclo r[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12a8 8 0 1 1-3-6.[...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Ciclo de Refrigeración</span><span class="tag">Interactivo</span></span>
-          <span class="card-desc">Ciclo de refrigeración por compresión de vapor: COP y diagrama.</span>
-          <span class="card-path">07 Ciclos potencia y refrigeración/</span>
-        </span>
-      </a>
-      </div>
-    </details>
-    </section>
-    <section id="u08">
-    <details class="unit" open style="--c:#0277bd;--cl:#d4ebf7">
-      <summary class="unit-head">
-        <span class="unit-num">08</span>
-        <span class="unit-title">Psicrometría</span>
-        <span class="unit-count">1 app</span>
-        <span class="chev" aria-hidden="true">›</span>
-      </summary>
-      <div class="grid">
-      <a class="card" href="08 Psicrometría/Carta_Psicrometrica.html" data-search="carta psicrométrica carta psicrométrica interactiva del aire húmedo (humedad, entalpía, punto de rocío). carta_[...]
-        <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3s6 6.5 6 11a6 6 [...]
-        <span class="card-body">
-          <span class="card-top"><span class="card-name">Carta Psicrométrica</span><span class="tag">Interactivo</span></span>
-          <span class="card-desc">Carta psicrométrica interactiva del aire húmedo (humedad, entalpía, punto de rocío).</span>
-          <span class="card-path">08 Psicrometría/</span>
-        </span>
-      </a>
-      </div>
-    </details>
-    </section>
-
-  <p class="no-results" id="noResults">No se encontraron aplicaciones para tu búsqueda.</p>
-</main>
+</div>
 <details class="note">
   <summary>Cómo incrustar este índice en Moodle</summary>
   <div class="note-body">
@@ -501,45 +514,73 @@ footer code{font-family:var(--mono)}
   </div>
 </details>
 <footer>
-  Archivo <code>index.html</code> generado para la raíz del repositorio <strong>Termo-IA-Dinamica</strong>.
-  Diseño alineado con la identidad visual de las aplicaciones (IBM Plex · azul cobalto Material).
+  Archivo <code>index.html</code> — raíz del repositorio <strong>Termo-IA-Dinamica</strong>. Diseño alineado con la identidad visual de las aplicaciones (IBM Plex · azul cobalto Material).
 </footer>
 <script>
 (function(){
   var q=document.getElementById('q');
+  var menuItems=[].slice.call(document.querySelectorAll('.m-item'));
+  var panels=[].slice.call(document.querySelectorAll('.panel'));
   var cards=[].slice.call(document.querySelectorAll('.card'));
-  var units=[].slice.call(document.querySelectorAll('.unit'));
   var groups=[].slice.call(document.querySelectorAll('.subgroup'));
   var counter=document.getElementById('counter');
+  var searchHead=document.getElementById('searchHead');
   var noResults=document.getElementById('noResults');
   var TOTAL=33;
-  function setCounter(n){ counter.textContent = n===TOTAL ? (TOTAL+' aplicaciones') : (n+' de '+TOTAL+' aplicaciones'); }
-  setCounter(TOTAL);
-  function filter(){
-    var term=q.value.trim().toLowerCase();
+  var activeId='u01';
+
+  function resetVisibility(){
+    cards.forEach(function(c){c.style.display='';});
+    groups.forEach(function(g){g.style.display='';var grid=g.nextElementSibling;if(grid)grid.style.display='';});
+  }
+  function showOnly(id){
+    resetVisibility();
+    panels.forEach(function(p){p.style.display = p.id===id ? '' : 'none';});
+    menuItems.forEach(function(m){
+      var on=m.dataset.target===id;
+      m.classList.toggle('active',on);
+      if(on){m.setAttribute('aria-current','true');}else{m.removeAttribute('aria-current');}
+    });
+    searchHead.style.display='none';
+    noResults.style.display='none';
+    counter.textContent=TOTAL+' aplicaciones';
+  }
+  function runSearch(term){
     var shown=0;
     cards.forEach(function(c){
-      var hit = !term || c.getAttribute('data-search').indexOf(term)>-1;
-      c.style.display = hit ? '' : 'none';
-      if(hit) shown++;
+      var hit=c.getAttribute('data-search').indexOf(term)>-1;
+      c.style.display=hit?'':'none'; if(hit)shown++;
     });
     groups.forEach(function(h){
       var grid=h.nextElementSibling;
       var any=grid && [].slice.call(grid.querySelectorAll('.card')).some(function(c){return c.style.display!=='none';});
-      h.style.display = any ? '' : 'none';
-      if(grid) grid.style.display = any ? '' : 'none';
+      h.style.display=any?'':'none'; if(grid)grid.style.display=any?'':'none';
     });
-    units.forEach(function(u){
-      var any=[].slice.call(u.querySelectorAll('.card')).some(function(c){return c.style.display!=='none';});
-      u.parentElement.style.display = any ? '' : 'none';
-      if(term && any) u.open=true;
+    panels.forEach(function(p){
+      var any=[].slice.call(p.querySelectorAll('.card')).some(function(c){return c.style.display!=='none';});
+      p.style.display=any?'':'none';
     });
-    noResults.style.display = shown ? 'none' : 'block';
-    setCounter(shown);
+    menuItems.forEach(function(m){m.classList.remove('active');m.removeAttribute('aria-current');});
+    searchHead.style.display='';
+    searchHead.innerHTML='Resultados para “<b>'+term.replace(/</g,'&lt;')+'</b>”';
+    noResults.style.display=shown?'none':'block';
+    counter.textContent=shown+' de '+TOTAL+' aplicaciones';
   }
-  q.addEventListener('input',filter);
-  document.getElementById('expand').addEventListener('click',function(){ units.forEach(function(u){u.open=true;}); });
-  document.getElementById('collapse').addEventListener('click',function(){ units.forEach(function(u){u.open=false;}); });
+  menuItems.forEach(function(m){
+    m.addEventListener('click',function(){
+      activeId=m.dataset.target;
+      q.value='';
+      showOnly(activeId);
+      if(window.innerWidth<860){
+        document.querySelector('.main').scrollIntoView({behavior:'smooth',block:'start'});
+      }
+    });
+  });
+  q.addEventListener('input',function(){
+    var t=q.value.trim().toLowerCase();
+    if(t) runSearch(t); else showOnly(activeId);
+  });
+  showOnly(activeId);
 })();
 </script>
 </body>
