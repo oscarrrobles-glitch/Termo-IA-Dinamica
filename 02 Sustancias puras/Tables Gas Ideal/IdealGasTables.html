@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gases Ideales — Propiedades Termodinámicas (Aire A-22 y otros gases)</title>
+<title>Gases Ideales — Propiedades Termodinámicas</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500&family=Roboto:wght@400;500&display=swap');
 
@@ -33,10 +33,9 @@
 
   body { background: var(--bg-page); color: var(--text-primary); font-family: var(--sans); font-size: 14px; min-height: 100vh; }
 
-  .app-header { background: var(--blue-deep); padding: 0 20px; height: 56px; display: flex; align-items: center; gap: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.24); }
-  .app-logo { width: 44px; height: 34px; background: rgba(255,255,255,0.18); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #fff; font-weight: 700; border: 1px solid rgba(255,255,255,0.25); flex-shrink: 0; letter-spacing: 0.3px; }
-  .app-title { font-size: 15px; font-weight: 500; color: #fff; letter-spacing: 0.3px; }
-  .app-sub { font-size: 11px; color: rgba(255,255,255,0.72); font-family: var(--mono); margin-top: 1px; }
+  .app-header { background: var(--blue-deep); padding: 0 20px; height: 54px; display: flex; align-items: center; gap: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.24); }
+  .brand-pill { background: #fff; color: var(--blue-deep); font-size: 13px; font-weight: 700; padding: 6px 16px; border-radius: 6px; letter-spacing: 0.4px; white-space: nowrap; flex-shrink: 0; font-family: var(--sans); }
+  .app-title { font-size: 18px; font-weight: 700; color: #fff; letter-spacing: 0.2px; }
 
   .tabs { display: flex; background: var(--bg-panel); border-bottom: 1px solid var(--border); padding: 0 20px; gap: 0; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
   .tab-btn { background: none; border: none; color: var(--text-sec); font-family: var(--sans); font-size: 13px; font-weight: 500; padding: 12px 18px; cursor: pointer; border-bottom: 3px solid transparent; letter-spacing: 0.3px; transition: color 0.15s, border-color 0.15s; white-space: nowrap; }
@@ -105,6 +104,7 @@
   .input-wrap { position: relative; display: flex; }
   .input-wrap input { padding-right: 60px; }
   .input-unit { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 10px; color: var(--text-hint); font-family: var(--mono); pointer-events: none; white-space: nowrap; }
+  .alt-label { font-size: 9px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: var(--text-hint); margin-bottom: 3px; }
 
   .unit-toggle { display:flex; gap:4px; margin-left:auto; }
   .unit-btn { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.35); border-radius: 4px; color: rgba(255,255,255,0.85); font-family: var(--sans); font-size: 12px; font-weight: 500; padding: 5px 14px; cursor: pointer; transition: all 0.15s; letter-spacing: 0.5px; }
@@ -123,11 +123,8 @@
 <body>
 
 <header class="app-header">
-  <div class="app-logo">GAS</div>
-  <div>
-    <div class="app-title">Propiedades Termodinámicas de Gases Ideales</div>
-    <div class="app-sub">Aire — Tabla A-22 · Otros gases — coef. cp̄ de A-21 · Moran &amp; Shapiro</div>
-  </div>
+  <div class="brand-pill">Termo·IA·Dinámica</div>
+  <div class="app-title">Propiedades Termodinámicas de Gases Ideales</div>
   <div class="unit-toggle">
     <button class="unit-btn active" id="btn-si" onclick="setUnits('SI')">SI</button>
     <button class="unit-btn" id="btn-en" onclick="setUnits('EN')">Inglés</button>
@@ -135,7 +132,7 @@
 </header>
 
 <div class="tabs">
-  <button class="tab-btn active" onclick="switchTab('air')">Aire — Tabla A-22</button>
+  <button class="tab-btn active" onclick="switchTab('air')">Aire</button>
   <button class="tab-btn" onclick="switchTab('gas')">Otros gases ideales</button>
 </div>
 
@@ -362,13 +359,32 @@ function airIsentropic(T1_si, ratioType, ratioVal){
   }
   return {s1, s2, ratioType, ratioVal, region:'air_isen'};
 }
-function airDeltaS(T1_si,P1,T2_si,P2){
+/* airDeltaS — soporta ec. 7.12, 7.13 (c variable) y 7.16, 7.17 (c constante)
+   eq     : '7.12'|'7.13'|'7.16'|'7.17'
+   ratio  : P₂/P₁ para ec. de presión; V₂/V₁ para ec. de volumen           */
+function airDeltaS(eq, T1_si, T2_si, ratio){
   if(T1_si<AIR[0].T||T1_si>AIR[AIR.length-1].T||T2_si<AIR[0].T||T2_si>AIR[AIR.length-1].T)
     return {error:'Alguna temperatura está fuera del rango de la Tabla A-22 (200 – 2200 K)'};
-  if(!(P1>0)||!(P2>0)) return {error:'Las presiones deben ser positivas'};
+  if(!(ratio>0)) return {error:'La relación debe ser un número positivo'};
   const s1=interpByT(AIR,T1_si), s2=interpByT(AIR,T2_si);
-  const ds = (s2.s0 - s1.s0) - R_AIR*Math.log(P2/P1);
-  return {s1,s2,P1,P2,ds, du:s2.u-s1.u, dh:s2.h-s1.h, region:'air_ds'};
+  const Tmean=(T1_si+T2_si)/2;
+  const cp_m=cpBar(GASES.Air.c,Tmean)/GASES.Air.M; // kJ/kg·K
+  const cv_m=cp_m-R_AIR;
+  const EQF={
+    'tbl':'Δs = s°(T₂) − s°(T₁) − R·ln(p₂/p₁)',
+    '7.13':'Δs = ∫cp(T)dT/T − R·ln(P₂/P₁)',
+    '7.12':'Δs = [s°(T₂)−s°(T₁)−R·ln(T₂/T₁)] + R·ln(V₂/V₁)',
+    '7.17':'Δs = cp·ln(T₂/T₁) − R·ln(P₂/P₁)',
+    '7.16':'Δs = cv·ln(T₂/T₁) + R·ln(V₂/V₁)'
+  };
+  let ds;
+  if(eq==='tbl')       ds=(s2.s0-s1.s0)-R_AIR*Math.log(ratio);   // s° tabulado A-22
+  else if(eq==='7.13') ds=(s2.s0-s1.s0)-R_AIR*Math.log(ratio);
+  else if(eq==='7.12') ds=(s2.s0-s1.s0)-R_AIR*Math.log(T2_si/T1_si)+R_AIR*Math.log(ratio);
+  else if(eq==='7.17') ds=cp_m*Math.log(T2_si/T1_si)-R_AIR*Math.log(ratio);
+  else                 ds=cv_m*Math.log(T2_si/T1_si)+R_AIR*Math.log(ratio);
+  return {s1,s2,T1:T1_si,T2:T2_si,ratio,ds,dh:s2.h-s1.h,du:s2.u-s1.u,
+          cp_m,cv_m,eq,eqFormula:EQF[eq],region:'air_ds'};
 }
 
 /* ══════════ MÓDULOS OTROS GASES ══════════ */
@@ -395,19 +411,43 @@ function gasIsentropic(gk,T1_si,ratioVal){   // sólo relación de presiones (ba
   const cp1=cpBar(G.c,T1_si), cp2=cpBar(G.c,T2);
   return {G,gk,T1:T1_si,T2,ratioVal,dh,du,cp1,cp2,region:'gas_isen'};
 }
-function gasDeltaS(gk,T1_si,P1,T2_si,P2){
+/* gasDeltaS — soporta ec. 7.12, 7.13 (c̄ variable) y 7.16, 7.17 (c̄ constante) */
+function gasDeltaS(gk, eq, T1_si, T2_si, ratio){
   const G=GASES[gk];
   if(!gasInRange(T1_si)||!gasInRange(T2_si)) return {error:'Alguna temperatura fuera del rango A-21 (300 – 1000 K)'};
-  if(!(P1>0)||!(P2>0)) return {error:'Las presiones deben ser positivas'};
+  if(!(ratio>0)) return {error:'La relación debe ser un número positivo'};
+  const Tmean=(T1_si+T2_si)/2;
+  const cp_m=cpBar(G.c,Tmean), cv_m=cp_m-RBAR;
   const ds0=ds0Bar(G.c,T1_si,T2_si);
-  const ds=ds0 - RBAR*Math.log(P2/P1);
   const dh=dhBar(G.c,T1_si,T2_si), du=dh-RBAR*(T2_si-T1_si);
-  return {G,gk,T1:T1_si,T2:T2_si,P1,P2,ds0,ds,dh,du,region:'gas_ds'};
+  const EQF={
+    'tbl':'Δs = s̄°(T₂) − s̄°(T₁) − R̄·ln(p₂/p₁)',
+    '7.13':'Δs̄ = ∫c̄p(T)dT/T − R̄·ln(P₂/P₁)',
+    '7.12':'Δs̄ = [s̄°(T₂)−s̄°(T₁)−R̄·ln(T₂/T₁)] + R̄·ln(V₂/V₁)',
+    '7.17':'Δs̄ = c̄p·ln(T₂/T₁) − R̄·ln(P₂/P₁)',
+    '7.16':'Δs̄ = c̄v·ln(T₂/T₁) + R̄·ln(V₂/V₁)'
+  };
+  let ds;
+  if(eq==='tbl')       ds=ds0-RBAR*Math.log(ratio);   // s̄° por polinomio A-21
+  else if(eq==='7.13') ds=ds0-RBAR*Math.log(ratio);
+  else if(eq==='7.12') ds=ds0-RBAR*Math.log(T2_si/T1_si)+RBAR*Math.log(ratio);
+  else if(eq==='7.17') ds=cp_m*Math.log(T2_si/T1_si)-RBAR*Math.log(ratio);
+  else                 ds=cv_m*Math.log(T2_si/T1_si)+RBAR*Math.log(ratio);
+  return {G,gk,T1:T1_si,T2:T2_si,ratio,ds0,ds,dh,du,cp_m,cv_m,
+          eq,eqFormula:EQF[eq],region:'gas_ds'};
 }
 
 /* ══════════ INTERFAZ ══════════ */
 let airMod='lookup', gasMod='lookup';
 let lastAir=null, lastGas=null;
+/* Δs: ecuación activa y modo de entrada P/V */
+let airDsEq='7.13', gasDsEq='7.13';
+let airPVMode='ratio', gasPVMode='ratio';
+
+function setAirDsEq(eq){ airDsEq=eq; renderAirInputs(); }
+function setGasDsEq(eq){ gasDsEq=eq; renderGasInputs(); }
+function setAirPVMode(m){ airPVMode=m; renderAirInputs(); }
+function setGasPVMode(m){ gasPVMode=m; renderGasInputs(); }
 
 function setUnits(sys){
   SYS=sys;
@@ -431,57 +471,137 @@ function field(label, id, ph, unit, val){
     <span class="input-unit">${unit||''}</span></div></div>`;
 }
 
+/* ── Campo de temperatura con entrada alternativa °C / °F ── */
+function tempField(label, id, phK){
+  const Tu   = uL('T');
+  const tOff = SYS==='SI' ? 273.15 : 459.67;
+  const altU = SYS==='SI' ? '°C' : '°F';
+  /* placeholder del campo alternativo: convierte el valor de ejemplo */
+  const phNum = parseFloat(phK); // phK puede ser "ej. 300" o "300"
+  const phAlt = isNaN(phNum) ? '' : `ej. ${Math.round(phNum - tOff)}`;
+  return `<div class="field-group"><div class="zone-label">${label}</div>
+    <div class="input-wrap">
+      <input type="number" id="${id}" placeholder="${phK||''}" step="any"
+             oninput="syncP2A('${id}',${tOff})">
+      <span class="input-unit">${Tu}</span>
+    </div>
+    <div class="alt-label" style="margin-top:5px">o en ${altU}</div>
+    <div class="input-wrap">
+      <input type="number" id="${id}-alt" placeholder="${phAlt}" step="any"
+             oninput="syncA2P('${id}-alt','${id}',${tOff})">
+      <span class="input-unit">${altU}</span>
+    </div>
+  </div>`;
+}
+/* K/°R → °C/°F */
+function syncP2A(primId, offset){
+  const v=parseFloat(document.getElementById(primId)?.value);
+  const alt=document.getElementById(primId+'-alt');
+  if(alt && !isNaN(v)) alt.value=(v-offset).toFixed(2);
+}
+/* °C/°F → K/°R */
+function syncA2P(altId, primId, offset){
+  const v=parseFloat(document.getElementById(altId)?.value);
+  const prim=document.getElementById(primId);
+  if(prim && !isNaN(v)) prim.value=(v+offset).toFixed(2);
+}
+
 /* ── Inputs AIRE ── */
 function renderAirInputs(){
-  const box=document.getElementById('air-inputs'); const Tu=uL('T');
+  const box=document.getElementById('air-inputs');
   if(airMod==='lookup'){
+    const curKey=document.getElementById('air-lk-key')?.value||'T';
+    const opt=(v,l)=>`<option value="${v}"${curKey===v?' selected':''}>${l}</option>`;
     box.innerHTML=`
       <div class="field-group"><div class="zone-label">Conocido</div>
         <select id="air-lk-key" onchange="renderAirInputs()">
-          <option value="T">Temperatura (T)</option>
-          <option value="h">Entalpía (h)</option>
-          <option value="u">Energía interna (u)</option>
-          <option value="s0">Función s°</option>
-        </select></div>` + airLookupValueField();
+          ${opt('T','Temperatura (T)')}
+          ${opt('h','Entalpía (h)')}
+          ${opt('u','Energía interna (u)')}
+          ${opt('s0','Función s°')}
+        </select></div>` + airLookupValueField(curKey);
   } else if(airMod==='isen'){
     box.innerHTML=
-      field('Temperatura inicial T₁','air-T1','ej. 300',Tu)+
+      tempField('Temperatura inicial T₁','air-T1','300')+
       `<div class="field-group"><div class="zone-label">Dato del proceso</div>
         <select id="air-rt"><option value="P">Relación de presiones P₂/P₁</option>
-        <option value="V">Relación de volúmenes V₂/V₁</option></select></div>`+
+        <option value="V">Relación de volúmenes V₂/V₁</option></select></div>
+      <hr class="sect-divider" style="margin:6px 0">`+
       field('Valor de la relación','air-ratio','ej. 8','—')+
       `<div class="formula">Isentrópico: p_r2/p_r1 = P₂/P₁ &nbsp;·&nbsp; v_r2/v_r1 = V₂/V₁</div>`;
   } else {
+    const Pu=SYS==='SI'?'bar':'atm', Vu=SYS==='SI'?'m³/kg':'ft³/lb';
+    const isPres=airDsEq==='tbl'||airDsEq==='7.13'||airDsEq==='7.17';
+    const EQL={'tbl':'s°(T), P','7.13':'cp var., P','7.12':'cv var., V','7.17':'cp cte., P','7.16':'cv cte., V'};
+    const EQF={'tbl':'Δs = s°(T₂)−s°(T₁) − R·ln(p₂/p₁)','7.13':'Δs = ∫cp(T)dT/T − R·ln(P₂/P₁)','7.12':'Δs = [s°(T₂)−s°(T₁)−R·ln(T₂/T₁)] + R·ln(V₂/V₁)','7.17':'Δs = cp·ln(T₂/T₁) − R·ln(P₂/P₁)','7.16':'Δs = cv·ln(T₂/T₁) + R·ln(V₂/V₁)'};
+    const rBtn=(eq)=>`<div class="radio-btn${airDsEq===eq?' active':''}" onclick="setAirDsEq('${eq}')" style="min-width:auto;flex:1;font-size:11px" title="${EQF[eq]}">${EQL[eq]}</div>`;
+    const mBtn=(m,lbl)=>`<div class="radio-btn${airPVMode===m?' active':''}" onclick="setAirPVMode('${m}')">${lbl}</div>`;
+    let pvHtml;
+    if(airPVMode==='ratio'){
+      pvHtml=field(isPres?'Relación P₂/P₁':'Relación V₂/V₁','air-pv-ratio',isPres?'ej. 5':'ej. 2','—');
+    } else {
+      pvHtml=isPres
+        ? field(`Presión P₁ (${Pu})`,'air-pv1','ej. 1',Pu)+field(`Presión P₂ (${Pu})`,'air-pv2','ej. 5',Pu)
+        : field(`Vol. específico V₁ (${Vu})`,'air-pv1','ej. 0.86',Vu)+field(`Vol. específico V₂ (${Vu})`,'air-pv2','ej. 1.72',Vu);
+    }
     box.innerHTML=
-      field('Temperatura T₁','air-T1','ej. 300',Tu)+
-      field('Presión P₁','air-P1','ej. 1','bar/atm')+
-      field('Temperatura T₂','air-T2','ej. 600',Tu)+
-      field('Presión P₂','air-P2','ej. 5','bar/atm')+
-      `<div class="formula">Δs = s°(T₂) − s°(T₁) − R·ln(P₂/P₁)</div>`;
+      `<div class="field-group"><div class="zone-label">Ecuación</div>
+        <div class="radio-group">${['tbl','7.13','7.12','7.17','7.16'].map(rBtn).join('')}</div>
+        <div class="formula" style="margin-top:6px">${EQF[airDsEq]}</div></div>`+
+      tempField('Temperatura T₁','air-T1','300')+
+      tempField('Temperatura T₂','air-T2','600')+
+      `<div class="field-group"><div class="zone-label">${isPres?'Presiones':'Volúmenes'}</div>
+        <div class="radio-group">${mBtn('ratio',isPres?'Relación P₂/P₁':'Relación V₂/V₁')}${mBtn('ind',isPres?'P₁ y P₂':'V₁ y V₂')}</div></div>`+
+      `<div style="margin-top:4px">${pvHtml}</div>`;
   }
 }
-function airLookupValueField(){
-  const key=document.getElementById('air-lk-key')?.value||'T';
-  const map={T:['Temperatura',uL('T'),'ej. 300'],h:['Entalpía',uL('h'),'ej. 400'],u:['Energía interna',uL('h'),'ej. 286'],s0:['Función s°',uL('s'),'ej. 1.99']};
+function airLookupValueField(key){
+  const map={
+    T: null,  // manejado por tempField
+    h: ['Entalpía',uL('h'),'ej. 400'],
+    u: ['Energía interna',uL('h'),'ej. 286'],
+    s0:['Función s°',uL('s'),'ej. 1.99']
+  };
+  if(key==='T') return tempField('Temperatura','air-val','300');
   const [lab,unit,ph]=map[key];
   return field(lab,'air-val',ph,unit);
 }
+
 /* ── Inputs OTROS GASES ── */
 function renderGasInputs(){
-  const box=document.getElementById('gas-inputs'); const Tu=uL('T');
+  const box=document.getElementById('gas-inputs');
   if(gasMod==='lookup'){
-    box.innerHTML=field('Temperatura T','gas-T','ej. 600',Tu)+
+    box.innerHTML=tempField('Temperatura T','gas-T','600')+
       `<div class="msg-info">Δh̄, Δū y Δs̄° se reportan respecto a T_ref = ${GAS_TREF} K. Rango válido: 300–1000 K.</div>`;
   } else if(gasMod==='isen'){
-    box.innerHTML=field('Temperatura inicial T₁','gas-T1','ej. 400',Tu)+
+    box.innerHTML=tempField('Temperatura inicial T₁','gas-T1','400')+
+      `<hr class="sect-divider" style="margin:6px 0">`+
       field('Relación de presiones P₂/P₁','gas-ratio','ej. 6','—')+
       `<div class="formula">Isentrópico: s̄°(T₂) − s̄°(T₁) = R̄·ln(P₂/P₁)</div>`;
   } else {
-    box.innerHTML=field('Temperatura T₁','gas-T1','ej. 400',Tu)+
-      field('Presión P₁','gas-P1','ej. 1','bar/atm')+
-      field('Temperatura T₂','gas-T2','ej. 800',Tu)+
-      field('Presión P₂','gas-P2','ej. 4','bar/atm')+
-      `<div class="formula">Δs̄ = s̄°(T₂) − s̄°(T₁) − R̄·ln(P₂/P₁)</div>`;
+    const Pu=SYS==='SI'?'bar':'atm', Vu=SYS==='SI'?'m³/kmol':'ft³/lbmol';
+    const isPres=gasDsEq==='tbl'||gasDsEq==='7.13'||gasDsEq==='7.17';
+    const EQL={'tbl':'s̄°(T), P','7.13':'c̄p var., P','7.12':'c̄v var., V','7.17':'c̄p cte., P','7.16':'c̄v cte., V'};
+    const EQF={'tbl':'Δs = s̄°(T₂)−s̄°(T₁) − R̄·ln(p₂/p₁)','7.13':'Δs̄ = ∫c̄p(T)dT/T − R̄·ln(P₂/P₁)','7.12':'Δs̄ = [s̄°(T₂)−s̄°(T₁)−R̄·ln(T₂/T₁)] + R̄·ln(V₂/V₁)','7.17':'Δs̄ = c̄p·ln(T₂/T₁) − R̄·ln(P₂/P₁)','7.16':'Δs̄ = c̄v·ln(T₂/T₁) + R̄·ln(V₂/V₁)'};
+    const rBtn=(eq)=>`<div class="radio-btn${gasDsEq===eq?' active':''}" onclick="setGasDsEq('${eq}')" style="min-width:auto;flex:1;font-size:11px" title="${EQF[eq]}">${EQL[eq]}</div>`;
+    const mBtn=(m,lbl)=>`<div class="radio-btn${gasPVMode===m?' active':''}" onclick="setGasPVMode('${m}')">${lbl}</div>`;
+    let pvHtml;
+    if(gasPVMode==='ratio'){
+      pvHtml=field(isPres?'Relación P₂/P₁':'Relación V₂/V₁','gas-pv-ratio',isPres?'ej. 4':'ej. 2','—');
+    } else {
+      pvHtml=isPres
+        ? field(`Presión P₁ (${Pu})`,'gas-pv1','ej. 1',Pu)+field(`Presión P₂ (${Pu})`,'gas-pv2','ej. 4',Pu)
+        : field(`Vol. molar V₁ (${Vu})`,'gas-pv1','ej. 8.5',Vu)+field(`Vol. molar V₂ (${Vu})`,'gas-pv2','ej. 17',Vu);
+    }
+    box.innerHTML=
+      `<div class="field-group"><div class="zone-label">Ecuación</div>
+        <div class="radio-group">${['tbl','7.13','7.12','7.17','7.16'].map(rBtn).join('')}</div>
+        <div class="formula" style="margin-top:6px">${EQF[gasDsEq]}</div></div>`+
+      tempField('Temperatura T₁','gas-T1','400')+
+      tempField('Temperatura T₂','gas-T2','800')+
+      `<div class="field-group"><div class="zone-label">${isPres?'Presiones':'Volúmenes'}</div>
+        <div class="radio-group">${mBtn('ratio',isPres?'Relación P₂/P₁':'Relación V₂/V₁')}${mBtn('ind',isPres?'P₁ y P₂':'V₁ y V₂')}</div></div>`+
+      `<div style="margin-top:4px">${pvHtml}</div>`;
   }
 }
 
@@ -505,10 +625,20 @@ function calcAir(){
     if(isNaN(T1)||isNaN(ratio)){ alert('Ingrese T₁ y la relación'); return; }
     res=airIsentropic(iT(T1), document.getElementById('air-rt').value, ratio);
   } else {
-    const T1=parseFloat(document.getElementById('air-T1').value), P1=parseFloat(document.getElementById('air-P1').value);
-    const T2=parseFloat(document.getElementById('air-T2').value), P2=parseFloat(document.getElementById('air-P2').value);
-    if([T1,P1,T2,P2].some(isNaN)){ alert('Ingrese T₁, P₁, T₂, P₂'); return; }
-    res=airDeltaS(iT(T1),P1,iT(T2),P2);  // presiones sólo como relación → unidades libres
+    const T1=parseFloat(document.getElementById('air-T1').value);
+    const T2=parseFloat(document.getElementById('air-T2').value);
+    if(isNaN(T1)||isNaN(T2)){ alert('Ingrese T₁ y T₂'); return; }
+    let ratio;
+    if(airPVMode==='ratio'){
+      ratio=parseFloat(document.getElementById('air-pv-ratio').value);
+      if(isNaN(ratio)||ratio<=0){ alert('Ingrese una relación positiva'); return; }
+    } else {
+      const a=parseFloat(document.getElementById('air-pv1').value);
+      const b=parseFloat(document.getElementById('air-pv2').value);
+      if(isNaN(a)||isNaN(b)||a<=0){ alert('Ingrese P₁ (o V₁) y P₂ (o V₂) válidos'); return; }
+      ratio=b/a;
+    }
+    res=airDeltaS(airDsEq, iT(T1), iT(T2), ratio);
   }
   lastAir=res; renderAir(res);
 }
@@ -532,7 +662,7 @@ function renderAir(res){
     badge('air-badge','r-super','Proceso isentrópico');
     const rlab=res.ratioType==='P'?`P₂/P₁ = ${res.ratioVal}`:`V₂/V₁ = ${res.ratioVal}`;
     out.innerHTML=head('Proceso isentrópico (s = cte)',sys)+
-      `<div class="msg-info">Dato: ${rlab}. Estado 2 obtenido por las funciones relativas de la Tabla A-22.</div>`+
+      `<div class="msg-info">Dato: ${rlab}. Estado 2 obtenido por las funciones relativas.</div>`+
       twoStateTable([
         ['Temperatura',dT(res.s1.T),dT(res.s2.T),uL('T'),2],
         ['Entalpía · h',dE(res.s1.h),dE(res.s2.h),uL('h'),2],
@@ -543,16 +673,25 @@ function renderAir(res){
       derived([['Δh = h₂ − h₁',dE(res.s2.h-res.s1.h),uL('h'),2],['Δu = u₂ − u₁',dE(res.s2.u-res.s1.u),uL('h'),2]]);
   } else if(res.region==='air_ds'){
     badge('air-badge','r-comp','Cambio de entropía');
-    out.innerHTML=head('Cambio de entropía',sys)+
+    const isPres=res.eq==='7.13'||res.eq==='7.17';
+    const ratioLbl=isPres?`P₂/P₁ = ${res.ratio.toFixed(4)}`:`V₂/V₁ = ${res.ratio.toFixed(4)}`;
+    const Tmid=((res.T1+res.T2)/2).toFixed(0);
+    const cRows=(res.eq==='7.16'||res.eq==='7.17')?[
+      [`cp (T_med = ${Tmid} K)`,dS(res.cp_m),uL('s'),4],
+      [`cv = cp − R`,dS(res.cv_m),uL('s'),4]
+    ]:[];
+    out.innerHTML=head('Cambio de entropía · Aire',sys)+
+      `<div class="msg-info">Ecuación ${res.eq} · ${ratioLbl}</div>`+
+      `<div class="formula" style="margin-bottom:12px">${res.eqFormula}</div>`+
       twoStateTable([
         ['Temperatura',dT(res.s1.T),dT(res.s2.T),uL('T'),2],
         ['s°(T)',dS(res.s1.s0),dS(res.s2.s0),uL('s'),5],
         ['Entalpía · h',dE(res.s1.h),dE(res.s2.h),uL('h'),2],
         ['Energía interna · u',dE(res.s1.u),dE(res.s2.u),uL('h'),2]
       ])+
-      `<div class="msg-info">Relación de presiones usada: P₂/P₁ = ${(res.P2/res.P1).toFixed(4)}</div>`+
       derived([
-        ['Δs = s°(T₂)−s°(T₁) − R·ln(P₂/P₁)',dS(res.ds),uL('s'),5],
+        ...cRows,
+        [`Δs (Ec. ${res.eq})`,dS(res.ds),uL('s'),5],
         ['Δh = h₂ − h₁',dE(res.dh),uL('h'),2],
         ['Δu = u₂ − u₁',dE(res.du),uL('h'),2]
       ]);
@@ -572,10 +711,20 @@ function calcGas(){
     if(isNaN(T1)||isNaN(r)){ alert('Ingrese T₁ y P₂/P₁'); return; }
     res=gasIsentropic(gk, iT(T1), r);
   } else {
-    const T1=parseFloat(document.getElementById('gas-T1').value), P1=parseFloat(document.getElementById('gas-P1').value);
-    const T2=parseFloat(document.getElementById('gas-T2').value), P2=parseFloat(document.getElementById('gas-P2').value);
-    if([T1,P1,T2,P2].some(isNaN)){ alert('Ingrese T₁, P₁, T₂, P₂'); return; }
-    res=gasDeltaS(gk, iT(T1),P1,iT(T2),P2);
+    const T1=parseFloat(document.getElementById('gas-T1').value);
+    const T2=parseFloat(document.getElementById('gas-T2').value);
+    if(isNaN(T1)||isNaN(T2)){ alert('Ingrese T₁ y T₂'); return; }
+    let ratio;
+    if(gasPVMode==='ratio'){
+      ratio=parseFloat(document.getElementById('gas-pv-ratio').value);
+      if(isNaN(ratio)||ratio<=0){ alert('Ingrese una relación positiva'); return; }
+    } else {
+      const a=parseFloat(document.getElementById('gas-pv1').value);
+      const b=parseFloat(document.getElementById('gas-pv2').value);
+      if(isNaN(a)||isNaN(b)||a<=0){ alert('Ingrese P₁ (o V₁) y P₂ (o V₂) válidos'); return; }
+      ratio=b/a;
+    }
+    res=gasDeltaS(gk, gasDsEq, iT(T1), iT(T2), ratio);
   }
   lastGas=res; renderGas(res);
 }
@@ -613,11 +762,20 @@ function renderGas(res){
       ]);
   } else {
     badge('gas-badge','r-comp','Cambio de entropía');
+    const isPres=res.eq==='7.13'||res.eq==='7.17';
+    const ratioLbl=isPres?`P₂/P₁ = ${res.ratio.toFixed(4)}`:`V₂/V₁ = ${res.ratio.toFixed(4)}`;
+    const Tmid=((res.T1+res.T2)/2).toFixed(0);
+    const cRows=(res.eq==='7.16'||res.eq==='7.17')?[
+      [`c̄p (T_med = ${Tmid} K)`,dS(res.cp_m),uL('cp'),4],
+      [`c̄v = c̄p − R̄`,dS(res.cv_m),uL('cp'),4]
+    ]:[];
     out.innerHTML=head(`Cambio de entropía · ${res.G.name}`,sys)+
-      `<div class="msg-info">Masa molar M = ${Mdisp}. Relación P₂/P₁ = ${(res.P2/res.P1).toFixed(4)}.</div>`+
+      `<div class="msg-info">M = ${Mdisp} · Ecuación ${res.eq} · ${ratioLbl}</div>`+
+      `<div class="formula" style="margin-bottom:12px">${res.eqFormula}</div>`+
       derived([
-        ['Δs̄° = s̄°(T₂) − s̄°(T₁)',dS(res.ds0),uL('sbar'),4],
-        ['Δs̄ = Δs̄° − R̄·ln(P₂/P₁)',dS(res.ds),uL('sbar'),4],
+        [`Δs̄° = s̄°(T₂)−s̄°(T₁)`,dS(res.ds0),uL('sbar'),4],
+        ...cRows,
+        [`Δs̄ (Ec. ${res.eq})`,dS(res.ds),uL('sbar'),4],
         ['Δh̄ = h̄₂ − h̄₁',dE(res.dh),uL('hbar'),1],
         ['Δū = ū₂ − ū₁',dE(res.du),uL('hbar'),1]
       ]);
