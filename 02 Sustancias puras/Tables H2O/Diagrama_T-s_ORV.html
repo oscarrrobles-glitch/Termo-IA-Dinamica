@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Tabla A · Diagrama T–s · Agua</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.27.0/plotly.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f5f7fa;--surface:#fff;--border:#dde3ec;--text:#1a2233;--muted:#5c6b84;
+  --accent:#1976d2;--dome:#7b1fa2;--critical:#f57c00;
+  --hdr:linear-gradient(90deg,#1565c0 0%,#1976d2 60%,#1e88e5 100%)}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 0 40px}
+.topbar{width:100%;background:var(--hdr);display:flex;align-items:center;
+  justify-content:space-between;gap:14px;padding:0 28px;height:66px;
+  box-shadow:0 2px 8px rgba(21,101,192,.18);margin-bottom:24px;flex-shrink:0;
+  position:relative;overflow:hidden}
+.topbar::before{content:'';position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(ellipse 280px 100px at 50% 140%,rgba(255,179,0,.22),transparent 70%);
+  opacity:.9;z-index:0}
+.topbar-brand{display:flex;align-items:center;gap:10px;
+  font-family:'IBM Plex Sans',sans-serif;font-weight:700;
+  font-size:1.45rem;letter-spacing:-.01em;color:#fff;line-height:1;
+  position:relative;z-index:2;text-shadow:0 1px 2px rgba(0,0,0,.20);flex-shrink:0}
+.topbar-brand .t-name{display:flex;align-items:baseline;gap:3px}
+.topbar-logo{width:38px;height:38px;flex-shrink:0;
+  filter:drop-shadow(0 1px 3px rgba(0,0,0,.22))
+         drop-shadow(0 0 6px rgba(255,179,0,.28))}
+.topbar-logo .ring{transform-origin:center;
+  animation:brand-rot 18s linear infinite}
+.topbar-logo .spark{transform-origin:center;
+  animation:brand-pulse 2.4s ease-in-out infinite}
+.topbar-brand .t-sep{color:rgba(255,224,178,.85);font-weight:400;padding:0 2px}
+.topbar-brand .t-ia{background:linear-gradient(90deg,#1565c0 0%,#1976d2 60%,#1e88e5 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  font-weight:900;letter-spacing:.01em;
+  filter:drop-shadow(0 0 6px rgba(255,152,0,.35))}
+.topbar-center{position:absolute;left:50%;top:50%;
+  transform:translate(-50%,-50%);display:flex;align-items:center;gap:12px;z-index:1}
+.topbar-icon{width:46px;height:46px;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.12);border-radius:10px;
+  box-shadow:inset 0 0 0 1px rgba(255,236,179,.30),
+             0 0 14px rgba(255,152,0,.30),
+             0 1px 3px rgba(0,0,0,.15)}
+.topbar-icon svg{width:28px;height:40px;display:block;overflow:visible}
+.th-glow{transform-origin:16px 46px;animation:th-pulse 2.2s ease-in-out infinite}
+.th-bulb{transform-origin:16px 46px;animation:th-bulb 2.2s ease-in-out infinite}
+.th-col{transform-origin:16px 51px;animation:th-rise 3.8s ease-in-out infinite}
+@keyframes th-pulse{0%,100%{opacity:.55;transform:scale(.80)}
+  50%{opacity:1;transform:scale(1.20)}}
+@keyframes th-bulb{0%,100%{filter:brightness(1) saturate(1)}
+  50%{filter:brightness(1.18) saturate(1.25)}}
+@keyframes th-rise{0%,100%{transform:scaleY(.94)}
+  50%{transform:scaleY(1.03)}}
+.topbar-text h1{font-size:1rem;font-weight:700;color:#fff;letter-spacing:.04em;
+  text-transform:uppercase;line-height:1.1}
+.topbar-text h1 .lc{text-transform:lowercase;font-weight:800;letter-spacing:.01em}
+.topbar-text p{font-size:0.75rem;color:rgba(255,255,255,.78);font-weight:300;margin-top:1px}
+.topbar-spacer{visibility:hidden;pointer-events:none}
+.main-wrapper{width:100%;max-width:1560px;padding:0 20px 0 270px;display:flex;flex-direction:column;gap:0;position:relative}
+.subtitle-bar{display:flex;align-items:center;gap:10px;padding:10px 18px;background:#fff;
+  border:1px solid var(--border);border-radius:8px 8px 0 0;border-bottom:none}
+.subtitle-bar .ci{font-size:1rem;color:var(--accent)}
+.subtitle-bar .ct{font-size:.95rem;font-weight:600;color:var(--text)}
+.unit-toggle{margin-left:auto;display:flex;border:1.5px solid var(--accent);border-radius:6px;overflow:hidden}
+.unit-btn{padding:4px 14px;font-size:.78rem;font-weight:600;background:#fff;color:var(--accent);
+  border:none;cursor:pointer;transition:background .18s,color .18s;letter-spacing:.04em}
+.unit-btn:first-child{border-right:1.5px solid var(--accent)}
+.unit-btn.active{background:var(--accent);color:#fff}
+.unit-btn:not(.active):hover{background:#e3edf9}
+#chart{width:100%;height:630px;background:#fff;border:1px solid var(--border);
+  border-radius:0 0 8px 8px;overflow:visible;box-shadow:0 2px 12px rgba(25,118,210,.07)}
+.ax-drag-handle{position:absolute;width:26px;height:26px;background:rgba(255,255,255,0.95);
+  border-radius:5px;display:flex;align-items:center;justify-content:center;
+  z-index:25;user-select:none;font-size:14px;font-weight:700;
+  box-shadow:0 2px 6px rgba(0,0,0,0.20);transition:background 0.15s,transform 0.12s;
+  pointer-events:all}
+.ax-drag-handle.round{border-radius:50%}
+.ax-drag-handle:hover{transform:scale(1.18)}
+.sidebar{position:absolute;top:52px;left:230px;height:72vh;z-index:100}
+.sidebar-tab{position:absolute;left:0;top:50%;z-index:5;writing-mode:vertical-rl;text-orientation:mixed;transform:translateY(-50%) rotate(180deg);
+  background:var(--accent);color:#fff;font-size:0.75rem;font-weight:600;letter-spacing:.07em;
+  text-transform:uppercase;padding:14px 8px;border-radius:0 6px 6px 0;cursor:pointer;
+  user-select:none;white-space:nowrap;transition:background .2s;display:flex;align-items:center;
+  gap:6px;box-shadow:2px 0 8px rgba(25,118,210,.15)}
+.sidebar-tab:hover{background:#1565c0}
+.sidebar-tab .arrow{display:inline-block;font-size:0.75rem;transition:transform .35s;writing-mode:horizontal-tb}
+.sidebar.open .sidebar-tab .arrow{transform:rotate(180deg)}
+.sidebar-panel{position:absolute;top:0;left:-204px;width:238px;max-height:72vh;overflow-y:auto;opacity:0;visibility:hidden;transition:opacity .3s ease,visibility .3s ease;background:#fff;
+  border:1px solid var(--border);border-radius:10px;
+  box-shadow:0 6px 20px rgba(25,118,210,.14)}
+.sidebar.open .sidebar-panel{opacity:1;visibility:visible}
+.spi{width:238px;padding:18px 16px;display:flex;flex-direction:column;gap:10px}
+.sb-sub{font-size:0.75rem;font-weight:700;color:var(--dome);letter-spacing:.07em;text-transform:uppercase;
+  border-bottom:1px solid var(--border);padding-bottom:5px;margin-top:2px;
+  display:flex;align-items:center;justify-content:space-between;gap:6px}
+.info-btn{display:inline-flex;align-items:center;justify-content:center;
+  width:15px;height:15px;border-radius:50%;border:1px solid var(--accent);
+  background:#fff;color:var(--accent);font-family:Georgia,serif;
+  font-size:0.75rem;font-weight:700;font-style:italic;line-height:1;
+  cursor:pointer;transition:background .15s,color .15s;user-select:none;
+  text-transform:none;letter-spacing:0}
+.info-btn:hover{background:var(--accent);color:#fff}
+.info-btn.active{background:var(--accent);color:#fff}
+.info-box{font-size:0.75rem;color:#5c6b84;line-height:1.35;
+  background:#f5f8fd;border:1px solid #d9e5f5;border-radius:5px;
+  padding:7px 9px;margin-bottom:4px;display:none}
+.info-box.open{display:block}
+.fc-mode{display:flex;gap:4px;margin:4px 0}
+.fc-mode-btn{flex:1;padding:5px 4px;font-size:0.75rem;font-weight:600;
+  color:#bf360c;background:#fff3e0;border:1px solid #ffb74d;
+  border-radius:5px;cursor:pointer;transition:all .15s;text-align:center}
+.fc-mode-btn.active{background:#e65100;color:#fff;border-color:#e65100}
+.fc-mode-btn:hover:not(.active){background:#ffe0b2}
+.brand{display:flex;align-items:center;gap:10px;
+  padding:12px 10px 14px;margin:-8px -4px 6px;
+  background:linear-gradient(135deg,#f5f8fd 0%,#fff4ee 100%);
+  border:1px solid #e3edf9;border-radius:8px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.9),
+             0 1px 3px rgba(25,118,210,.08)}
+.brand-logo{width:42px;height:42px;flex-shrink:0;
+  filter:drop-shadow(0 1px 2px rgba(25,118,210,.25))}
+.brand-logo .ring{transform-origin:center;
+  animation:brand-rot 18s linear infinite}
+.brand-logo .spark{transform-origin:center;
+  animation:brand-pulse 2.4s ease-in-out infinite}
+@keyframes brand-rot{to{transform:rotate(360deg)}}
+@keyframes brand-pulse{0%,100%{opacity:.55;transform:scale(.9)}
+  50%{opacity:1;transform:scale(1.08)}}
+.brand-text{display:flex;flex-direction:column;line-height:1.02;
+  font-family:'IBM Plex Sans',sans-serif}
+.brand-top{font-size:.92rem;font-weight:700;letter-spacing:-.01em;
+  color:#0d47a1;display:flex;align-items:baseline;gap:3px}
+.brand-top .sep{color:#b39ddb;font-weight:400;padding:0 1px}
+.brand-top .ia{background:linear-gradient(135deg,#1976d2 0%,#7b1fa2 60%,#e65100 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  font-weight:800;letter-spacing:.01em}
+.brand-bot{font-size:0.75rem;font-weight:500;color:#4a148c;
+  letter-spacing:.02em;font-style:italic;margin-top:1px}
+.brand-tag{font-size:0.75rem;font-weight:600;color:#5c6b84;
+  letter-spacing:.12em;text-transform:uppercase;margin-top:3px}
+.rtog{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;
+  background:#f5f8fd;border:1px solid #d9e5f5;border-radius:6px;cursor:pointer;transition:background .15s;user-select:none}
+.rtog:hover{background:#e8f0fc}
+.rtog .rl{font-size:.78rem;color:var(--text);display:flex;align-items:center;gap:7px}
+.rtog .rd{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.sw{width:32px;height:17px;background:#c8d6e8;border-radius:999px;position:relative;transition:background .2s;flex-shrink:0}
+.sw::after{content:'';position:absolute;top:2px;left:2px;width:13px;height:13px;border-radius:50%;background:#8fa8c8;transition:transform .2s,background .2s}
+.rtog.active .sw{background:rgba(25,118,210,.25);border:1px solid var(--accent)}
+.rtog.active .sw::after{transform:translateX(15px);background:var(--accent)}
+.ctrl{display:flex;gap:6px;align-items:center}
+.sel{flex:1;font-size:0.75rem;color:var(--text);background:#f5f8fd;border:1px solid #d9e5f5;
+  border-radius:5px;padding:5px 6px;cursor:pointer;outline:none}
+.sel:focus{border-color:var(--accent)}
+.addbtn{flex-shrink:0;background:var(--accent);color:#fff;border:none;border-radius:5px;
+  padding:5px 10px;font-size:0.75rem;font-weight:600;cursor:pointer;transition:background .18s;white-space:nowrap}
+.addbtn:hover{background:#1565c0}
+.sg{display:flex;flex-direction:column;gap:5px}
+.sr{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:#f5f8fd;border:1px solid #d9e5f5;border-radius:6px}
+.sl{font-size:0.75rem;color:var(--text);cursor:pointer;user-select:none}
+.ss{position:relative;display:inline-block;width:34px;height:18px;flex-shrink:0}
+.ss input{opacity:0;width:0;height:0}
+.ss-knob{position:absolute;inset:0;background:#c8d6e8;border-radius:999px;cursor:pointer;transition:background .2s}
+.ss-knob::before{content:'';position:absolute;width:13px;height:13px;left:2px;top:2.5px;background:#8fa8c8;border-radius:50%;transition:transform .2s,background .2s}
+.ss input:checked+.ss-knob{background:rgba(25,118,210,.28);border:1px solid var(--accent)}
+.ss input:checked+.ss-knob::before{transform:translateX(16px);background:var(--accent)}
+.ic{background:#f5f8fd;border:1px solid #d9e5f5;border-radius:6px;padding:10px 12px}
+.ic .lb{font-size:0.75rem;font-family:'IBM Plex Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.ic .vl{font-size:.88rem;font-weight:600;color:var(--text)}
+#chart .xtick text, #chart .ytick text, #chart .y2tick text{font-weight:600 !important}
+#chart .xtitle, #chart .ytitle, #chart .y2title{font-weight:700 !important}
+#chart .scatterlayer .textpoint text, #chart g.scatter text{font-weight:700 !important;
+  paint-order:stroke fill;stroke:#fff;stroke-width:2.5px;stroke-linejoin:round}
+@media print{
+  .sidebar,.topbar-brand,.topbar-spacer,.dl-btn{display:none!important}
+  .main-wrapper{padding:0!important;max-width:100%!important}
+  #chart{border:none!important;box-shadow:none!important;height:90vh!important}
+  .subtitle-bar{border-radius:0!important;border-bottom:1px solid var(--border)!important}
+}
+.spi::-webkit-scrollbar{width:5px}
+.spi::-webkit-scrollbar-track{background:#f1f3f7;border-radius:4px}
+.spi::-webkit-scrollbar-thumb{background:#b0c4de;border-radius:4px}
+.spi::-webkit-scrollbar-thumb:hover{background:#7b97bb}
+.reset-btn{width:100%;margin-top:10px;padding:7px 10px;font-size:0.75rem;font-weight:700;
+  color:#fff;background:linear-gradient(90deg,#c62828,#e53935);border:none;border-radius:6px;
+  cursor:pointer;transition:background .18s,transform .12s;letter-spacing:.04em;
+  box-shadow:0 2px 6px rgba(229,57,53,.22)}
+.reset-btn:hover{background:linear-gradient(90deg,#b71c1c,#c62828);transform:translateY(-1px)}
+.reset-btn:active{transform:translateY(0)}
+.dl-btn{padding:4px 12px;font-size:.77rem;font-weight:700;color:var(--accent);
+  background:#fff;border:1.5px solid var(--accent);border-radius:6px;
+  cursor:pointer;transition:background .18s,color .18s;letter-spacing:.04em;margin-left:8px;
+  box-shadow:0 1px 4px rgba(25,118,210,.12)}
+.dl-btn:hover{background:var(--accent);color:#fff}
+:where(a,button,select,input,textarea,canvas,summary,[tabindex]):focus-visible{outline:3px solid var(--accent,#1976d2);outline-offset:2px;border-radius:6px}
+.sr-only{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <span class="topbar-brand" aria-label="TermoIA Dinámica" style="display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:1.05rem;letter-spacing:.3px;color:#fff;flex-shrink:0"><span style="display:flex;align-items:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7dd8f8" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 17 8 11 13 14 20 6"/><polyline points="17 6 20 6 20 9"/></svg></span>Termo<span style="color:#f97316"> · IA · </span>Dinámica<span style="background:rgba(255,255,255,.18);border-radius:8px;padding:4px 6px;display:flex;align-items:center"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg></span></span>
+  <div class="topbar-center">
+    <div class="topbar-icon" aria-hidden="true">
+      <svg viewBox="0 0 32 56" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="th-merc" x1="0" y1="1" x2="0" y2="0">
+            <stop offset="0%"   stop-color="#1565c0"/>
+            <stop offset="25%"  stop-color="#ef5350"/>
+            <stop offset="60%"  stop-color="#ff9800"/>
+            <stop offset="85%"  stop-color="#ffeb3b"/>
+            <stop offset="100%" stop-color="#fffde7"/>
+          </linearGradient>
+          <radialGradient id="th-bulb" cx=".5" cy=".55" r=".55">
+            <stop offset="0%"   stop-color="#fff59d"/>
+            <stop offset="45%"  stop-color="#ff9800"/>
+            <stop offset="100%" stop-color="#bf360c"/>
+          </radialGradient>
+          <radialGradient id="th-glow" cx=".5" cy=".5" r=".5">
+            <stop offset="0%"   stop-color="#ffeb3b" stop-opacity=".85"/>
+            <stop offset="55%"  stop-color="#ff7043" stop-opacity=".35"/>
+            <stop offset="100%" stop-color="#e65100" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <circle class="th-glow" cx="16" cy="46" r="12" fill="url(#th-glow)"/>
+        <path d="M12 6 Q12 2.5 16 2.5 Q20 2.5 20 6 L20 36 Q23.5 38.5 23.5 43.5 Q23.5 52.5 16 52.5 Q8.5 52.5 8.5 43.5 Q8.5 38.5 12 36 Z"
+              fill="rgba(255,255,255,.16)" stroke="#e3f2fd" stroke-width="1.4"
+              stroke-linejoin="round"/>
+        <g class="th-col">
+          <path d="M14.2 7.5 L17.8 7.5 L17.8 38 Q20 39.8 20 42.5 Q20 46.5 16 46.5 Q12 46.5 12 42.5 Q12 39.8 14.2 38 Z"
+                fill="url(#th-merc)"/>
+        </g>
+        <circle class="th-bulb" cx="16" cy="46" r="5.2" fill="url(#th-bulb)"
+                stroke="#ffecb3" stroke-width=".6" opacity=".96"/>
+        <g stroke="#fff3e0" stroke-width=".85" stroke-linecap="round" opacity=".80">
+          <line x1="20.5" y1="12" x2="23.5" y2="12"/>
+          <line x1="20.5" y1="18" x2="22.3" y2="18"/>
+          <line x1="20.5" y1="24" x2="23.5" y2="24"/>
+          <line x1="20.5" y1="30" x2="22.3" y2="30"/>
+        </g>
+        <path d="M13.2 10 L13.2 34" stroke="#ffffff" stroke-width=".9"
+              stroke-linecap="round" opacity=".45"/>
+      </svg>
+    </div>
+    <div class="topbar-text">
+      <h1>Tabla A &nbsp;·&nbsp; Diagrama T – <span class="lc">s</span></h1>
+      <p>Agua Saturada y Vapor Sobrecalentado</p>
+    </div>
+  </div>
+  <div class="topbar-spacer topbar-brand" aria-hidden="true" style="visibility:hidden;display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:1.05rem;letter-spacing:.3px"></div>
+</div>
+<div class="main-wrapper">
+<div class="subtitle-bar">
+  <span class="ci">📈</span>
+  <span class="ct">Diagrama Temperatura – Entropía Específica</span>
+  <div class="unit-toggle">
+    <button id="btn-si" class="unit-btn active" onclick="setUnits('SI')">SI</button>
+    <button id="btn-ing" class="unit-btn" onclick="setUnits('ING')">Inglés</button>
+  </div>
+  <button class="dl-btn" onclick="downloadChart()" title="Descargar imagen PNG (3×, alta resolución)">⬇ PNG</button>
+</div>
+<div id="chart"></div>
+<div class="sidebar" id="sidebar">
+  <div class="sidebar-panel"><div class="spi">
+    <div class="brand" role="banner" aria-label="TermoIA Dinámica" style="display:inline-flex;align-items:center;gap:8px;font-weight:700;font-size:1.05rem;letter-spacing:.3px"><span style="display:flex;align-items:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7dd8f8" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 17 8 11 13 14 20 6"/><polyline points="17 6 20 6 20 9"/></svg></span>Termo<span style="color:#f97316"> · IA · </span>Dinámica<span style="background:rgba(255,255,255,.18);border-radius:8px;padding:4px 6px;display:flex;align-items:center"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/><line x1="12" y1="9" x2="12" y2="13"/></svg></span></div>
+      <div class="sr"><label class="sl" id="lbl-low">Bajas P</label>
+        <label class="ss"><input type="checkbox" id="sh-low" onchange="toggleGrp('low')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-mid">Medias P</label>
+        <label class="ss"><input type="checkbox" id="sh-mid" onchange="toggleGrp('mid')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-high">Altas P</label>
+        <label class="ss"><input type="checkbox" id="sh-high" onchange="toggleGrp('high')"><span class="ss-knob"></span></label></div>
+      <div class="sr"><label class="sl" id="lbl-vhigh">Muy altas P</label>
+        <label class="ss"><input type="checkbox" id="sh-vhigh" onchange="toggleGrp('vhigh')"><span class="ss-knob"></span></label></div>
+    </div>
+    <div class="ctrl" style="margin-top:4px">
+      <select id="sel-single" class="sel"></select>
+      <button class="addbtn" onclick="addSingle()">+ Ver</button>
+      <button class="addbtn" onclick="clearSingles()" style="background:#e53935">Limpiar todo</button>
+    </div>
+    <div id="list-single"></div>
+
+    <div class="sb-sub" style="margin-top:6px">
+      <span>Isobara de P</span>
+      <span class="info-btn" id="info-custom-btn" onclick="toggleInfo('custom')" title="Ayuda">i</span>
+    </div>
+    <div class="info-box" id="info-custom">
+      Ingresa cualquier valor de presión. Si coincide con la tabla se traza directamente; de lo contrario se interpola logarítmicamente en P entre isobaras tabulares cercanas (línea discontinua).
+    </div>
+    <div class="ctrl">
+      <input type="number" id="inp-custom" class="sel" style="flex:1" placeholder="Valor P" step="any" min="0">
+      <span id="unit-custom" style="font-size:0.75rem;color:#5c6b84;min-width:30px">bar</span>
+    </div>
+    <div id="msg-custom" style="font-size:0.75rem;color:#e53935;min-height:.9rem;line-height:1.2"></div>
+    <div class="ctrl" style="margin-top:2px">
+      <button class="addbtn" onclick="addCustom()" style="flex:1">+ Ver</button>
+      <button class="addbtn" onclick="clearCustoms()" style="background:#e53935;flex:1">Limpiar todo</button>
+    </div>
+    <div id="list-custom"></div>
+
+    <div class="sb-sub">Cursor</div>
+    <div class="rtog" id="tog-fc" onclick="toggleFC()">
+      <div class="rl"><div class="rd" style="background:#e65100"></div>Libre</div>
+      <div class="sw"></div>
+    </div>
+    <div id="fc-panel" style="display:none;flex-direction:column;gap:6px">
+      <div class="ic"><div class="lb">Temperatura T</div><div class="vl" id="fr-T" style="color:#e65100">— °C</div></div>
+      <div class="ic"><div class="lb">Entropía s</div><div class="vl" id="fr-s" style="color:#e65100">— kJ/(kg·K)</div></div>
+      <div class="ic" style="background:#fff3e0;border-color:#ffb74d">
+        <div class="lb" style="color:#bf360c;display:flex;align-items:center;justify-content:space-between;gap:6px">
+          <span id="fc-mode-lb">Trayectoria</span>
+          <span class="info-btn" id="info-fc-btn" onclick="toggleInfo('fc')" title="Ayuda"
+                style="border-color:#e65100;color:#e65100">i</span>
+        </div>
+        <div class="info-box" id="info-fc" style="background:#fff8f0;border-color:#ffcc80;color:#6b5a4a">
+          Clic en el plano para marcar un punto. En modo <b>Trayectoria</b> cada segmento se une al siguiente con una flecha; en modo <b>Puntos</b> los marcadores son independientes.
+        </div>
+        <div class="fc-mode">
+          <div class="fc-mode-btn active" id="fcm-path" onclick="setFCMode('path')">Trayectoria</div>
+          <div class="fc-mode-btn" id="fcm-points" onclick="setFCMode('points')">Puntos</div>
+        </div>
+        <div class="vl" id="fr-nmk" style="color:#bf360c;font-size:.82rem">0 puntos</div>
+        <div id="fr-mlist" style="display:flex;flex-direction:column;gap:4px;margin-top:6px;max-height:220px;overflow-y:auto"></div>
+        <div style="display:flex;gap:6px;margin-top:6px">
+          <button class="addbtn" onclick="undoFCMark()" style="background:#fb8c00;flex:1">Deshacer</button>
+          <button class="addbtn" onclick="clearFCMarks()" style="background:#e53935;flex:1">Limpiar</button>
+        </div>
+      </div>
+    </div>
+  
+    <button class="reset-btn" onclick="resetAll()">↺ Reiniciar todo</button>
+  </div></div>
+  <div class="sidebar-tab" onclick="toggleSidebar()"><span class="arrow">&#9660;</span>Visualizar</div>
+</div>
+</div>
+<script src="diagrama-script.js"></script>
+</body>
+</html>
